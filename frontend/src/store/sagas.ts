@@ -4,7 +4,7 @@ import { ErrorCodes } from '../error';
 import { firebaseAuth } from '../firebase';
 import router from '../router';
 import {
-  actionTypes, FailureAppAction, FailureAppActionTypes,
+  actionTypes, AppAction, FailureAppAction, FailureAppActionTypes,
 } from './actions';
 
 function* errorHandler(
@@ -39,20 +39,19 @@ function* errorHandler(
   }
 }
 
-function* getAllBisFunctions() {
+function* plan() {
   try {
     const response: {
       data: any
     } = yield call(() => {
-      return axios.get('http://localhost:8000/api/bis-function/');
+      return axios.get('http://localhost:8000/api/fin-planning/plan');
     });
 
-    router.navigate(`/home`);
-
-    yield put({
-      type: 'GET_MYSELF_SUCCESS',
+    yield put<AppAction>({
+      type: 'PLAN_SUCCESS',
       payload: {
-        myself: response.data,
+        bisFunctions: response.data.bisFunctions,
+        bisMetrics: response.data.bisMetrics,
       },
     });
   } catch (error) {
@@ -87,5 +86,5 @@ function* getMyself() {
 
 export const rootSaga = function* rootSaga() {
   yield takeLatest(actionTypes.GET_MYSELF, getMyself);
-  yield takeLatest(actionTypes.GET_ALL_BIS_FUNCTIONS, getAllBisFunctions);
+  yield takeLatest(actionTypes.PLAN, plan);
 };

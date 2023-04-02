@@ -1,31 +1,14 @@
 import React, { FC, useEffect } from 'react';
-import { Route } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
 
-import { NavigationTabOption } from '../../store/types';
-import { AppState } from '../../store/reducer';
-import { AppAction } from '../../store/actions';
-import Page from '../../components/Page/Page';
+import BisFunction from '../../components/BisFunction/BisFunction';
+import { BisFunctionDto } from '../../store/bis-function.types';
 
 type Props = {
-  dictionary: any;
+  bisFunctions: BisFunctionDto[]
 }
 
-const BisFunction: FC<Props> = () => {
-  const dispatch = useDispatch();
-  const { success } = useSelector((state: AppState) => state.actions.getMyself);
-
-  useEffect(() => {
-    dispatch<AppAction>({ type: 'GET_MYSELF' });
-  }, [dispatch]);
-
-  return (
-    <Page>
-      <div>
-        <h1>Home</h1>
-      </div>
-    </Page>
-  );
+const BisFunctionsContainer: FC<Props> = ({bisFunctions}) => {
+  return <>{bisFunctions.map(bisFunction => <BisFunction bisFunction={bisFunction}/>)}</>;
 };
 
-export default BisFunction;
+export default BisFunctionsContainer;

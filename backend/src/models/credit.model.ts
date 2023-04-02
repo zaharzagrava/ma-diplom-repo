@@ -8,6 +8,7 @@ import {
   Default,
   IsUUID,
   DataType,
+  Unique,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -23,6 +24,7 @@ export default class Credit extends Model<Credit, Partial<Credit>> {
   @Column
   id: string;
 
+  @Unique
   @Column
   name: string;
 

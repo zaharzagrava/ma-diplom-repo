@@ -10,6 +10,7 @@ import { GoogleAuthProvider, onAuthStateChanged, signInWithRedirect } from 'fire
 import { InterceptorService } from '../../services/Interceptors';
 import { config } from '../../config';
 import styled from 'styled-components';
+import MonitorAndPlanning from '../MonitorAndPlanning/MonitorAndPlanning';
 
 // Bright Gray (#EEEEEE)
 // Gainsboro (#DDDDDD)
@@ -31,7 +32,6 @@ const Header = styled.header`
 
 const Article = styled.article`
   grid-area: content;
-  padding: 20px;
 `;
 
 const Aside = styled.div`
@@ -97,7 +97,7 @@ const AppContainer = () => {
           <Title>Менеджер проекту</Title>
         </Header>
         <Article>
-          Main Content
+          <MonitorAndPlanning/>
         </Article>
         <Aside>
           <List>

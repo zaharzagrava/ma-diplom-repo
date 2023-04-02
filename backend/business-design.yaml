@@ -12,8 +12,10 @@ functionality:
     - user (of different types) with their work hours
     - tools with their configured functions of deterioration
   - different functions can be added like:
-    - add 2 users each year, fix all tools
-    - take credit next month
+    - add 2 users each year
+    - fix all tools
+    - take credit next month for specified sum
+    - pay +20% to all users
   - I think lets remove departments (or leave only for stats) and focus on the moniroting playfield
 
 endpoint:

@@ -1,7 +1,8 @@
 import produce from 'immer';
 import { ErrorCodes } from '../error';
 import { actionTypes, AppAction } from './actions';
-import { Myself, ProviderForEnduser } from './types';
+import { BisMetricDto, Myself, ProviderForEnduser } from './types';
+import { BisFunctionDto } from './bis-function.types';
 
 /* Initial State */
 export const RootReducerInitialState = {
@@ -13,6 +14,10 @@ export const RootReducerInitialState = {
 
   ui: {
     //
+    monitoringAndPlanning: {
+      from: 202201 as number | null,
+      to: 202301 as number | null,
+    }
   },
 
   actions: {
@@ -33,92 +38,15 @@ export const RootReducerInitialState = {
       success: null as boolean | null, // is user logged in
     },
 
-    getProvidersByServiceType: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-    },
-
-    postProvider: {
+    plan: {
       loading: false as boolean,
       errors: null as ErrorCodes[] | null,
       success: null as boolean | null, // is there been at least one successful register
-    },
-
-    postEnduser: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null, // is there been at least one successful register
-    },
-
-    putAvatarEnduser: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null, // is there been at least one successful register
-    },
-
-    deleteAvatarEnduser: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null, // is there been at least one successful register
-    },
-
-    putEnduser: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null, // is there been at least one successful register
-    },
-
-    loginEnduser: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null,
-    },
-
-    confirmEnduser: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null,
-    },
-
-    confirmProvider: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null,
-    },
-
-    sendRestorePassword: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null,
-    },
-
-    changePasswordByToken: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null,
-    },
-
-    changePasswordByCurrPassword: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: null as boolean | null,
-    },
-
-    sendSupportEmail: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: false as boolean,
     },
 
     logoutEnduser: {
       loading: false as boolean,
       errors: null as ErrorCodes[] | null,
-    },
-
-    joinMailchimpAudience: {
-      loading: false as boolean,
-      errors: null as ErrorCodes[] | null,
-      success: false as boolean | null,
     },
   },
 
@@ -128,11 +56,8 @@ export const RootReducerInitialState = {
    */
   myself: null as Myself | null,
 
-  /**
-   * Is modified by the following actions
-   *  - getProvidersByServiceType
-   */
-  providers: null as ProviderForEnduser[] | null,
+  bisFunctions: null as BisFunctionDto[] | null,
+  bisMetrics: null as BisMetricDto[] | null,
 };
 
 export type AppState = typeof RootReducerInitialState;
@@ -157,18 +82,19 @@ export const RootReducer = produce(
         draft.actions.getMyself.success = false;
         break;
 
-      case actionTypes.GET_ALL_BIS_FUNCTIONS:
-        draft.actions.getProvidersByServiceType.errors = null;
-        draft.actions.getProvidersByServiceType.loading = true;
+      case actionTypes.PLAN:
+        draft.actions.plan.errors = null;
+        draft.actions.plan.loading = true;
         break;
-      case actionTypes.GET_ALL_BIS_FUNCTIONS_SUCCESS:
-        draft.providers = action.payload.providers;
-        draft.actions.getProvidersByServiceType.errors = null;
-        draft.actions.getProvidersByServiceType.loading = false;
+      case actionTypes.PLAN_SUCCESS:
+        draft.bisFunctions = action.payload.bisFunctions;
+        draft.bisMetrics = action.payload.bisMetrics;
+        draft.actions.plan.errors = null;
+        draft.actions.plan.loading = false;
         break;
-      case actionTypes.GET_ALL_BIS_FUNCTIONS_FAILURE:
-        draft.actions.getProvidersByServiceType.errors = action.payload.errors;
-        draft.actions.getProvidersByServiceType.loading = false;
+      case actionTypes.PLAN_FAILURE:
+        draft.actions.plan.errors = action.payload.errors;
+        draft.actions.plan.loading = false;
         break;
 
       case actionTypes.LOG_OUT_ENDUSER:

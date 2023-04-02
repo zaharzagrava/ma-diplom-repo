@@ -8,18 +8,8 @@ import { AppAction } from '../../store/actions';
 import Page from '../../components/Page/Page';
 
 const HomeContainer = () => {
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch<AppAction>({ type: 'GET_MYSELF' });
-  }, [dispatch]);
-
   return (
-    <Page>
-      <div>
-        <h1>Home</h1>
-      </div>
-    </Page>
+    <h1>Home</h1>
   );
 };
 

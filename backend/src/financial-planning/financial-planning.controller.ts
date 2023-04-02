@@ -1,12 +1,12 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Firewall } from 'src/auth/decorators/firewall.decorator';
 import { User } from 'src/auth/decorators/user.decorator';
-import { UserRawDto } from './types';
+import { PlanDto, UserRawDto } from './types';
 import { FinancialPlanningService } from './financial-planning.service';
 
-@ApiTags('users')
-@Controller('users')
+@ApiTags('fin-planning')
+@Controller('fin-planning')
 export class FinancialPlanningController {
   private readonly l = new Logger(FinancialPlanningController.name);
 
@@ -15,15 +15,15 @@ export class FinancialPlanningController {
   ) {}
 
   @Firewall()
-  @Get('/me')
+  @Post('/')
   @ApiResponse({ type: UserRawDto })
-  async me(@User() user: UserRawDto): Promise<any> {
-    this.l.log('--- /api/users/me ---');
+  async plan(@User() user: UserRawDto, @Body() plan: PlanDto): Promise<any> {
+    this.l.log('--- /api/fin-planning/plan ---');
 
     return await this.financialPlanningService.plan({
       params: {
-        from: 202201,
-        to: 202301,
+        from: plan.from,
+        to: plan.to,
       },
     });
   }

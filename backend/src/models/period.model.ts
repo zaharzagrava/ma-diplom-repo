@@ -35,14 +35,4 @@ export default class Period extends Model<Period, Partial<Period>> {
 
   @UpdatedAt
   updatedAt: Date;
-
-  @DeletedAt
-  deletedAt: Date | null;
-
-  between(start: number, end?: number | null) {
-    return (
-      start <= this.period &&
-      (end === null || end === undefined || this.period <= end)
-    );
-  }
 }

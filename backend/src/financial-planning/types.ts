@@ -15,6 +15,11 @@ export class CreateUserDto {
   departmentId: string;
 }
 
+export interface PlanDto {
+  from?: number;
+  to?: number;
+}
+
 /**
  * @description - user with no related info attached
  */

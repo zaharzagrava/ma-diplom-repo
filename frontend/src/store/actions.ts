@@ -1,5 +1,6 @@
 import { ErrorCodes } from '../error';
-import { Myself, ProviderForEnduser } from './types';
+import { BisFunctionDto } from './bis-function.types';
+import {  BisMetricDto, Myself } from './types';
 
 /* Action Types */
 export const actionTypes = {
@@ -11,9 +12,9 @@ export const actionTypes = {
   GET_MYSELF_SUCCESS: 'GET_MYSELF_SUCCESS' as 'GET_MYSELF_SUCCESS',
   GET_MYSELF_FAILURE: 'GET_MYSELF_FAILURE' as 'GET_MYSELF_FAILURE',
 
-  GET_ALL_BIS_FUNCTIONS: 'GET_ALL_BIS_FUNCTIONS' as 'GET_ALL_BIS_FUNCTIONS',
-  GET_ALL_BIS_FUNCTIONS_SUCCESS: 'GET_ALL_BIS_FUNCTIONS_SUCCESS' as 'GET_ALL_BIS_FUNCTIONS_SUCCESS',
-  GET_ALL_BIS_FUNCTIONS_FAILURE: 'GET_ALL_BIS_FUNCTIONS_FAILURE' as 'GET_ALL_BIS_FUNCTIONS_FAILURE',
+  PLAN: 'PLAN' as 'PLAN',
+  PLAN_SUCCESS: 'PLAN_SUCCESS' as 'PLAN_SUCCESS',
+  PLAN_FAILURE: 'PLAN_FAILURE' as 'PLAN_FAILURE',
 
   LOG_OUT_ENDUSER: 'LOG_OUT_ENDUSER' as 'LOG_OUT_ENDUSER',
   LOG_OUT_ENDUSER_SUCCESS: 'LOG_OUT_ENDUSER_SUCCESS' as 'LOG_OUT_ENDUSER_SUCCESS',
@@ -51,22 +52,20 @@ export interface GetMyselfFailure {
   };
 }
 
-export interface GetBisFunctions {
-  type: typeof actionTypes.GET_ALL_BIS_FUNCTIONS;
-  payload: {
-    serviceType: any
-  }
+export interface Plan {
+  type: typeof actionTypes.PLAN;
 }
 
-export interface GetBisFunctionsSuccess {
-  type: typeof actionTypes.GET_ALL_BIS_FUNCTIONS_SUCCESS;
+export interface PlanSuccess {
+  type: typeof actionTypes.PLAN_SUCCESS;
   payload: {
-    providers: ProviderForEnduser[];
+    bisFunctions: BisFunctionDto[];
+    bisMetrics: BisMetricDto[];
   };
 }
 
-export interface GetBisFunctionsFailure {
-  type: typeof actionTypes.GET_ALL_BIS_FUNCTIONS_FAILURE;
+export interface PlanFailure {
+  type: typeof actionTypes.PLAN_FAILURE;
   payload: {
     errors: ErrorCodes[];
   };
@@ -106,11 +105,11 @@ export interface SetChosenServiceType {
 
 export type FailureAppActionTypes =
   typeof actionTypes.GET_MYSELF_FAILURE |
-  typeof actionTypes.GET_ALL_BIS_FUNCTIONS_FAILURE ;
+  typeof actionTypes.PLAN_FAILURE ;
 
 export type FailureAppAction =
   | GetMyselfFailure
-  | GetBisFunctionsFailure
+  | PlanFailure
   | LogOutEnduserFailure;
 
 export type AppAction =
@@ -118,9 +117,9 @@ export type AppAction =
   | GetMyself
   | GetMyselfSuccess
   | GetMyselfFailure
-  | GetBisFunctions
-  | GetBisFunctionsSuccess
-  | GetBisFunctionsFailure
+  | Plan
+  | PlanSuccess
+  | PlanFailure
   | LogOutEnduser
   | LogOutEnduserSuccess
   | LogOutEnduserFailure

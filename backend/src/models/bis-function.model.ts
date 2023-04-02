@@ -43,7 +43,7 @@ export default class BisFunction extends Model<
   @Column(DataType.ENUM(...BisFunctionTypes))
   type: BisFunctionType;
 
-  @Column(DataType.ENUM(...BisFunctionTypes))
+  @Column(DataType.JSON)
   meta: Record<string, any>;
 
   @ForeignKey(() => Product)

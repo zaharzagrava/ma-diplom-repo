@@ -30,7 +30,7 @@ export class BisFunctionController {
 
   @Firewall()
   @Get('/')
-  public async findAll() {
+  public async upsert() {
     return await this.bisFunctionService.findAll();
   }
 }
