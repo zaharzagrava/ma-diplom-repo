@@ -105,16 +105,16 @@ export default class User extends Model<User, Partial<User>> {
 
   @Unique
   @IsEmail
-  @Column
+  @Column({ allowNull: false })
   email: string;
 
-  @Column
+  @Column({ allowNull: false })
   fullName: string;
 
   @Column({ allowNull: false })
   country: string;
 
-  @Column
+  @Column({ allowNull: false })
   city: string;
 
   @CreatedAt

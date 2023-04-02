@@ -7,3 +7,25 @@ functionality:
     - history of ProductionChains
     - how do I apply department logic here
     - how do I make history here?
+  - create / update user (type of user) / department / tools / product / product chain
+  - each month the amount of goods generated will be calculated (or you can configure for any type)
+    - user (of different types) with their work hours
+    - tools with their configured functions of deterioration
+  - different functions can be added like:
+    - add 2 users each year, fix all tools
+    - take credit next month
+  - I think lets remove departments (or leave only for stats) and focus on the moniroting playfield
+
+endpoint:
+  - upsert User
+  - upsert ProductionChain
+  - upsert Product
+  - upsert Equipment
+  - upsert ProductionChain relations with Product, User, Equipment
+  - upsert Credit
+  - generate plan for predefined period
+
+  - managing multiple product chains and managing hours of users working on that
+
+fe:
+  - create a note that tells order in which operations are applied

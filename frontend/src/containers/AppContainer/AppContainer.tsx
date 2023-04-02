@@ -9,6 +9,62 @@ import { firebaseAuth } from '../../firebase';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithRedirect } from 'firebase/auth';
 import { InterceptorService } from '../../services/Interceptors';
 import { config } from '../../config';
+import styled from 'styled-components';
+
+// Bright Gray (#EEEEEE)
+// Gainsboro (#DDDDDD)
+// Chinese Silver (#CCCCCC)
+// X11 Gray (#BBBBBB)
+// Dark Charcoal (#333333)
+
+const Title = styled.h1`
+  color: black;
+  font-size: 1.5rem;
+`;
+
+const Header = styled.header`
+  grid-area: header;
+  padding: 20px;
+  background-color: #EEEEEE;
+`;
+
+
+const Article = styled.article`
+  grid-area: content;
+  padding: 20px;
+`;
+
+const Aside = styled.div`
+  grid-area: sidebar;
+  padding: 10px;
+  background-color: #EEEEEE;
+`;
+
+const Footer = styled.footer`
+  padding: 20px;
+  grid-area: footer;
+  background-color: #EEEEEE;
+`;
+
+const MainGrid = styled.div`
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 1fr 3fr;
+  grid-template-areas: 
+    "header  header"
+    "sidebar content"
+    "footer  footer";
+`;
+
+const List = styled.ul`
+  list-style-type: none;
+  padding-inline-start: 10px;
+`
+
+const ListElem = styled.li`
+  padding-top: 10px;
+  font-size: 18px;
+`;
 
 const AppContainer = () => {
   const dispatch = useDispatch();
@@ -36,9 +92,23 @@ const AppContainer = () => {
 
   return (
     <Page>
-      <div>
-        <h1>App</h1>
-      </div>
+      <MainGrid>
+        <Header>
+          <Title>Менеджер проекту</Title>
+        </Header>
+        <Article>
+          Main Content
+        </Article>
+        <Aside>
+          <List>
+            <ListElem>Моніторинг та Планування</ListElem>
+            <ListElem>Користувачі</ListElem>
+            <ListElem>Ресурси</ListElem>
+            <ListElem>Обладнання</ListElem>
+          </List>
+        </Aside>
+        <Footer>Вийти</Footer>
+      </MainGrid>
     </Page>
   );
 };

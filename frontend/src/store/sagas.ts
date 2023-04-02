@@ -39,6 +39,29 @@ function* errorHandler(
   }
 }
 
+function* getAllBisFunctions() {
+  try {
+    const response: {
+      data: any
+    } = yield call(() => {
+      return axios.get('http://localhost:8000/api/bis-function/');
+    });
+
+    router.navigate(`/home`);
+
+    yield put({
+      type: 'GET_MYSELF_SUCCESS',
+      payload: {
+        myself: response.data,
+      },
+    });
+  } catch (error) {
+    firebaseAuth.signOut();
+
+    yield call(errorHandler, error, 'GET_MYSELF_FAILURE');
+  }
+}
+
 function* getMyself() {
   try {
     const response: {
@@ -61,7 +84,8 @@ function* getMyself() {
     yield call(errorHandler, error, 'GET_MYSELF_FAILURE');
   }
 }
+
 export const rootSaga = function* rootSaga() {
   yield takeLatest(actionTypes.GET_MYSELF, getMyself);
-  //
+  yield takeLatest(actionTypes.GET_ALL_BIS_FUNCTIONS, getAllBisFunctions);
 };

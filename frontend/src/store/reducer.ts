@@ -157,139 +157,18 @@ export const RootReducer = produce(
         draft.actions.getMyself.success = false;
         break;
 
-      case actionTypes.GET_PROVIDERS:
+      case actionTypes.GET_ALL_BIS_FUNCTIONS:
         draft.actions.getProvidersByServiceType.errors = null;
         draft.actions.getProvidersByServiceType.loading = true;
         break;
-      case actionTypes.GET_PROVIDERS_SUCCESS:
+      case actionTypes.GET_ALL_BIS_FUNCTIONS_SUCCESS:
         draft.providers = action.payload.providers;
         draft.actions.getProvidersByServiceType.errors = null;
         draft.actions.getProvidersByServiceType.loading = false;
         break;
-      case actionTypes.GET_PROVIDERS_FAILURE:
+      case actionTypes.GET_ALL_BIS_FUNCTIONS_FAILURE:
         draft.actions.getProvidersByServiceType.errors = action.payload.errors;
         draft.actions.getProvidersByServiceType.loading = false;
-        break;
-
-      case actionTypes.POST_ENDUSER:
-        draft.actions.postEnduser.errors = null;
-        draft.actions.postEnduser.loading = true;
-        break;
-      case actionTypes.POST_ENDUSER_SUCCESS:
-        draft.actions.postEnduser.errors = null;
-        draft.actions.postEnduser.loading = false;
-        draft.actions.postEnduser.success = true;
-        draft.myself = action.payload.enduser;
-
-        draft.actions.getMyself.errors = null;
-        draft.actions.getMyself.loading = false;
-        draft.actions.getMyself.success = true;
-        break;
-      case actionTypes.POST_ENDUSER_FAILURE:
-        draft.actions.postEnduser.errors = action.payload.errors;
-        draft.actions.postEnduser.loading = false;
-        break;
-
-      case actionTypes.PUT_AVATAR_ENDUSER:
-        draft.actions.putAvatarEnduser.errors = null;
-        draft.actions.putAvatarEnduser.loading = true;
-        break;
-      case actionTypes.PUT_AVATAR_ENDUSER_SUCCESS:
-        draft.actions.putAvatarEnduser.errors = null;
-        draft.actions.putAvatarEnduser.loading = false;
-        draft.actions.putAvatarEnduser.success = true;
-        if (draft.myself) draft.myself.avatar = action.payload.avatar;
-        break;
-      case actionTypes.PUT_AVATAR_ENDUSER_FAILURE:
-        draft.actions.putAvatarEnduser.errors = action.payload.errors;
-        draft.actions.putAvatarEnduser.loading = false;
-        break;
-
-      case actionTypes.DELETE_AVATAR_ENDUSER:
-        draft.actions.deleteAvatarEnduser.errors = null;
-        draft.actions.deleteAvatarEnduser.loading = true;
-        break;
-      case actionTypes.DELETE_AVATAR_ENDUSER_SUCCESS:
-        draft.actions.deleteAvatarEnduser.errors = null;
-        draft.actions.deleteAvatarEnduser.loading = false;
-        draft.actions.deleteAvatarEnduser.success = true;
-        if (draft.myself) draft.myself.avatar = null;
-        break;
-      case actionTypes.DELETE_AVATAR_ENDUSER_FAILURE:
-        draft.actions.putAvatarEnduser.errors = action.payload.errors;
-        draft.actions.putAvatarEnduser.loading = false;
-        break;
-
-      case actionTypes.PUT_ENDUSER:
-        draft.actions.putEnduser.errors = null;
-        draft.actions.putEnduser.loading = true;
-        break;
-      case actionTypes.PUT_ENDUSER_SUCCESS:
-        draft.actions.putEnduser.errors = null;
-        draft.actions.putEnduser.loading = false;
-        draft.actions.putEnduser.success = true;
-        if (draft.myself) draft.myself = { ...draft.myself, ...action.payload };
-        break;
-      case actionTypes.PUT_ENDUSER_FAILURE:
-        draft.actions.putEnduser.errors = action.payload.errors;
-        draft.actions.putEnduser.loading = false;
-        break;
-
-      case actionTypes.CONFIRM_ENDUSER:
-        draft.actions.confirmEnduser.errors = null;
-        draft.actions.confirmEnduser.loading = true;
-        break;
-      case actionTypes.CONFIRM_ENDUSER_SUCCESS:
-        draft.actions.confirmEnduser.errors = null;
-        draft.actions.confirmEnduser.loading = false;
-        draft.actions.confirmEnduser.success = true;
-        break;
-      case actionTypes.CONFIRM_ENDUSER_FAILURE:
-        draft.actions.confirmEnduser.errors = action.payload.errors;
-        draft.actions.confirmEnduser.loading = false;
-        break;
-
-      case actionTypes.CONFIRM_PROVIDER:
-        draft.actions.confirmProvider.errors = null;
-        draft.actions.confirmProvider.loading = true;
-        break;
-      case actionTypes.CONFIRM_PROVIDER_SUCCESS:
-        draft.actions.confirmProvider.errors = null;
-        draft.actions.confirmProvider.loading = false;
-        draft.actions.confirmProvider.success = true;
-        break;
-      case actionTypes.CONFIRM_PROVIDER_FAILURE:
-        draft.actions.confirmProvider.errors = action.payload.errors;
-        draft.actions.confirmProvider.loading = false;
-        break;
-
-      case actionTypes.CHANGE_PASSWORD_BY_CURR_PASSWORD:
-        draft.actions.changePasswordByCurrPassword.errors = null;
-        draft.actions.changePasswordByCurrPassword.loading = true;
-        break;
-      case actionTypes.CHANGE_PASSWORD_BY_CURR_PASSWORD_SUCCESS:
-        draft.actions.changePasswordByCurrPassword.errors = null;
-        draft.actions.changePasswordByCurrPassword.loading = false;
-        draft.actions.changePasswordByCurrPassword.success = true;
-        break;
-      case actionTypes.CHANGE_PASSWORD_BY_CURR_PASSWORD_FAILURE:
-        draft.actions.changePasswordByCurrPassword.errors = action.payload.errors;
-        draft.actions.changePasswordByCurrPassword.loading = false;
-        break;
-
-      case actionTypes.SEND_SUPPORT_EMAIL:
-        draft.actions.sendSupportEmail.errors = null;
-        draft.actions.sendSupportEmail.loading = true;
-        draft.actions.sendSupportEmail.success = false;
-        break;
-      case actionTypes.SEND_SUPPORT_EMAIL_SUCCESS:
-        draft.actions.sendSupportEmail.errors = null;
-        draft.actions.sendSupportEmail.loading = false;
-        draft.actions.sendSupportEmail.success = true;
-        break;
-      case actionTypes.SEND_SUPPORT_EMAIL_FAILURE:
-        draft.actions.sendSupportEmail.errors = action.payload.errors;
-        draft.actions.sendSupportEmail.loading = false;
         break;
 
       case actionTypes.LOG_OUT_ENDUSER:
@@ -303,21 +182,6 @@ export const RootReducer = produce(
       case actionTypes.LOG_OUT_ENDUSER_FAILURE:
         draft.actions.logoutEnduser.errors = action.payload.errors;
         draft.actions.logoutEnduser.loading = false;
-        break;
-
-      case actionTypes.JOIN_MAILCHIMP_AUDIENCE:
-        draft.actions.joinMailchimpAudience.errors = null;
-        draft.actions.joinMailchimpAudience.loading = true;
-        break;
-      case actionTypes.JOIN_MAILCHIMP_AUDIENCE_SUCCESS:
-        draft.actions.joinMailchimpAudience.errors = null;
-        draft.actions.joinMailchimpAudience.loading = false;
-        draft.actions.joinMailchimpAudience.success = true;
-        break;
-      case actionTypes.JOIN_MAILCHIMP_AUDIENCE_FAILURE:
-        draft.actions.joinMailchimpAudience.errors = action.payload.errors;
-        draft.actions.joinMailchimpAudience.loading = false;
-        draft.actions.joinMailchimpAudience.success = false;
         break;
 
       /* UI actions */
