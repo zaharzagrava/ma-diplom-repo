@@ -10,7 +10,8 @@ import {
   Legend,
   Brush,
   LineChart,
-  Line
+  Line,
+  ReferenceLine
 } from "recharts";
 import { BisMetricDto } from '../../store/types';
 
@@ -21,7 +22,7 @@ type Props = {
 const BisMetricsChart: FC<Props> = ({bisMetricsDto}) => {
   const bisFunctions1 = [
     {
-      y: 1000,
+      y: -200,
       x: 202201,
     },
     {
@@ -43,6 +44,7 @@ const BisMetricsChart: FC<Props> = ({bisMetricsDto}) => {
       <YAxis domain={["min", "max"]} dataKey="y" tickFormatter={(value, index) => `${value}$`}  />
       <Tooltip />
       <Legend />
+      <ReferenceLine y={0} label="Bankrupcy" stroke="red" strokeDasharray="3 3" strokeWidth={2} />
       <Line type="monotone" dataKey="x" stroke="#8884d8" />
       <Line type="monotone" dataKey="y" stroke="#272727" />
     </LineChart>

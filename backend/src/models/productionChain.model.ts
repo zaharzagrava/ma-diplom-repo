@@ -24,7 +24,6 @@ import ProductionChainEquipment from './productionChainEquipment.model';
 
 @Table({
   timestamps: true,
-  paranoid: true,
   tableName: 'ProductionChain',
 })
 export default class ProductionChain extends Model<
@@ -55,7 +54,7 @@ export default class ProductionChain extends Model<
   users: User[];
 
   @ForeignKey(() => Resource)
-  @Column
+  @Column({ type: DataType.STRING })
   prodChainResourceId: string;
 
   @BelongsToMany(() => Resource, () => ProductionChainResource)
@@ -65,8 +64,12 @@ export default class ProductionChain extends Model<
   @Column
   prodChainProductId: string;
 
-  @BelongsTo(() => Product)
+  @ForeignKey(() => Product)
+  @Column({ type: DataType.STRING })
   productId: Product;
+
+  @BelongsTo(() => Product)
+  product: Product;
 
   @ForeignKey(() => Equipment)
   @Column

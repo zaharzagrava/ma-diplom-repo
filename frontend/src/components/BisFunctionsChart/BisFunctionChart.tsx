@@ -16,28 +16,12 @@ type Props = {
   bisFunctions: BisFunctionDto[];
 }
 
-const BisFunctionChart: FC<Props> = ({bisFunctions}) => {
-  const bisFunctions1 = [
-    {
-      name: "Закупка Ресурсів",
-      uv: [202203, 202205]
-    },
-    {
-      name: "Виготовлення Ресурсів",
-      uv: [202201, 202202]
-    },
-    {
-      name: "Виплата Кредиту",
-      uv: [202204, 202207]
-    },
-  ]
-
-
+const BisFunctionsChart: FC<Props> = ({bisFunctions}) => {
   return (
     <BarChart
       width={1000}
       height={300}
-      data={bisFunctions1}
+      data={bisFunctions}
       layout='vertical'
       margin={{
         top: 5,
@@ -54,4 +38,4 @@ const BisFunctionChart: FC<Props> = ({bisFunctions}) => {
   );
 };
 
-export default BisFunctionChart;
+export default BisFunctionsChart;

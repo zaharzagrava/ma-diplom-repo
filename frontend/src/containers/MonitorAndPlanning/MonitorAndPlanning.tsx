@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 
-import BisFunctionChart from '../../components/BisFunctionsChart/BisFunctionChart';
+import BisFunctionsChart from '../../components/BisFunctionsChart/BisFunctionChart';
 import BisMetricsChart from '../../components/BisMetricsChart/BisMetricsChart';
-import BisFunctionsContainer from '../BisFunction/BisFunctionContainer';
+import BisFunctionsContainer from '../BisFunctions/BisFunctionsContainer';
 import { AppState } from '../../store/reducer';
 import { useSelector } from 'react-redux';
 import { DateTime } from 'luxon';
@@ -14,11 +14,11 @@ const MonitorAndPlanningContainer = () => {
   const bisFunctions = useSelector((state: AppState) => state.bisFunctions);
   const bisMetrics = useSelector((state: AppState) => state.bisMetrics);
 
-
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch<AppAction>({ type: 'PLAN'})
+    console.log('@dispatch plan');
+    dispatch<AppAction>({ type: 'PLAN_ALPHA_BETA'});
   }, [dispatch])
 
   if(bisFunctions === null || bisMetrics === null) {
@@ -31,7 +31,7 @@ const MonitorAndPlanningContainer = () => {
       <BisFunctionsContainer bisFunctions={bisFunctions}/>
       <button>Plan</button>
       <BisMetricsChart bisMetricsDto={[]}/>
-      <BisFunctionChart bisFunctions={bisFunctions}/>
+      <BisFunctionsChart bisFunctions={bisFunctions}/>
     </>
   );
 };

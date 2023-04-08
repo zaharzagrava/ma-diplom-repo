@@ -8,19 +8,14 @@ import {
   Default,
   IsUUID,
   DataType,
-  Unique,
   ForeignKey,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
-import User from './user.model';
 import Resource from './resource.model';
-import Product from './product.model';
-import Equipment from './equipment.model';
 import ProductionChain from './productionChain.model';
 
 @Table({
   timestamps: true,
-  paranoid: true,
   tableName: 'ProductionChainResource',
 })
 export default class ProductionChainResource extends Model<
@@ -42,7 +37,7 @@ export default class ProductionChainResource extends Model<
   amount: number;
 
   @ForeignKey(() => Resource)
-  @Column
+  @Column({ type: DataType.STRING, allowNull: true })
   resourceId: string;
 
   @ForeignKey(() => ProductionChain)

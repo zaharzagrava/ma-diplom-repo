@@ -93,7 +93,6 @@ export interface UserWithAllFilters {
 @Table({
   modelName: 'User',
   timestamps: true,
-  paranoid: true,
   tableName: 'User',
 })
 export default class User extends Model<User, Partial<User>> {
@@ -111,18 +110,9 @@ export default class User extends Model<User, Partial<User>> {
   @Column({ allowNull: false })
   fullName: string;
 
-  @Column({ allowNull: false })
-  country: string;
-
-  @Column({ allowNull: false })
-  city: string;
-
   @CreatedAt
   createdAt: Date;
 
   @UpdatedAt
   updatedAt: Date;
-
-  @DeletedAt
-  deletedAt: Date | null;
 }

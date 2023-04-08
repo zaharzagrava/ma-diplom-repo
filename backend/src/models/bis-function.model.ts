@@ -10,6 +10,8 @@ import {
   IsUUID,
   DataType,
   ForeignKey,
+  Scopes,
+  Unique,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 import Product from './product.model';
@@ -25,9 +27,25 @@ export enum BisFunctionType {
 
 export const BisFunctionTypes = Object.values(BisFunctionType);
 
+export enum BisFunctionScope {
+  WithAll = 'WithAll',
+}
+
+export interface BisFunctionWithAll {
+  id?: string | string[];
+}
+
+@Scopes(() => ({
+  [BisFunctionScope.WithAll]: ({ id }: BisFunctionWithAll = {}) => {
+    return {
+      where: {
+        ...(id && { id }),
+      },
+    };
+  },
+}))
 @Table({
   timestamps: true,
-  paranoid: true,
   tableName: 'BisFunction',
 })
 export default class BisFunction extends Model<
@@ -40,6 +58,10 @@ export default class BisFunction extends Model<
   @Column
   id: string;
 
+  @Unique
+  @Column({ type: DataType.STRING })
+  name: string;
+
   @Column(DataType.ENUM(...BisFunctionTypes))
   type: BisFunctionType;
 
@@ -47,15 +69,15 @@ export default class BisFunction extends Model<
   meta: Record<string, any>;
 
   @ForeignKey(() => Product)
-  @Column
+  @Column({ type: DataType.STRING, allowNull: true })
   productId: string | null;
 
   @ForeignKey(() => Resource)
-  @Column
+  @Column({ type: DataType.STRING, allowNull: true })
   resourceId: string | null;
 
   @ForeignKey(() => Credit)
-  @Column
+  @Column({ type: DataType.STRING, allowNull: true })
   creditId: string | null;
 
   @CreatedAt

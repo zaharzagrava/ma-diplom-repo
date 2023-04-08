@@ -1,20 +1,16 @@
-import { Credit } from "./types";
-
-export enum BisFunctionType {
-  PAYOUT_CREDIT_FIXED_AMOUNT = 'PAYOUT_CREDIT_FIXED_AMOUNT',
-
-  // Function that instructs the business to buy that much products that would result in a given amount of goods produced
-  BUY_RESOURCE_PRODUCT_FIXED_AMOUNT = 'BUY_RESOURCE_PRODUCT_FIXED_AMOUNT',
-}
+import { BisFunctionType } from 'src/models/bis-function.model';
+import Credit from 'src/models/credit.model';
 
 export interface BisFunctionDto {
   id: string;
   name: string;
   type: BisFunctionType;
-  period?: number | {
-    from?: number;
-    to?: number;
-  };
+  period?:
+    | number
+    | {
+        from?: number;
+        to?: number;
+      };
 }
 
 /**
@@ -32,7 +28,8 @@ export interface BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT extends BisFunctionDto {
  *    - from by default is from current period
  *    - to by default is until the last period planned
  */
-export interface BisFunctionDto_BUY_RESOURCE_PRODUCT_FIXED_AMOUNT extends BisFunctionDto  {
+export interface BisFunctionDto_BUY_RESOURCE_PRODUCT_FIXED_AMOUNT
+  extends BisFunctionDto {
   productId: string;
   amount: number;
 }

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { put, call, takeLatest } from 'redux-saga/effects';
+import { put, call, takeLatest, takeLeading } from 'redux-saga/effects';
 import { ErrorCodes } from '../error';
 import { firebaseAuth } from '../firebase';
 import router from '../router';
@@ -41,10 +41,11 @@ function* errorHandler(
 
 function* plan() {
   try {
+    console.log('@plan');
     const response: {
       data: any
     } = yield call(() => {
-      return axios.get('http://localhost:8000/api/fin-planning/plan');
+      return axios.post('http://localhost:8000/api/fin-planning');
     });
 
     yield put<AppAction>({
@@ -55,10 +56,9 @@ function* plan() {
       },
     });
   } catch (error) {
-    firebaseAuth.signOut();
-
-    yield call(errorHandler, error, 'GET_MYSELF_FAILURE');
+    yield call(errorHandler, error, 'PLAN_FAILURE');
   }
+  console.log('@finish');
 }
 
 function* getMyself() {
@@ -85,6 +85,6 @@ function* getMyself() {
 }
 
 export const rootSaga = function* rootSaga() {
-  yield takeLatest(actionTypes.GET_MYSELF, getMyself);
-  yield takeLatest(actionTypes.PLAN, plan);
+  yield takeLeading(actionTypes.GET_MYSELF, getMyself);
+  yield takeLeading(actionTypes.PLAN, plan);
 };

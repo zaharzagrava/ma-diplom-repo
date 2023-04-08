@@ -53,6 +53,13 @@ const MainGrid = styled.div`
   grid-template-areas: 
     "header  header"
     "sidebar content"
+    "sidebar content"
+    "sidebar content"
+    "sidebar content"
+    "sidebar content"
+    "sidebar content"
+    "sidebar content"
+    "sidebar content"
     "footer  footer";
 `;
 

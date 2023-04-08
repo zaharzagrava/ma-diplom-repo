@@ -16,7 +16,6 @@ import ProductionChain from './productionChain.model';
 
 @Table({
   timestamps: true,
-  paranoid: true,
   tableName: 'ProductionChainEquipment',
 })
 export default class ProductionChainEquipment extends Model<

@@ -7,8 +7,6 @@ import {
   PrimaryKey,
   Default,
   IsUUID,
-  DataType,
-  Unique,
   ForeignKey,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
@@ -17,7 +15,6 @@ import ProductionChain from './productionChain.model';
 
 @Table({
   timestamps: true,
-  paranoid: true,
   tableName: 'ProductionChainUser',
 })
 export default class ProductionChainUser extends Model<

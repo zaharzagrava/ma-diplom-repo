@@ -13,7 +13,7 @@ import { configureStore } from '@reduxjs/toolkit';
 
 export type AppSaga = SagaIterator<AppState>;
 
-/* Setting up dsaga and store */
+/* Setting up saga and store */
 const sagaMiddleware = createSagaMiddleware();
 
 export const store = configureStore<

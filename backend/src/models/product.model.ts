@@ -14,7 +14,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Table({
   timestamps: true,
-  paranoid: true,
   tableName: 'Product',
 })
 export default class Product extends Model<Product, Partial<Product>> {

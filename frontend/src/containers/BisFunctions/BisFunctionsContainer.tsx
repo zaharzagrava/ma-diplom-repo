@@ -8,7 +8,7 @@ type Props = {
 }
 
 const BisFunctionsContainer: FC<Props> = ({bisFunctions}) => {
-  return <>{bisFunctions.map(bisFunction => <BisFunction bisFunction={bisFunction}/>)}</>;
+  return <>{bisFunctions.map(bisFunction => <BisFunction bisFunction={bisFunction} key={bisFunction.id} />)}</>;
 };
 
 export default BisFunctionsContainer;

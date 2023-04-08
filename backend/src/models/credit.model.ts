@@ -14,7 +14,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 @Table({
   timestamps: true,
-  paranoid: true,
   tableName: 'Credit',
 })
 export default class Credit extends Model<Credit, Partial<Credit>> {

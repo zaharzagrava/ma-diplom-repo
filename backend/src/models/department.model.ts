@@ -19,7 +19,6 @@ import User from './user.model';
 
 @Table({
   timestamps: true, // add the timestamp attributes (updatedAt, createdAt)
-  paranoid: true, // don't delete database entries but set the newly added attribute deletedAt
   tableName: 'Department',
   modelName: 'Department',
 })
@@ -52,7 +51,4 @@ export default class Department extends Model<Department, Partial<Department>> {
 
   @UpdatedAt
   updatedAt: Date;
-
-  @DeletedAt
-  deletedAt: Date | null;
 }

@@ -322,6 +322,12 @@ module.exports = {
           primaryKey: true,
         },
 
+        name: {
+          type: Sequelize.STRING(255),
+          unique: true,
+          allowNull: false,
+        },
+
         type: {
           type: Sequelize.ENUM(
             'PAYOUT_CREDIT_FIXED_AMOUNT',

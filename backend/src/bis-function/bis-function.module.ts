@@ -9,6 +9,7 @@ import Equipment from 'src/models/equipment.model';
 import BisFunction from 'src/models/bis-function.model';
 import { BisFunctionController } from './bis-function.controller';
 import { AuthModule } from 'src/auth/auth.module';
+import Credit from 'src/models/credit.model';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { AuthModule } from 'src/auth/auth.module';
       Period,
       Product,
       Resource,
+      Credit,
       Equipment,
       BisFunction,
     ]),
