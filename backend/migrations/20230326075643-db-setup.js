@@ -375,6 +375,8 @@ module.exports = {
           type: Sequelize.ENUM(
             'PAYOUT_CREDIT_FIXED_AMOUNT',
             'BUY_RESOURCE_PRODUCT_FIXED_AMOUNT',
+            'SELL_PRODUCT_FIXED',
+            'CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE',
           ),
           allowNull: false,
         },
@@ -443,9 +445,9 @@ module.exports = {
       },
     );
 
-    // ProductChain
+    // ProductionChain
     await queryInterface.createTable(
-      'ProductChain',
+      'ProductionChain',
       {
         id: {
           type: Sequelize.UUID,
@@ -486,9 +488,9 @@ module.exports = {
       },
     );
 
-    // ProductChainEquipment
+    // ProductionChainEquipment
     await queryInterface.createTable(
-      'ProductChainEquipment',
+      'ProductionChainEquipment',
       {
         id: {
           type: Sequelize.UUID,
@@ -512,13 +514,13 @@ module.exports = {
           },
         },
 
-        productChainId: {
+        productionChainId: {
           type: Sequelize.UUID,
           allowNull: true,
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
           references: {
-            model: 'ProductChain',
+            model: 'ProductionChain',
             key: 'id',
           },
         },
@@ -539,9 +541,9 @@ module.exports = {
       },
     );
 
-    // ProductChainResource
+    // ProductionChainResource
     await queryInterface.createTable(
-      'ProductChainResource',
+      'ProductionChainResource',
       {
         id: {
           type: Sequelize.UUID,
@@ -565,13 +567,13 @@ module.exports = {
           },
         },
 
-        productChainId: {
+        productionChainId: {
           type: Sequelize.UUID,
           allowNull: true,
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
           references: {
-            model: 'ProductChain',
+            model: 'ProductionChain',
             key: 'id',
           },
         },
@@ -592,9 +594,9 @@ module.exports = {
       },
     );
 
-    // ProductChainUser
+    // ProductionChainUser
     await queryInterface.createTable(
-      'ProductChainUser',
+      'ProductionChainUser',
       {
         id: {
           type: Sequelize.UUID,
@@ -613,13 +615,13 @@ module.exports = {
           },
         },
 
-        productChainId: {
+        productionChainId: {
           type: Sequelize.UUID,
           allowNull: true,
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
           references: {
-            model: 'ProductChain',
+            model: 'ProductionChain',
             key: 'id',
           },
         },

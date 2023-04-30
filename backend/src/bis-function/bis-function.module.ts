@@ -10,6 +10,8 @@ import BisFunction from 'src/models/bis-function.model';
 import { BisFunctionController } from './bis-function.controller';
 import { AuthModule } from 'src/auth/auth.module';
 import Credit from 'src/models/credit.model';
+import { ProductModule } from 'src/product/product.module';
+import { PeriodModule } from 'src/period/period.module';
 
 @Module({
   imports: [
@@ -23,6 +25,8 @@ import Credit from 'src/models/credit.model';
       BisFunction,
     ]),
     DbUtilsModule,
+    ProductModule,
+    PeriodModule,
   ],
   controllers: [BisFunctionController],
   providers: [BisFunctionService],

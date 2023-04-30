@@ -7,14 +7,14 @@ import { AppState } from '../../store/reducer';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { AppAction } from '../../store/actions';
+import { VerticalGrid } from '../../components/Utils/VerticalGrid';
+import { HorizontalGrid } from '../../components/Utils/HorizontalGrid';
+import { AlignCenter } from '../../components/Utils/AlignCenter';
 
 const MonitorAndPlanningContainer = () => {
   // const {from, to} = useSelector((state: AppState) => state.ui.monitoringAndPlanning);
   const bisFunctions = useSelector((state: AppState) => state.bisFunctions);
   const bisMetrics = useSelector((state: AppState) => state.bisMetrics);
-
-  console.log('@bisFunctions');
-  console.log(JSON.stringify(bisFunctions, null, 2));
 
   const dispatch = useDispatch();
 
@@ -28,18 +28,21 @@ const MonitorAndPlanningContainer = () => {
   }
 
   return (
-    <>
+    <VerticalGrid>
       <h2>Моніторинг та Планування</h2>
       <BisFunctionsContainer bisFunctions={bisFunctions}/>
-      <button>Add new business function</button>
-      <hr/>
-      <button>Plan</button>
-      <BisMetricsChart bisMetricsDto={bisMetrics.balance}/>
-      <BisFunctionsChart bisFunctions={bisFunctions.map(x => ({
-        ...x,
-        periodRange: [x.startPeriod, x.endPeriod ?? 202205]
-      }))}/>
-    </>
+      <AlignCenter>
+        <button>Add new business function</button>
+      </AlignCenter>
+      <AlignCenter>
+        <button>Plan</button>
+        <BisMetricsChart bisMetricsDto={bisMetrics.balance}/>
+        <BisFunctionsChart bisFunctions={bisFunctions.map(x => ({
+          name: x.name,
+          periodRange: [x.startPeriod, x.endPeriod ?? 202212]
+        }))}/>
+      </AlignCenter>
+    </VerticalGrid>
   );
 };
 

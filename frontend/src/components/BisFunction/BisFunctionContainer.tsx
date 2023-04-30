@@ -6,6 +6,7 @@ import BisFunction from './BisFunction';
 import { CreateErrorObject } from '../../store/types';
 import { useDispatch } from 'react-redux';
 import { BisFunctionUpsert } from '../../store/actions';
+import { Card } from '../Utils/Card';
 
 export const bisFunctionGeneralSettings = {
   name: {
@@ -101,7 +102,7 @@ const BisFunctionContainer: FC<Props> = (params) => {
   const bisFunctionEditDto = bisFunctionsToEditTransform(params.bisFunction);
 
   if(!bisFunctionEditDto) {
-    return <div>No transformer for edit mode for this method is implemented</div>
+    return <Card>No transformer for edit mode for this method is implemented</Card>
   }
 
   return <BisFunction

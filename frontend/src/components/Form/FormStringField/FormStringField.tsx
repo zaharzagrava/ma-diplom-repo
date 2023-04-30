@@ -1,5 +1,6 @@
 import { ErrorMessage, Field, FieldProps } from 'formik';
 import React, { FunctionComponent, useState } from 'react';
+import styled from 'styled-components';
 import Icon from '../../Icon/Icon';
 import FormError from '../FormError/FormError';
 
@@ -33,6 +34,18 @@ interface Props {
   editable?: boolean;
 }
 
+const Container = styled.div`
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: auto 1fr;
+  grid-auto-flow: row;
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const FormStringField: FunctionComponent<Props> = ({
   name,
   type: argType,
@@ -50,11 +63,11 @@ const FormStringField: FunctionComponent<Props> = ({
   }
 
   return (
-    <div>
+    <Container>
       {label && <p>{label}</p>}
       <Field name={name}>
         {({ field }: FieldProps) => (
-          <div>
+          <InputContainer>
             <input
               type={type}
               name={name}
@@ -65,20 +78,21 @@ const FormStringField: FunctionComponent<Props> = ({
               onChange={field.onChange}
               onBlur={field.onBlur}
               readOnly={!editable}
+              size={30}
             />
             {isHideIconShown && (
               <div>
                 <Icon type="eye" onClick={() => setIsHidden(!isHidden)} />
               </div>
             )}
-          </div>
+          </InputContainer>
         )}
       </Field>
       <ErrorMessage
         component={FormError as React.FunctionComponent<{}>}
         name={name}
       />
-    </div>
+    </Container>
   );
 };
 

@@ -47,15 +47,11 @@ function* bisFunctionsGetAll() {
       return axios.get('http://localhost:8000/api/bis-function');
     });
 
-    console.log('@response.data ---');
-    console.log(JSON.stringify(response.data, null, 2));
-
     yield put<AppAction>({
       type: 'BIS_FUNCTIONS_GET_ALL_SUCCESS',
       payload: response.data
     });
   } catch (error) {
-    console.log('@failure');
     yield call(errorHandler, error, 'BIS_FUNCTION_UPSERT_FAILURE');
   }
 }
@@ -75,7 +71,6 @@ function* bisFunctionUpsert(params: BisFunctionUpsert) {
 
     yield put<AppAction>({type: 'PLAN',});
   } catch (error) {
-    console.log('@failure');
     yield call(errorHandler, error, 'BIS_FUNCTION_UPSERT_FAILURE');
   }
 }
@@ -95,7 +90,6 @@ function* plan() {
   } catch (error) {
     yield call(errorHandler, error, 'PLAN_FAILURE');
   }
-  console.log('@finish');
 }
 
 function* getMyself() {

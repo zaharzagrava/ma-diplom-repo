@@ -52,9 +52,6 @@ export class BisFunctionController {
   ) {
     console.log('--- /api/bis-function/upsert');
 
-    console.log('@params');
-    console.log(JSON.stringify(params, null, 2));
-
     return await this.bisFunctionService.upsert({
       bisFunctionUpsert: params,
     });

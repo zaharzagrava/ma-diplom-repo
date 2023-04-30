@@ -26,41 +26,41 @@ const Title = styled.h1`
 const Header = styled.header`
   grid-area: header;
   padding: 20px;
-  background-color: #EEEEEE;
+  background-color: #FFFFFF;
 `;
 
 
-const Article = styled.article`
-  grid-area: content;
+const Main = styled.article`
 `;
 
 const Aside = styled.div`
-  grid-area: sidebar;
   padding: 10px;
-  background-color: #EEEEEE;
+  background-color: #FFFFFF;
+`;
+
+const Content = styled.div`
+  padding: 20px;
+  grid-area: content;
+  background-color: #FFFFFF;
+
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: auto 1fr;
+  grid-auto-flow: row;
 `;
 
 const Footer = styled.footer`
   padding: 20px;
   grid-area: footer;
-  background-color: #EEEEEE;
+  background-color: #FFFFFF;
 `;
 
 const MainGrid = styled.div`
   display: grid;
-  grid-gap: 20px;
-  grid-template-columns: 1fr 3fr;
-  grid-template-areas: 
-    "header  header"
-    "sidebar content"
-    "sidebar content"
-    "sidebar content"
-    "sidebar content"
-    "sidebar content"
-    "sidebar content"
-    "sidebar content"
-    "sidebar content"
-    "footer  footer";
+  padding: 0px 20px;
+  grid-gap: 50px;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas: "header" "content" "footer";
 `;
 
 const List = styled.ul`
@@ -103,17 +103,16 @@ const AppContainer = () => {
         <Header>
           <Title>Менеджер проекту</Title>
         </Header>
-        <Article>
-          <MonitorAndPlanning/>
-        </Article>
-        <Aside>
-          <List>
-            <ListElem>Моніторинг та Планування</ListElem>
-            <ListElem>Користувачі</ListElem>
-            <ListElem>Ресурси</ListElem>
-            <ListElem>Обладнання</ListElem>
-          </List>
-        </Aside>
+        <Content>
+            <Aside>
+              <List>
+                <ListElem>Моніторинг та Планування</ListElem>
+              </List>
+            </Aside>
+            <Main>
+              <MonitorAndPlanning/>
+            </Main>
+        </Content>
         <Footer>Вийти</Footer>
       </MainGrid>
     </Page>

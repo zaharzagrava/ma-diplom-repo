@@ -105,4 +105,10 @@ export class PeriodService {
 
     return this.buildPeriodValue(year + 1, 1);
   }
+
+  public between(start: number, end: number | null, period: number) {
+    return (
+      start <= period && (end === null || end === undefined || period <= end)
+    );
+  }
 }

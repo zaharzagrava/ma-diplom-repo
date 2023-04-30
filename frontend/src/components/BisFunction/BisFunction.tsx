@@ -1,8 +1,11 @@
 import { Formik, FormikProps } from 'formik';
 import React, { FC } from 'react';
+import styled from 'styled-components';
 
 import { BisFunctionDto, BisFunctionEditDto, BisFunctionSettings } from '../../store/bis-function.types';
 import FormStringField from '../Form/FormStringField/FormStringField';
+import { Card } from '../Utils/Card';
+import { HorizontalGrid } from '../Utils/HorizontalGrid';
 import { bisFunctionsSettings } from './BisFunctionContainer';
 
 type Props = {
@@ -30,14 +33,14 @@ const BisFunction: FC<Props> = (params) => {
   const bisFunctionSettings = bisFunctionsSettings[params.bisFunctionEdit.type as keyof BisFunctionSettings]
 
   if(bisFunctionsSettings[params.bisFunctionEdit.type as keyof typeof bisFunctionsSettings]) {
-    return <div style={{
-      border: '1px solid black'
-    }}>
+    return <Card>
       <Formik initialValues={params.bisFunctionEdit} enableReinitialize={true} validate={params.onValidate} onSubmit={params.onSubmit}>
         {({ handleSubmit }: FormikProps<BisFunctionEditDto>) => (
           <div>
-            <FormStringField name={'name'} placeholder="Function name" label="NAME" editable={false} />
-            <FormStringField name={'type'} placeholder="Function type" label="TYPE" editable={false} />
+            <HorizontalGrid>
+              <FormStringField name={'name'} placeholder="Function name" label="NAME" editable={false} />
+              <FormStringField name={'type'} placeholder="Function type" label="TYPE" editable={false} />
+            </HorizontalGrid>
             {bisFunctionSettings && <>
               {Object.entries(bisFunctionSettings.fields).map(([key, value]) => {
                 return <FormStringField key={key} name={key} placeholder={value.default} label={value.label}/>
@@ -50,16 +53,11 @@ const BisFunction: FC<Props> = (params) => {
           </div>
         )}
       </Formik>
-    </div>
+    </Card>
   } 
 
-  switch (params.bisFunctionEdit.type) {
-    default:
-      break;
-  }
-
   return (
-    <h1>Error: No renderer for type {params.bisFunctionEdit.type}</h1>
+    <Card>Error: No renderer for type {params.bisFunctionEdit.type}</Card>
   );
 };
 

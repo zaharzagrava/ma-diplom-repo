@@ -1,5 +1,6 @@
 import { BisFunctionType } from 'src/models/bis-function.model';
 import Credit from 'src/models/credit.model';
+import Product from 'src/models/product.model';
 
 export interface BisFunctionUpsertDto {
   name: string;
@@ -28,6 +29,15 @@ export interface BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT
  */
 export interface BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT extends BisFunctionDto {
   credit: Credit;
+  amount: number;
+}
+
+/**
+ * @description
+ *    - pays out a fixed amount of the credit each period
+ */
+export interface BisFunction_SELL_PRODUCT_FIXED extends BisFunctionDto {
+  product: Product;
   amount: number;
 }
 

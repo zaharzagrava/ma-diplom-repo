@@ -33,30 +33,9 @@ export default class ProductionChain extends Model<
   @Column
   name: string;
 
-  // @ForeignKey(() => ProductionChainUser)
-  // @Column
-  // prodChainUserId: string;
-
-  // @BelongsToMany(() => User, () => ProductionChainUser)
-  // users: User[];
-
-  // @ForeignKey(() => ProductionChainResource)
-  // @Column({ type: DataType.STRING })
-  // prodChainResourceId: string;
-
-  // @BelongsToMany(() => Resource, () => ProductionChainResource)
-  // resources: Resource[];
-
-  // @ForeignKey(() => Equipment)
-  // @Column
-  // prodChainEquipmentId: string;
-
-  // @BelongsToMany(() => Equipment, () => ProductionChainEquipment)
-  // equipments: Equipment[];
-
   @ForeignKey(() => Product)
   @Column({ type: DataType.STRING })
-  productId: Product;
+  productId: string;
 
   @BelongsTo(() => Product)
   product: Product;

@@ -41,7 +41,7 @@ export class FinancialPlanningService {
     try {
       await this.dbUtilsService.wrapInTransaction(async (tx) => {
         const fromPeriod = params.from ?? 202201;
-        const toPeriod = params.to ?? 202205;
+        const toPeriod = params.to ?? 202212;
         const bisFunctions = await this.bisFunctionModel.findAll();
 
         const business = await this.businessModel.findOne();
@@ -80,7 +80,11 @@ export class FinancialPlanningService {
 
           // Execute business functions
           for (const bisFunction of bisFunctions) {
-            iState = await this.bisFunctionService.exec(iState, bisFunction);
+            iState = await this.bisFunctionService.exec(
+              iState,
+              bisFunction,
+              iPeriod,
+            );
           }
 
           // Payout salaries
@@ -102,8 +106,6 @@ export class FinancialPlanningService {
       console.log(JSON.stringify(error, null, 2));
     }
 
-    console.log('@bisMetrics');
-    console.log(JSON.stringify(bisMetrics, null, 2));
     return bisMetrics;
   }
 }

@@ -1,6 +1,7 @@
 import React, { FC, useEffect } from 'react';
 
 import BisFunctionContainer from '../../components/BisFunction/BisFunctionContainer';
+import { VerticalGrid } from '../../components/Utils/VerticalGrid';
 import { BisFunctionDto } from '../../store/bis-function.types';
 
 type Props = {
@@ -8,7 +9,9 @@ type Props = {
 }
 
 const BisFunctionsContainer: FC<Props> = ({bisFunctions}) => {
-  return <>{bisFunctions.map(bisFunction => <BisFunctionContainer mode='edit' bisFunction={bisFunction} key={bisFunction.id} />)}</>;
+  return <VerticalGrid>
+    {bisFunctions.map(bisFunction => <BisFunctionContainer mode='edit' bisFunction={bisFunction} key={bisFunction.id} />)}
+  </VerticalGrid>;
 };
 
 export default BisFunctionsContainer;
