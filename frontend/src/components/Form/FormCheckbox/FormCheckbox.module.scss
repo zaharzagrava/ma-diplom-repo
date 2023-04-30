@@ -1,0 +1,32 @@
+@function vw($px-vw, $base-vw: 1920px) {
+  @return ($px-vw / $base-vw) * 100vw;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  width: vw(20px);
+  height: vw(20px);
+
+  margin-right: vw(14px);
+  font-size: vw(16px);
+
+  @media screen and (min-width: 1920px) {
+    width: 20px;
+    height: 20px;
+
+    margin-right: 14px;
+    font-size: 16px;
+  }
+}
+
+.checkbox_label {
+  font-size: vw(16px);
+
+  @media screen and (min-width: 1920px) {
+    font-size: 16px;
+  }
+}

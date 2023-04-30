@@ -8,6 +8,43 @@ module.exports = {
 
     const transaction = await queryInterface.sequelize.transaction();
 
+    // Business
+    await queryInterface.createTable(
+      'Business',
+      {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.literal('uuid_generate_v4()'),
+          primaryKey: true,
+        },
+
+        name: {
+          type: Sequelize.STRING(255),
+          unique: true,
+          allowNull: false,
+        },
+
+        balance: {
+          type: Sequelize.FLOAT,
+          allowNull: false,
+        },
+
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+      },
+      {
+        timestamps: true,
+        transaction,
+      },
+    );
+
     // User
     await queryInterface.createTable(
       'User',
@@ -328,6 +365,12 @@ module.exports = {
           allowNull: false,
         },
 
+        order: {
+          type: Sequelize.INTEGER,
+          unique: true,
+          allowNull: false,
+        },
+
         type: {
           type: Sequelize.ENUM(
             'PAYOUT_CREDIT_FIXED_AMOUNT',
@@ -339,6 +382,16 @@ module.exports = {
         meta: {
           type: Sequelize.JSON,
           allowNull: false,
+        },
+
+        startPeriod: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+
+        endPeriod: {
+          type: Sequelize.INTEGER,
+          allowNull: true,
         },
 
         productId: {
@@ -370,6 +423,203 @@ module.exports = {
           onUpdate: 'CASCADE',
           references: {
             model: 'Credit',
+            key: 'id',
+          },
+        },
+
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+      },
+      {
+        timestamps: true,
+        transaction,
+      },
+    );
+
+    // ProductChain
+    await queryInterface.createTable(
+      'ProductChain',
+      {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.literal('uuid_generate_v4()'),
+          primaryKey: true,
+        },
+
+        name: {
+          type: Sequelize.STRING(255),
+          unique: true,
+          allowNull: false,
+        },
+
+        productId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'Product',
+            key: 'id',
+          },
+        },
+
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+      },
+      {
+        timestamps: true,
+        transaction,
+      },
+    );
+
+    // ProductChainEquipment
+    await queryInterface.createTable(
+      'ProductChainEquipment',
+      {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.literal('uuid_generate_v4()'),
+          primaryKey: true,
+        },
+
+        amount: {
+          type: Sequelize.FLOAT,
+          allowNull: false,
+        },
+
+        equipmentId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'Equipment',
+            key: 'id',
+          },
+        },
+
+        productChainId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'ProductChain',
+            key: 'id',
+          },
+        },
+
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+      },
+      {
+        timestamps: true,
+        transaction,
+      },
+    );
+
+    // ProductChainResource
+    await queryInterface.createTable(
+      'ProductChainResource',
+      {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.literal('uuid_generate_v4()'),
+          primaryKey: true,
+        },
+
+        amount: {
+          type: Sequelize.FLOAT,
+          allowNull: false,
+        },
+
+        resourceId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'Resource',
+            key: 'id',
+          },
+        },
+
+        productChainId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'ProductChain',
+            key: 'id',
+          },
+        },
+
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+      },
+      {
+        timestamps: true,
+        transaction,
+      },
+    );
+
+    // ProductChainUser
+    await queryInterface.createTable(
+      'ProductChainUser',
+      {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.literal('uuid_generate_v4()'),
+          primaryKey: true,
+        },
+
+        userId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'User',
+            key: 'id',
+          },
+        },
+
+        productChainId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'ProductChain',
             key: 'id',
           },
         },

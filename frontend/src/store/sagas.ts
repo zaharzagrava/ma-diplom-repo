@@ -4,7 +4,7 @@ import { ErrorCodes } from '../error';
 import { firebaseAuth } from '../firebase';
 import router from '../router';
 import {
-  actionTypes, AppAction, FailureAppAction, FailureAppActionTypes,
+  actionTypes, AppAction, BisFunctionUpsert, FailureAppAction, FailureAppActionTypes,
 } from './actions';
 
 function* errorHandler(
@@ -39,9 +39,49 @@ function* errorHandler(
   }
 }
 
+function* bisFunctionsGetAll() {
+  try {
+    const response: {
+      data: any
+    } = yield call(() => {
+      return axios.get('http://localhost:8000/api/bis-function');
+    });
+
+    console.log('@response.data ---');
+    console.log(JSON.stringify(response.data, null, 2));
+
+    yield put<AppAction>({
+      type: 'BIS_FUNCTIONS_GET_ALL_SUCCESS',
+      payload: response.data
+    });
+  } catch (error) {
+    console.log('@failure');
+    yield call(errorHandler, error, 'BIS_FUNCTION_UPSERT_FAILURE');
+  }
+}
+
+function* bisFunctionUpsert(params: BisFunctionUpsert) {
+  try {
+    const response: {
+      data: any
+    } = yield call(() => {
+      return axios.post('http://localhost:8000/api/bis-function', params.payload);
+    });
+
+    yield put<AppAction>({
+      type: 'BIS_FUNCTION_UPSERT_SUCCESS',
+      payload: response.data
+    });
+
+    yield put<AppAction>({type: 'PLAN',});
+  } catch (error) {
+    console.log('@failure');
+    yield call(errorHandler, error, 'BIS_FUNCTION_UPSERT_FAILURE');
+  }
+}
+
 function* plan() {
   try {
-    console.log('@plan');
     const response: {
       data: any
     } = yield call(() => {
@@ -50,10 +90,7 @@ function* plan() {
 
     yield put<AppAction>({
       type: 'PLAN_SUCCESS',
-      payload: {
-        bisFunctions: response.data.bisFunctions,
-        bisMetrics: response.data.bisMetrics,
-      },
+      payload: response.data
     });
   } catch (error) {
     yield call(errorHandler, error, 'PLAN_FAILURE');
@@ -87,4 +124,6 @@ function* getMyself() {
 export const rootSaga = function* rootSaga() {
   yield takeLeading(actionTypes.GET_MYSELF, getMyself);
   yield takeLeading(actionTypes.PLAN, plan);
+  yield takeLeading(actionTypes.BIS_FUNCTION_UPSERT, bisFunctionUpsert);
+  yield takeLeading(actionTypes.BIS_FUNCTIONS_GET_ALL, bisFunctionsGetAll);
 };

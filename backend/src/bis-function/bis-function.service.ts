@@ -9,8 +9,12 @@ import BisFunction, {
 import Product from 'src/models/product.model';
 import Resource from 'src/models/resource.model';
 import Equipment from 'src/models/equipment.model';
-import { BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT } from './bis-function.types';
+import {
+  BisFunctionUpsertDto,
+  BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT,
+} from './bis-function.types';
 import Credit from 'src/models/credit.model';
+import { BusinessState } from 'src/business/types';
 
 @Injectable()
 export class BisFunctionService {
@@ -36,15 +40,51 @@ export class BisFunctionService {
   public async findAll(params?: BisFunctionWithAll, postProcess = true) {
     const bisFunctions = await this.bisFunctionModel.findAll();
 
-    return bisFunctions.map((bisFunction) => {
+    const processedBisFunctions = bisFunctions.map(async (bisFunction) => {
       switch (bisFunction.type) {
         case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
           return this.postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(bisFunction);
-
         default:
           return bisFunction;
       }
     });
+
+    return await Promise.all(processedBisFunctions);
+  }
+
+  public async upsert({
+    bisFunctionUpsert,
+  }: {
+    bisFunctionUpsert: BisFunctionUpsertDto;
+  }) {
+    const bisFunctions = await this.findAll();
+
+    return bisFunctions.find((x) => x.name);
+  }
+
+  private async postProcess(
+    bisFunction: BisFunction,
+  ): Promise<BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT> {
+    if (bisFunction.type !== BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT) {
+      throw new Error('Not a valid type');
+    }
+
+    if (!bisFunction.creditId)
+      throw new Error('Invalid PAYOUT_CREDIT_FIXED_AMOUNT record');
+
+    const credit = await this.creditModel.findByPk(bisFunction.creditId);
+
+    if (!credit) throw new Error('Credit not found');
+
+    return {
+      id: bisFunction.id,
+      name: bisFunction.name,
+      type: bisFunction.type,
+      startPeriod: bisFunction.startPeriod,
+      endPeriod: bisFunction.endPeriod,
+      credit,
+      amount: bisFunction.meta.amount,
+    };
   }
 
   private async postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(
@@ -64,28 +104,26 @@ export class BisFunctionService {
     return {
       id: bisFunction.id,
       name: bisFunction.name,
-      amount: bisFunction.meta.amount,
       type: bisFunction.type,
+      startPeriod: bisFunction.startPeriod,
+      endPeriod: bisFunction.endPeriod,
       credit,
+      amount: bisFunction.meta.amount,
     };
   }
 
-  public exec(
-    bisFunction: BisFunction,
-    productionChain: {
-      products: Product[];
-      resources: Resource[];
-      equipment: Equipment[];
-    },
-  ) {
+  public async exec(businessState: BusinessState, bisFunction: BisFunction) {
     switch (bisFunction.type) {
-      case BisFunctionType.BUY_RESOURCE_PRODUCT_FIXED_AMOUNT:
-        this.buyProductResultFixedAmount();
-        break;
-
-      default:
-        break;
+      case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
+        const bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT =
+          await this.postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(bisFunction);
+        return this.exec_PAYOUT_CREDIT_FIXED_AMOUNT(
+          businessState,
+          bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT,
+        );
     }
+
+    return businessState;
   }
 
   /**
@@ -93,7 +131,12 @@ export class BisFunctionService {
    *    - buys enough products to produce a given amount of Products in a give ProductionChain
    *
    */
-  private buyProductResultFixedAmount() {
-    //
+  private exec_PAYOUT_CREDIT_FIXED_AMOUNT(
+    businessState: BusinessState,
+    bisFunction: BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT,
+  ): BusinessState {
+    businessState.balance -= bisFunction.amount;
+
+    return businessState;
   }
 }

@@ -13,7 +13,7 @@ import {
 import { BisFunctionDto } from '../../store/bis-function.types';
 
 type Props = {
-  bisFunctions: BisFunctionDto[];
+  bisFunctions: (BisFunctionDto & { periodRange: [number, number]})[];
 }
 
 const BisFunctionsChart: FC<Props> = ({bisFunctions}) => {
@@ -31,9 +31,9 @@ const BisFunctionsChart: FC<Props> = ({bisFunctions}) => {
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis  domain={["min", "max"]} type="number" dataKey="uv" />
+      <XAxis  domain={["min", "max"]} type="number" dataKey="periodRange" />
       <YAxis tickMargin={10} type='category' dataKey="name"  />
-      <Bar dataKey="uv" fill="#333333"  />
+      <Bar dataKey="periodRange" fill="#333333"  />
     </BarChart>
   );
 };

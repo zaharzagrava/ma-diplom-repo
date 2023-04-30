@@ -7,13 +7,15 @@ import { FinancialPlanningService } from './financial-planning.service';
 import { PeriodModule } from 'src/period/period.module';
 import { BisFunctionModule } from 'src/bis-function/bis-function.module';
 import { DbUtilsModule } from 'src/utils/db-utils/db-utils.module';
+import Business from 'src/models/business.model';
+import BisFunction from 'src/models/bis-function.model';
 
 @Module({
   imports: [
     AuthModule,
     PeriodModule,
     BisFunctionModule,
-    SequelizeModule.forFeature([User]),
+    SequelizeModule.forFeature([User, Business, BisFunction]),
     DbUtilsModule,
   ],
   providers: [FinancialPlanningService],

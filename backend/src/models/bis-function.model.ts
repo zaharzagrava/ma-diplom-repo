@@ -4,7 +4,6 @@ import {
   Table,
   CreatedAt,
   UpdatedAt,
-  DeletedAt,
   PrimaryKey,
   Default,
   IsUUID,
@@ -62,11 +61,21 @@ export default class BisFunction extends Model<
   @Column({ type: DataType.STRING })
   name: string;
 
+  @Unique
+  @Column({ type: DataType.INTEGER })
+  order: number;
+
   @Column(DataType.ENUM(...BisFunctionTypes))
   type: BisFunctionType;
 
   @Column(DataType.JSON)
   meta: Record<string, any>;
+
+  @Column({ type: DataType.INTEGER })
+  startPeriod: number;
+
+  @Column({ type: DataType.INTEGER, allowNull: true })
+  endPeriod: number | null;
 
   @ForeignKey(() => Product)
   @Column({ type: DataType.STRING, allowNull: true })

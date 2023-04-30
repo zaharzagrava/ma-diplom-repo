@@ -1,6 +1,6 @@
 import { ErrorCodes } from '../error';
-import { BisFunctionDto } from './bis-function.types';
-import {  BisMetricDto, Myself } from './types';
+import { BisFunctionDto, BisFunctionEditDto } from './bis-function.types';
+import { BisMetriscDto, Myself } from './types';
 
 /* Action Types */
 export const actionTypes = {
@@ -12,9 +12,17 @@ export const actionTypes = {
   GET_MYSELF_SUCCESS: 'GET_MYSELF_SUCCESS' as 'GET_MYSELF_SUCCESS',
   GET_MYSELF_FAILURE: 'GET_MYSELF_FAILURE' as 'GET_MYSELF_FAILURE',
 
-  PLAN: 'PLAN_ALPHA_BETA' as 'PLAN_ALPHA_BETA',
+  PLAN: 'PLAN' as 'PLAN',
   PLAN_SUCCESS: 'PLAN_SUCCESS' as 'PLAN_SUCCESS',
   PLAN_FAILURE: 'PLAN_FAILURE' as 'PLAN_FAILURE',
+
+  BIS_FUNCTIONS_GET_ALL: 'BIS_FUNCTIONS_GET_ALL' as 'BIS_FUNCTIONS_GET_ALL',
+  BIS_FUNCTIONS_GET_ALL_SUCCESS: 'BIS_FUNCTIONS_GET_ALL_SUCCESS' as 'BIS_FUNCTIONS_GET_ALL_SUCCESS',
+  BIS_FUNCTIONS_GET_ALL_FAILURE: 'BIS_FUNCTIONS_GET_ALL_FAILURE' as 'BIS_FUNCTIONS_GET_ALL_FAILURE',
+
+  BIS_FUNCTION_UPSERT: 'BIS_FUNCTION_UPSERT' as 'BIS_FUNCTION_UPSERT',
+  BIS_FUNCTION_UPSERT_SUCCESS: 'BIS_FUNCTION_UPSERT_SUCCESS' as 'BIS_FUNCTION_UPSERT_SUCCESS',
+  BIS_FUNCTION_UPSERT_FAILURE: 'BIS_FUNCTION_UPSERT_FAILURE' as 'BIS_FUNCTION_UPSERT_FAILURE',
 
   LOG_OUT_ENDUSER: 'LOG_OUT_ENDUSER' as 'LOG_OUT_ENDUSER',
   LOG_OUT_ENDUSER_SUCCESS: 'LOG_OUT_ENDUSER_SUCCESS' as 'LOG_OUT_ENDUSER_SUCCESS',
@@ -58,14 +66,44 @@ export interface Plan {
 
 export interface PlanSuccess {
   type: typeof actionTypes.PLAN_SUCCESS;
-  payload: {
-    bisFunctions: BisFunctionDto[];
-    bisMetrics: BisMetricDto[];
-  };
+  payload:  BisMetriscDto;
 }
 
 export interface PlanFailure {
   type: typeof actionTypes.PLAN_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
+export interface BisFunctionsGetAll {
+  type: typeof actionTypes.BIS_FUNCTIONS_GET_ALL;
+}
+
+export interface BisFunctionsGetAllSuccess {
+  type: typeof actionTypes.BIS_FUNCTIONS_GET_ALL_SUCCESS;
+  payload: BisFunctionDto[];
+}
+
+export interface BisFunctionsGetAllFailure {
+  type: typeof actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
+export interface BisFunctionUpsert {
+  type: typeof actionTypes.BIS_FUNCTION_UPSERT;
+  payload: BisFunctionEditDto;
+}
+
+export interface BisFunctionUpsertSuccess {
+  type: typeof actionTypes.BIS_FUNCTION_UPSERT_SUCCESS;
+  payload: BisFunctionDto;
+}
+
+export interface BisFunctionUpsertFailure {
+  type: typeof actionTypes.BIS_FUNCTION_UPSERT_FAILURE;
   payload: {
     errors: ErrorCodes[];
   };
@@ -105,11 +143,16 @@ export interface SetChosenServiceType {
 
 export type FailureAppActionTypes =
   typeof actionTypes.GET_MYSELF_FAILURE |
-  typeof actionTypes.PLAN_FAILURE ;
+  typeof actionTypes.PLAN_FAILURE | 
+  typeof actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE | 
+  typeof actionTypes.BIS_FUNCTION_UPSERT_FAILURE 
+  ;
 
 export type FailureAppAction =
   | GetMyselfFailure
   | PlanFailure
+  | BisFunctionUpsertFailure
+  | BisFunctionsGetAllFailure
   | LogOutEnduserFailure;
 
 export type AppAction =
@@ -120,6 +163,12 @@ export type AppAction =
   | Plan
   | PlanSuccess
   | PlanFailure
+  | BisFunctionsGetAll
+  | BisFunctionsGetAllSuccess
+  | BisFunctionsGetAllFailure
+  | BisFunctionUpsert
+  | BisFunctionUpsertSuccess
+  | BisFunctionUpsertFailure
   | LogOutEnduser
   | LogOutEnduserSuccess
   | LogOutEnduserFailure

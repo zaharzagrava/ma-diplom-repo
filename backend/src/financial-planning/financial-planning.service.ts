@@ -1,15 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import User from 'src/models/user.model';
 import { Transaction } from 'sequelize';
 import { PeriodService } from 'src/period/period.service';
 import { BisFunctionService } from 'src/bis-function/bis-function.service';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
+import BisFunction, { BisFunctionType } from 'src/models/bis-function.model';
+import { BusinessState } from 'src/business/types';
+import { BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT } from 'src/bis-function/bis-function.types';
+import Business from 'src/models/business.model';
 
 @Injectable()
 export class FinancialPlanningService {
   constructor(
     @InjectModel(User) private userModel: typeof User,
+    @InjectModel(Business) private businessModel: typeof Business,
+    @InjectModel(BisFunction)
+    private readonly bisFunctionModel: typeof BisFunction,
     private readonly periodService: PeriodService,
     private readonly bisFunctionService: BisFunctionService,
     private readonly dbUtilsService: DbUtilsService,
@@ -25,63 +32,78 @@ export class FinancialPlanningService {
     };
     tx?: Transaction;
   }): Promise<any> {
-    return await this.dbUtilsService.wrapInTransaction(async (tx) => {
-      const bisFunctions = await this.bisFunctionService.findAll();
+    let bisMetrics: {
+      balance: BusinessState[];
+    } = {
+      balance: [],
+    };
 
-      // We will have a set of functions: produce goods, sell goods etc. and each function will accept all data needed and change it accorddingly
-      // const state: number[] = [];
-      // let iPeriod = params.from ?? 202201;
-      // while (iPeriod !== params.to) {
-      //   state.push(0);
+    try {
+      await this.dbUtilsService.wrapInTransaction(async (tx) => {
+        const fromPeriod = params.from ?? 202201;
+        const toPeriod = params.to ?? 202205;
+        const bisFunctions = await this.bisFunctionModel.findAll();
 
-      //   // ---
+        const business = await this.businessModel.findOne();
 
-      //   // Buy, repair equipment
+        if (!business) {
+          throw new InternalServerErrorException(
+            'Business record is not found',
+          );
+        }
 
-      //   // Buy products
+        // We will have a set of functions: produce goods, sell goods etc. and each function will accept all data needed and change it accorddingly
+        const state: BusinessState[] = [
+          { balance: business.balance, period: fromPeriod },
+        ];
+        let iPeriod = fromPeriod;
+        while (iPeriod !== toPeriod) {
+          const prevState = state[state.length - 1];
+          let iState: BusinessState = {
+            balance: prevState.balance,
+            period: iPeriod,
+          };
+          // ---
 
-      //   // Produce goods
+          // Buy, repair equipment
 
-      //   // Sell goods
+          // Buy products
 
-      //   // ---
+          // Produce goods
 
-      //   // Increase all credits amounts
-      //   // amount * (1 + rate)
+          // Sell goods
 
-      //   // Payout all credits
+          // ---
 
-      //   // Payout salaries
+          // Increase all credits amounts
+          // amount * (1 + rate)
 
-      //   // ---
+          // Execute business functions
+          for (const bisFunction of bisFunctions) {
+            iState = await this.bisFunctionService.exec(iState, bisFunction);
+          }
 
-      //   iPeriod = this.periodService.next(iPeriod);
-      // }
+          // Payout salaries
 
-      return {
-        bisFunctions: [
-          {
-            name: 'Закупка Ресурсів',
-            uv: [202203, 202205],
-          },
-          {
-            name: 'Виготовлення Ресурсів',
-            uv: [202201, 202202],
-          },
-          {
-            name: 'Виплата Кредиту',
-            uv: [202204, 202207],
-          },
-        ],
-        bisMetrics: {
-          balance: [
-            {
-              amount: 1000,
-              period: 202201,
-            },
-          ],
-        },
-      };
-    });
+          // ---
+
+          iPeriod = this.periodService.next(iPeriod);
+          state.push(iState);
+        }
+
+        bisMetrics = {
+          balance: state,
+        };
+
+        throw new InternalServerErrorException('Cancel this transaction');
+      });
+    } catch (error) {
+      console.log('@error');
+      console.log(JSON.stringify(error, null, 2));
+    }
+
+    console.log('@bisMetrics');
+    console.log(JSON.stringify(bisMetrics, null, 2));
+    return bisMetrics;
   }
 }

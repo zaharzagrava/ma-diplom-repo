@@ -5,6 +5,7 @@ import User from 'src/models/user.model';
 import * as _ from 'lodash';
 import BisFunction, { BisFunctionType } from 'src/models/bis-function.model';
 import Credit from 'src/models/credit.model';
+import Business from 'src/models/business.model';
 
 @Injectable()
 export class AdminService {
@@ -15,6 +16,7 @@ export class AdminService {
     @InjectModel(BisFunction) private bisFunctionModel: typeof BisFunction,
     @InjectModel(Credit) private creditModel: typeof Credit,
     @InjectModel(Department) private departmentModel: typeof Department,
+    @InjectModel(Business) private businessModel: typeof Business,
   ) {
     this.seed();
   }
@@ -36,6 +38,12 @@ export class AdminService {
       await this.userModel.destroy({ where: {} });
       await this.creditModel.destroy({ where: {} });
       await this.bisFunctionModel.destroy({ where: {} });
+      await this.businessModel.destroy({ where: {} });
+
+      await this.businessModel.create({
+        name: 'My business',
+        balance: 10000,
+      });
 
       await this.userModel.create({
         email: 'zaharzagrava@gmail.com',
@@ -52,9 +60,12 @@ export class AdminService {
       await this.bisFunctionModel.create({
         name: 'Payout credit',
         type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
+        startPeriod: 202201,
+        endPeriod: 202205,
         meta: {
           amount: 1000,
         },
+        order: 1,
         creditId: credit.id,
       });
     } catch (error) {

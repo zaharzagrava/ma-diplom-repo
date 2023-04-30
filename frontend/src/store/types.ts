@@ -54,9 +54,8 @@ export enum NavigationTabOption {
 
 
 
-export interface BisMetricDto {
-  name: string;
-  values: { period: number; value: number; }
+export interface BisMetriscDto {
+  balance: { balance: number; period: number}[]
 }
 
 export interface Credit {
@@ -69,3 +68,6 @@ export interface Credit {
   updatedAt: Date;
 }
 
+export type CreateErrorObject<T extends { [key: string]: any }> = {
+  [actionName in keyof T]?: string | string[];
+};

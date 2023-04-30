@@ -5,7 +5,6 @@ import BisMetricsChart from '../../components/BisMetricsChart/BisMetricsChart';
 import BisFunctionsContainer from '../BisFunctions/BisFunctionsContainer';
 import { AppState } from '../../store/reducer';
 import { useSelector } from 'react-redux';
-import { DateTime } from 'luxon';
 import { useDispatch } from 'react-redux';
 import { AppAction } from '../../store/actions';
 
@@ -14,11 +13,14 @@ const MonitorAndPlanningContainer = () => {
   const bisFunctions = useSelector((state: AppState) => state.bisFunctions);
   const bisMetrics = useSelector((state: AppState) => state.bisMetrics);
 
+  console.log('@bisFunctions');
+  console.log(JSON.stringify(bisFunctions, null, 2));
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    console.log('@dispatch plan');
-    dispatch<AppAction>({ type: 'PLAN_ALPHA_BETA'});
+    dispatch<AppAction>({ type: 'BIS_FUNCTIONS_GET_ALL'});
+    dispatch<AppAction>({ type: 'PLAN'});
   }, [dispatch])
 
   if(bisFunctions === null || bisMetrics === null) {
@@ -29,9 +31,14 @@ const MonitorAndPlanningContainer = () => {
     <>
       <h2>Моніторинг та Планування</h2>
       <BisFunctionsContainer bisFunctions={bisFunctions}/>
+      <button>Add new business function</button>
+      <hr/>
       <button>Plan</button>
-      <BisMetricsChart bisMetricsDto={[]}/>
-      <BisFunctionsChart bisFunctions={bisFunctions}/>
+      <BisMetricsChart bisMetricsDto={bisMetrics.balance}/>
+      <BisFunctionsChart bisFunctions={bisFunctions.map(x => ({
+        ...x,
+        periodRange: [x.startPeriod, x.endPeriod ?? 202205]
+      }))}/>
     </>
   );
 };

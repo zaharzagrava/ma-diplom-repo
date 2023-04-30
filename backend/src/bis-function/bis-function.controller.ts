@@ -1,4 +1,11 @@
-import { Controller, Get, Injectable, Logger } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Injectable,
+  Logger,
+  Post,
+} from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import BisFunction, { BisFunctionType } from 'src/models/bis-function.model';
@@ -8,6 +15,9 @@ import Equipment from 'src/models/equipment.model';
 import { BisFunctionService } from './bis-function.service';
 import { Firewall } from 'src/auth/decorators/firewall.decorator';
 import { ApiTags } from '@nestjs/swagger';
+import { User } from 'src/auth/decorators/user.decorator';
+import { UserRawDto } from 'src/users/types';
+import { BisFunctionUpsertDto } from './bis-function.types';
 
 @ApiTags('bis-function')
 @Controller('bis-function')
@@ -30,7 +40,23 @@ export class BisFunctionController {
 
   @Firewall()
   @Get('/')
-  public async upsert() {
+  public async findAll() {
     return await this.bisFunctionService.findAll();
+  }
+
+  @Firewall()
+  @Post('/')
+  public async upsert(
+    @User() user: UserRawDto,
+    @Body() params: BisFunctionUpsertDto,
+  ) {
+    console.log('--- /api/bis-function/upsert');
+
+    console.log('@params');
+    console.log(JSON.stringify(params, null, 2));
+
+    return await this.bisFunctionService.upsert({
+      bisFunctionUpsert: params,
+    });
   }
 }

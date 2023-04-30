@@ -1,6 +1,6 @@
 import React, { FC, useEffect } from 'react';
 
-import BisFunction from '../../components/BisFunction/BisFunction';
+import BisFunctionContainer from '../../components/BisFunction/BisFunctionContainer';
 import { BisFunctionDto } from '../../store/bis-function.types';
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 }
 
 const BisFunctionsContainer: FC<Props> = ({bisFunctions}) => {
-  return <>{bisFunctions.map(bisFunction => <BisFunction bisFunction={bisFunction} key={bisFunction.id} />)}</>;
+  return <>{bisFunctions.map(bisFunction => <BisFunctionContainer mode='edit' bisFunction={bisFunction} key={bisFunction.id} />)}</>;
 };
 
 export default BisFunctionsContainer;

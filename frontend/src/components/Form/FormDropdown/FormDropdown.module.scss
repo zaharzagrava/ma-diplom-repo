@@ -1,0 +1,151 @@
+@function vw($px-vw, $base-vw: 1920px) {
+  @return ($px-vw / $base-vw) * 100vw;
+}
+
+.container {
+  flex: 1 0 0px;
+  height: 100%;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.container * {
+  font-family: futura-pt;
+  font-style: normal;
+  font-size: vw(16px);
+  letter-spacing: vw(0.7px);
+
+  @media screen and (min-width: 1920px) {
+    font-size: 16px;
+    letter-spacing: 0.7px;
+  }
+}
+
+.field_label {
+  font-weight: 600;
+  font-size: vw(14px);
+
+  margin-bottom: vw(8px);
+  color: #7198ae;
+
+  @media screen and (min-width: 1920px) {
+    font-size: 14px;
+
+    margin-bottom: 8px;
+  }
+}
+
+.field {
+  color: #bac8cb;
+  font-family: futura-pt;
+  font-style: normal;
+  font-weight: 400;
+  font-size: vw(18px);
+  letter-spacing: vw(0.7px);
+
+  flex: 1 0 0px;
+
+  padding: vw(15px) vw(20px);
+  border: vw(1px) solid #e0e6ef;
+  border-radius: vw(8px);
+
+  @media screen and (min-width: 1920px) {
+    font-size: 18px;
+    letter-spacing: 0.7px;
+
+    padding: 15px 20px;
+    border: 1px solid #e0e6ef;
+    border-radius: 8px;
+  }
+}
+
+.dropdown_header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: vw(14px) vw(20px);
+  border-radius: vw(15px);
+  margin-bottom: vw(5px);
+
+  border: vw(1px) solid #e0e6ef;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: 1920px) {
+    padding: 14px 20px;
+    border-radius: 15px;
+    margin-bottom: 5px;
+
+    border: 1px solid #e0e6ef;
+  }
+}
+
+.dropdown_label {
+  font-size: vw(18px);
+  color: #5c7d8f;
+
+  @media screen and (min-width: 1920px) {
+    font-size: 18px;
+  }
+}
+
+.dropdown_header_arrow_icon {
+  width: vw(22px);
+  height: vw(22px);
+
+  @media screen and (min-width: 1920px) {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.dropdown_header_arrow_icon > * {
+  stroke: #5c7d8f;
+}
+
+.options_container {
+  flex: 1 0 0px;
+  border-radius: vw(15px);
+  margin-top: vw(65px);
+  height: vw(200px);
+  position: absolute;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+
+  z-index: 2;
+
+  @media screen and (min-width: 1920px) {
+    border-radius: 15px;
+    margin-top: 65px;
+    height: 200px;
+  }
+}
+
+.label_margin {
+  margin-top: vw(65px + 26px);
+
+  @media screen and (min-width: 1920px) {
+    margin-top: 65px + 26px;
+  }
+}
+
+.option {
+  background-color: #fff;
+  padding: vw(14px) vw(20px);
+  color: #4e5d66;
+
+  &:hover {
+    background: #f8fafc;
+    cursor: pointer;
+  }
+
+  @media screen and (min-width: 1920px) {
+    padding: 14px 20px;
+  }
+}

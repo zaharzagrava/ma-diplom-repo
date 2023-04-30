@@ -12,7 +12,7 @@ export class UsersController {
 
   constructor(private readonly usersService: UsersService) {}
 
-  @Firewall()
+  @Firewall() // Виклик декоратору для ендпоінту
   @Get('/me')
   @ApiResponse({ type: UserRawDto })
   async me(@User() user: UserRawDto): Promise<any> {
