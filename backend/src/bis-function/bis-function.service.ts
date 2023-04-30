@@ -1,4 +1,8 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
@@ -12,7 +16,9 @@ import Equipment from 'src/models/equipment.model';
 import {
   BisFunctionUpsertDto,
   BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT,
-  BisFunction_SELL_PRODUCT_FIXED,
+  BisFunctionDto_SELL_PRODUCT_FIXED,
+  BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT,
+  BisFunctionEditDto_SELL_PRODUCT_FIXED,
 } from './bis-function.types';
 import Credit from 'src/models/credit.model';
 import { BusinessState } from 'src/business/types';
@@ -50,6 +56,8 @@ export class BisFunctionService {
       switch (bisFunction.type) {
         case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
           return this.postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(bisFunction);
+        case BisFunctionType.SELL_PRODUCT_FIXED:
+          return this.postProcess_SELL_PRODUCT_FIXED(bisFunction);
         default:
           return bisFunction;
       }
@@ -65,32 +73,48 @@ export class BisFunctionService {
   }) {
     const bisFunctions = await this.findAll();
 
-    return bisFunctions.find((x) => x.name);
-  }
+    let _bisFunctionUpsert;
+    let updatedBisFunction;
+    switch (bisFunctionUpsert.type) {
+      case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
+        _bisFunctionUpsert =
+          bisFunctionUpsert as BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT;
 
-  private async postProcess(
-    bisFunction: BisFunction,
-  ): Promise<BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT> {
-    if (bisFunction.type !== BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT) {
-      throw new Error('Not a valid type');
+        return await this.bisFunctionModel.update(
+          {
+            ...(_bisFunctionUpsert.amount && {
+              meta: {
+                amount: _bisFunctionUpsert.amount,
+              },
+            }),
+            creditId: _bisFunctionUpsert.creditId,
+          },
+          {
+            where: { name: bisFunctionUpsert.name },
+            returning: true,
+          },
+        );
+      case BisFunctionType.SELL_PRODUCT_FIXED:
+        _bisFunctionUpsert =
+          bisFunctionUpsert as BisFunctionEditDto_SELL_PRODUCT_FIXED;
+
+        return await this.bisFunctionModel.update(
+          {
+            ...(_bisFunctionUpsert.amount && {
+              meta: {
+                amount: _bisFunctionUpsert.amount,
+              },
+            }),
+            productId: _bisFunctionUpsert.productId,
+          },
+          {
+            where: { name: bisFunctionUpsert.name },
+            returning: true,
+          },
+        );
     }
 
-    if (!bisFunction.creditId)
-      throw new Error('Invalid PAYOUT_CREDIT_FIXED_AMOUNT record');
-
-    const credit = await this.creditModel.findByPk(bisFunction.creditId);
-
-    if (!credit) throw new Error('Credit not found');
-
-    return {
-      id: bisFunction.id,
-      name: bisFunction.name,
-      type: bisFunction.type,
-      startPeriod: bisFunction.startPeriod,
-      endPeriod: bisFunction.endPeriod,
-      credit,
-      amount: bisFunction.meta.amount,
-    };
+    return bisFunctions.find((x) => x.name);
   }
 
   public async exec(
@@ -130,7 +154,7 @@ export class BisFunctionService {
 
   private async postProcess_SELL_PRODUCT_FIXED(
     bisFunction: BisFunction,
-  ): Promise<BisFunction_SELL_PRODUCT_FIXED> {
+  ): Promise<BisFunctionDto_SELL_PRODUCT_FIXED> {
     if (bisFunction.type !== BisFunctionType.SELL_PRODUCT_FIXED) {
       throw new Error('Not a valid type');
     }
@@ -160,7 +184,7 @@ export class BisFunctionService {
    */
   private async exec_SELL_PRODUCT_FIXED(
     businessState: BusinessState,
-    bisFunction: BisFunction_SELL_PRODUCT_FIXED,
+    bisFunction: BisFunctionDto_SELL_PRODUCT_FIXED,
     tx?: Transaction,
   ): Promise<BusinessState> {
     const { product, income } = await this.productService.sellProduct({

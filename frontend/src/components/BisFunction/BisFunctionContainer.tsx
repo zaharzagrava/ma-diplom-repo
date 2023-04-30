@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useEffect } from 'react';
 import * as joi from 'joi';
 
-import { BisFunctionDto, BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT, BisFunctionEditDto, BisFunctionEditDto_PAYOUT_CREDIT_FIXED_AMOUNT, BisFunctionSettings, BisFunctionToEditTransform, BisFunctionType } from '../../store/bis-function.types';
+import { BisFunctionDto, BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT, BisFunctionDto_SELL_PRODUCT_FIXED, BisFunctionEditDto, BisFunctionEditDto_PAYOUT_CREDIT_FIXED_AMOUNT, BisFunctionEditDto_SELL_PRODUCT_FIXED, BisFunctionSettings, BisFunctionToEditTransform, BisFunctionType } from '../../store/bis-function.types';
 import BisFunction from './BisFunction';
 import { CreateErrorObject } from '../../store/types';
 import { useDispatch } from 'react-redux';
@@ -43,7 +43,23 @@ export const bisFunctionsSettings: BisFunctionSettings = {
       },
     },
   },
-  [BisFunctionType.BUY_RESOURCE_PRODUCT_FIXED_AMOUNT]: undefined,
+  [BisFunctionType.SELL_PRODUCT_FIXED]: {
+    customValidation: undefined,
+    fields: {
+      amount: {
+        label: 'Amount to sell:',
+        validate: joi.number().min(1).max(10000).required(),
+        default: 0,
+      },
+      productId: {
+        label: 'The product to sell:',
+        validate: joi.string().required(),
+        default: null,
+      },
+    },
+  },
+  [BisFunctionType.CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE]: undefined,
+  [BisFunctionType.BUY_RESOURCE_PRODUCT_FIXED_AMOUNT]: undefined
 };
 
 export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto) => {
@@ -51,6 +67,7 @@ export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto) => {
     case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
       const bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT = bisFunction as BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT;
       return {
+        id: bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT.id,
         name: bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT.name,
         type: bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT.type,
         amount: bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT.amount,
@@ -59,6 +76,18 @@ export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto) => {
         endPeriod: bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT.endPeriod,
       } as BisFunctionEditDto_PAYOUT_CREDIT_FIXED_AMOUNT;
   
+      case BisFunctionType.SELL_PRODUCT_FIXED:
+        const bisFunction_SELL_PRODUCT_FIXED = bisFunction as BisFunctionDto_SELL_PRODUCT_FIXED;
+        return {
+          id: bisFunction_SELL_PRODUCT_FIXED.id,
+          name: bisFunction_SELL_PRODUCT_FIXED.name,
+          type: bisFunction_SELL_PRODUCT_FIXED.type,
+          amount: bisFunction_SELL_PRODUCT_FIXED.amount,
+          productId: bisFunction_SELL_PRODUCT_FIXED.product.id,
+          startPeriod: bisFunction_SELL_PRODUCT_FIXED.startPeriod,
+          endPeriod: bisFunction_SELL_PRODUCT_FIXED.endPeriod,
+        } as BisFunctionEditDto_SELL_PRODUCT_FIXED;
+    
     default:
       break;
   }

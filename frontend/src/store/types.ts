@@ -68,6 +68,16 @@ export interface Credit {
   updatedAt: Date;
 }
 
+export interface Product {
+  id: string;
+  name: string;
+  price: number;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+
 export type CreateErrorObject<T extends { [key: string]: any }> = {
   [actionName in keyof T]?: string | string[];
 };

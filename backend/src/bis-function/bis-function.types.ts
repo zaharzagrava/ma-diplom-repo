@@ -36,9 +36,18 @@ export interface BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT extends BisFunctionDto {
  * @description
  *    - pays out a fixed amount of the credit each period
  */
-export interface BisFunction_SELL_PRODUCT_FIXED extends BisFunctionDto {
+export interface BisFunctionDto_SELL_PRODUCT_FIXED extends BisFunctionDto {
   product: Product;
   amount: number;
+}
+
+/**
+ * @description
+ *    - pays out a fixed amount of the credit each period
+ */
+export interface BisFunctionEditDto_SELL_PRODUCT_FIXED extends BisFunctionDto {
+  productId?: string;
+  amount?: number;
 }
 
 /**

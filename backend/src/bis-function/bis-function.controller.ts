@@ -45,12 +45,15 @@ export class BisFunctionController {
   }
 
   @Firewall()
-  @Post('/')
+  @Post('/upsert')
   public async upsert(
     @User() user: UserRawDto,
     @Body() params: BisFunctionUpsertDto,
   ) {
     console.log('--- /api/bis-function/upsert');
+
+    console.log('@params');
+    console.log(params);
 
     return await this.bisFunctionService.upsert({
       bisFunctionUpsert: params,

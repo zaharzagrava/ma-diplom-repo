@@ -58,10 +58,13 @@ function* bisFunctionsGetAll() {
 
 function* bisFunctionUpsert(params: BisFunctionUpsert) {
   try {
+    console.log('@params');
+    console.log(JSON.stringify(params, null, 2));
+
     const response: {
       data: any
     } = yield call(() => {
-      return axios.post('http://localhost:8000/api/bis-function', params.payload);
+      return axios.post('http://localhost:8000/api/bis-function/upsert', params.payload);
     });
 
     yield put<AppAction>({

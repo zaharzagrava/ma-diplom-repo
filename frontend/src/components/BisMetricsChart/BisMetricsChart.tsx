@@ -17,9 +17,6 @@ type Props = {
 }
 
 const BisMetricsChart: FC<Props> = ({bisMetricsDto}) => {
-  console.log('@bisMetricsDto');
-  console.log(JSON.stringify(bisMetricsDto, null, 2));
-
   return (
     <LineChart width={1000} height={250} data={bisMetricsDto}
       margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>

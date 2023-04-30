@@ -20,6 +20,7 @@ import { FinancialPlanningModule } from './financial-planning/financial-planning
     AdminModule,
     BisFunctionModule,
     FinancialPlanningModule,
+    BisFunctionModule,
     DevtoolsModule.register({
       http: process.env.NODE_ENV !== 'production',
       port: 8001,

@@ -30,7 +30,10 @@ endpoint:
   - managing multiple product chains and managing hours of users working on that
 
 fe:
-  - create datepicker that defines defaults for start and end period on frontend
-  - create editable form for credit payout
-  - create ability to add, deactivate, remove new BisFunctions
-  - create a note that tells order in which operations are applied
+  - create 3 more business functions and showcase them in coursework
+  - create datepicker that
+    - defines defaults for start and end period on frontend
+    - allows to edit startPeriod and endPeriod in BisFunction
+  - create dropdown for choosing Resource / Product / Equipment
+  - ---
+  - create ability to add, edit, deactivate, remove, reorder BisFunctions

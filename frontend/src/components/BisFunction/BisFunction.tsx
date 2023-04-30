@@ -40,7 +40,10 @@ const BisFunction: FC<Props> = (params) => {
             <HorizontalGrid>
               <FormStringField name={'name'} placeholder="Function name" label="NAME" editable={false} />
               <FormStringField name={'type'} placeholder="Function type" label="TYPE" editable={false} />
+              <FormStringField name={'startPeriod'} placeholder="Start Period" label="START_PERIOD" editable={false} />
+              <FormStringField name={'endPeriod'} placeholder="End Period" label="END_PERIOD" editable={false} />
             </HorizontalGrid>
+            <hr/>
             {bisFunctionSettings && <>
               {Object.entries(bisFunctionSettings.fields).map(([key, value]) => {
                 return <FormStringField key={key} name={key} placeholder={value.default} label={value.label}/>

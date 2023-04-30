@@ -58,6 +58,7 @@ export class FinancialPlanningService {
         ];
         let iPeriod = fromPeriod;
         while (iPeriod !== toPeriod) {
+          iPeriod = this.periodService.next(iPeriod);
           const prevState = state[state.length - 1];
           let iState: BusinessState = {
             balance: prevState.balance,
@@ -91,7 +92,6 @@ export class FinancialPlanningService {
 
           // ---
 
-          iPeriod = this.periodService.next(iPeriod);
           state.push(iState);
         }
 
