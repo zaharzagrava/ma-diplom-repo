@@ -2,7 +2,6 @@ import { ErrorMessage, Field, FieldProps } from 'formik';
 import React, { useRef, useState } from 'react';
 import FormError from '../FormError/FormError';
 
-import styles from './FormDropdown.module.scss';
 import Icon from '../../Icon/Icon';
 import { useOutsideClick } from '../../../hooks/useOutsideClick';
 
@@ -28,37 +27,31 @@ const FormDropdown = ({
   useOutsideClick(ref, () => setIsOpen(false));
 
   return (
-    <div className={styles.container} ref={ref}>
-      {label && <p className={styles.field_label}>{label}</p>}
+    <div ref={ref}>
+      {label && <p>{label}</p>}
       <Field name={name}>
         {({ field, form }: FieldProps) => (
           <>
             <button
               type="button"
-              className={styles.dropdown_header}
               onClick={() => setIsOpen(!isOpen)}
             >
-              <div className={styles.dropdown_header_label}>
+              <div>
                 {labels[options.findIndex((option) => option === field.value)] ||
                   labels[options.findIndex((option) => option === defaultValue)] ||
                   placeholder}
               </div>
-              <div className={styles.dropdown_header_arrow}>
+              <div>
                 <Icon
                   type="triangle"
-                  styleClass={styles.dropdown_header_arrow_icon}
                 />
               </div>
             </button>
             {isOpen && (
-              <div
-                className={`${styles.options_container} ${label && styles.label_margin
-                  }`}
-              >
+              <div>
                 {options.map((option, optionIndex) => (
                   <button
                     key={option}
-                    className={styles.option}
                     onClick={() => {
                       form.setFieldValue(name, option);
                       setIsOpen(false);

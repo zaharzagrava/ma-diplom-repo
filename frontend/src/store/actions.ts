@@ -66,7 +66,7 @@ export interface Plan {
 
 export interface PlanSuccess {
   type: typeof actionTypes.PLAN_SUCCESS;
-  payload:  BisMetriscDto;
+  payload: BisMetriscDto;
 }
 
 export interface PlanFailure {

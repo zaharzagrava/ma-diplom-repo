@@ -58,9 +58,6 @@ function* bisFunctionsGetAll() {
 
 function* bisFunctionUpsert(params: BisFunctionUpsert) {
   try {
-    console.log('@params');
-    console.log(JSON.stringify(params, null, 2));
-
     const response: {
       data: any
     } = yield call(() => {
@@ -72,7 +69,8 @@ function* bisFunctionUpsert(params: BisFunctionUpsert) {
       payload: response.data
     });
 
-    yield put<AppAction>({type: 'PLAN',});
+    yield put<AppAction>({type: 'PLAN' });
+    yield put<AppAction>({type: 'BIS_FUNCTIONS_GET_ALL' });
   } catch (error) {
     yield call(errorHandler, error, 'BIS_FUNCTION_UPSERT_FAILURE');
   }

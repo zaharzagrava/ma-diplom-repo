@@ -93,6 +93,25 @@ export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto) => {
   }
 }
 
+export const bisFunctionsSubmitPreProcess = (bisFunction: BisFunctionEditDto) => {
+  switch (bisFunction.type) {
+    case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
+      const bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT = bisFunction as BisFunctionEditDto_PAYOUT_CREDIT_FIXED_AMOUNT;
+      bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT.amount = Number(bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT.amount);
+      return bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT;
+  
+      case BisFunctionType.SELL_PRODUCT_FIXED:
+        const bisFunction_SELL_PRODUCT_FIXED = bisFunction as BisFunctionEditDto_PAYOUT_CREDIT_FIXED_AMOUNT;
+        bisFunction_SELL_PRODUCT_FIXED.amount = Number(bisFunction_SELL_PRODUCT_FIXED.amount);
+        return bisFunction_SELL_PRODUCT_FIXED;
+    
+    default:
+      break;
+  }
+
+  return bisFunction;
+}
+
 type Props = {
   mode: 'edit' | 'create';
   bisFunction: BisFunctionDto;
@@ -125,7 +144,14 @@ const BisFunctionContainer: FC<Props> = (params) => {
   }, []);
 
   const onBisFunctionSubmit = useCallback((values: BisFunctionEditDto) => {
-    dispatch<BisFunctionUpsert>({ type: 'BIS_FUNCTION_UPSERT', payload: values });
+    console.log('@values');
+    console.log(JSON.stringify(values, null, 2));
+    const preProcessedValues = bisFunctionsSubmitPreProcess(values);
+
+    console.log('@preProcessedValues');
+    console.log(JSON.stringify(preProcessedValues, null, 2));
+
+    dispatch<BisFunctionUpsert>({ type: 'BIS_FUNCTION_UPSERT', payload: preProcessedValues });
   }, [dispatch]);
 
   const bisFunctionEditDto = bisFunctionsToEditTransform(params.bisFunction);

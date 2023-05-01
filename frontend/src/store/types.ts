@@ -55,7 +55,7 @@ export enum NavigationTabOption {
 
 
 export interface BisMetriscDto {
-  balance: { balance: number; period: number}[]
+  balance: { balance: number; period: number; prompts: string[]}[]
 }
 
 export interface Credit {

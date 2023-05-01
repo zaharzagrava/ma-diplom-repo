@@ -21,8 +21,8 @@ const BisMetricsChart: FC<Props> = ({bisMetricsDto}) => {
     <LineChart width={1000} height={250} data={bisMetricsDto}
       margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis domain={["min", "max"]} dataKey="period" />
-      <YAxis domain={["min", "max"]} dataKey="balance" tickFormatter={(value, index) => `${value}$`}  />
+      <XAxis domain={[202201, 202212]} dataKey="period" />
+      <YAxis domain={[-1000, "max"]} dataKey="balance" tickFormatter={(value, index) => `${value}$`}  />
       <Tooltip />
       <Legend />
       <ReferenceLine y={0} label="Bankrupcy" stroke="red" strokeDasharray="3 3" strokeWidth={2} />

@@ -110,7 +110,7 @@ export class AdminService {
 
       await this.businessModel.create({
         name: 'My business',
-        balance: 10000,
+        balance: 1000,
       });
 
       await this.userModel.create({

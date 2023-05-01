@@ -31,6 +31,9 @@ endpoint:
 
 fe:
   - create 3 more business functions and showcase them in coursework
+    - define them in BusinessFunctionContainer
+    - define methods for editing, fetching, executing in bis-function.service.ts
+    - define in types
   - create datepicker that
     - defines defaults for start and end period on frontend
     - allows to edit startPeriod and endPeriod in BisFunction

@@ -41,6 +41,7 @@ export interface BisFunctionUpsertDto {
 
 export interface BisFunctionDto extends BisFunctionUpsertDto {
   id: string;
+  order: number;
 }
 
 /**

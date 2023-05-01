@@ -27,10 +27,19 @@ export class ProductService {
     product: Product;
     income: number;
   }> {
+    console.log('ProductService.sellProduct');
     return await this.dbUtilsService.wrapInTransaction(async (tx) => {
-      await this.productModel.findByPk();
+      const _sellAmount = Math.min(product.amount, sellAmount);
+      const income = product.price * _sellAmount;
 
-      if (product.amount <= sellAmount) {
+      console.log({
+        productAmount: product.amount,
+        _sellAmount,
+        income,
+      });
+
+      if (_sellAmount !== 0) {
+        console.log('Selling');
         await this.productModel.update(
           {
             amount: product.amount - sellAmount,
@@ -38,14 +47,15 @@ export class ProductService {
           {
             where: { id: product.id },
             returning: true,
+            transaction: tx,
           },
         );
       }
 
       return {
         product,
-        income: product.amount * sellAmount,
+        income,
       };
-    });
+    }, tx);
   }
 }

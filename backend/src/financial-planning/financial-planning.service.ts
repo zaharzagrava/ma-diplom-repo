@@ -54,18 +54,29 @@ export class FinancialPlanningService {
 
         // We will have a set of functions: produce goods, sell goods etc. and each function will accept all data needed and change it accorddingly
         const state: BusinessState[] = [
-          { balance: business.balance, period: fromPeriod },
+          { balance: business.balance, period: fromPeriod, prompts: [] },
         ];
         let iPeriod = fromPeriod;
+        for (const bisFunction of bisFunctions) {
+          console.log('BisFunction Period');
+          console.log(
+            bisFunction.name,
+            bisFunction.startPeriod,
+            bisFunction.endPeriod,
+          );
+        }
+
+        console.log('Start State');
+        console.log(JSON.stringify(state[0], null, 2));
+
         while (iPeriod !== toPeriod) {
           iPeriod = this.periodService.next(iPeriod);
           const prevState = state[state.length - 1];
           let iState: BusinessState = {
             balance: prevState.balance,
             period: iPeriod,
+            prompts: [],
           };
-          // ---
-
           // Buy, repair equipment
 
           // Buy products
@@ -74,23 +85,27 @@ export class FinancialPlanningService {
 
           // Sell goods
 
-          // ---
-
           // Increase all credits amounts
           // amount * (1 + rate)
 
           // Execute business functions
-          for (const bisFunction of bisFunctions) {
+          for (const bisFunction of bisFunctions.sort((a, b) => {
+            return a.order - b.order;
+          })) {
             iState = await this.bisFunctionService.exec(
               iState,
               bisFunction,
               iPeriod,
+              tx,
             );
           }
 
           // Payout salaries
 
           // ---
+
+          console.log('iState');
+          console.log(JSON.stringify(iState, null, 2));
 
           state.push(iState);
         }
@@ -102,8 +117,15 @@ export class FinancialPlanningService {
         throw new InternalServerErrorException('Cancel this transaction');
       });
     } catch (error) {
-      console.log('@error');
-      console.log(JSON.stringify(error, null, 2));
+      if (
+        !(
+          error instanceof InternalServerErrorException &&
+          error.message === 'Cancel this transaction'
+        )
+      ) {
+        console.log('Financial Planning Error');
+        console.log(JSON.stringify(error, null, 2));
+      }
     }
 
     return bisMetrics;

@@ -3,6 +3,7 @@ import React, { FC } from 'react';
 import styled from 'styled-components';
 
 import { BisFunctionDto, BisFunctionEditDto, BisFunctionSettings } from '../../store/bis-function.types';
+import FormDatepicker from '../Form/FormDatePicker/FormDatePicker';
 import FormStringField from '../Form/FormStringField/FormStringField';
 import { Card } from '../Utils/Card';
 import { HorizontalGrid } from '../Utils/HorizontalGrid';
@@ -34,14 +35,20 @@ const BisFunction: FC<Props> = (params) => {
 
   if(bisFunctionsSettings[params.bisFunctionEdit.type as keyof typeof bisFunctionsSettings]) {
     return <Card>
-      <Formik initialValues={params.bisFunctionEdit} enableReinitialize={true} validate={params.onValidate} onSubmit={params.onSubmit}>
+      <Formik
+        initialValues={params.bisFunctionEdit}
+        enableReinitialize={true}
+        validate={params.onValidate}
+        onSubmit={params.onSubmit}
+      >
         {({ handleSubmit }: FormikProps<BisFunctionEditDto>) => (
           <div>
             <HorizontalGrid>
-              <FormStringField name={'name'} placeholder="Function name" label="NAME" editable={false} />
-              <FormStringField name={'type'} placeholder="Function type" label="TYPE" editable={false} />
-              <FormStringField name={'startPeriod'} placeholder="Start Period" label="START_PERIOD" editable={false} />
-              <FormStringField name={'endPeriod'} placeholder="End Period" label="END_PERIOD" editable={false} />
+              <p>#{params.bisFunction.order}</p>
+              <FormStringField name={'name'} placeholder="Function name" label="Name" editable={false} />
+              <FormStringField name={'type'} placeholder="Function type" label="Type" editable={false} />
+              <FormDatepicker name={'startPeriod'} label="Start" />
+              <FormDatepicker name={'endPeriod'} label="End" />
             </HorizontalGrid>
             <hr/>
             {bisFunctionSettings && <>

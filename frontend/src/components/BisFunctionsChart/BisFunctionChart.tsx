@@ -42,7 +42,7 @@ const BisFunctionsChart: FC<Props> = ({bisFunctions}) => {
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis tickCount={12} domain={["min", 202212]} type="number" dataKey="periodRange" />
+      <XAxis tickCount={12} domain={[202201, 202212]} type="number" dataKey="periodRange" />
       <YAxis tickMargin={10} type='category' dataKey="name"  />
       <Bar dataKey="periodRange" fill="#333333"  />
     </BarChart>

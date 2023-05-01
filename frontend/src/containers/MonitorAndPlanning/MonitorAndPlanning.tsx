@@ -10,11 +10,15 @@ import { AppAction } from '../../store/actions';
 import { VerticalGrid } from '../../components/Utils/VerticalGrid';
 import { HorizontalGrid } from '../../components/Utils/HorizontalGrid';
 import { AlignCenter } from '../../components/Utils/AlignCenter';
+import { Table, TD, TR } from '../../components/Utils/TableUtils';
 
 const MonitorAndPlanningContainer = () => {
   // const {from, to} = useSelector((state: AppState) => state.ui.monitoringAndPlanning);
   const bisFunctions = useSelector((state: AppState) => state.bisFunctions);
   const bisMetrics = useSelector((state: AppState) => state.bisMetrics);
+
+  console.log('@bisFunctions');
+  console.log(JSON.stringify(bisFunctions, null, 2));
 
   const dispatch = useDispatch();
 
@@ -42,6 +46,17 @@ const MonitorAndPlanningContainer = () => {
           periodRange: [x.startPeriod, x.endPeriod ?? 202212]
         }))}/>
       </AlignCenter>
+      <AlignCenter>
+        <Table>
+        {bisMetrics.balance.map((bisMetricsPeriod => {
+          return <TR>
+            <TD>{bisMetricsPeriod.period}</TD>
+            <TD>{bisMetricsPeriod.prompts.map(prompt => <div>{prompt}</div>)}</TD>
+          </TR>
+        }))}
+        </Table>
+      </AlignCenter>
+
     </VerticalGrid>
   );
 };
