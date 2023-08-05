@@ -12,6 +12,8 @@ import { AuthModule } from 'src/auth/auth.module';
 import Credit from 'src/models/credit.model';
 import { ProductModule } from 'src/product/product.module';
 import { PeriodModule } from 'src/period/period.module';
+import { CreditModule } from 'src/credit/credit.module';
+import { ResourceModule } from 'src/resource/resource.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { PeriodModule } from 'src/period/period.module';
     DbUtilsModule,
     ProductModule,
     PeriodModule,
+    CreditModule,
+    ResourceModule,
   ],
   controllers: [BisFunctionController],
   providers: [BisFunctionService],

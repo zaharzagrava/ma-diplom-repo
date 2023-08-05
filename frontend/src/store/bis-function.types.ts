@@ -12,9 +12,42 @@ export enum BisFunctionType {
   CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE = 'CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE',
 }
 
+export interface BisFunctionTypeDescDto {
+  label: string;
+  type: BisFunctionType;
+  description?: string;
+}
+
+export const bisFunctionTypes: BisFunctionTypeDescDto[] = [
+  {
+    label: 'Credit: Payout fixed amount',
+    type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
+    description: `This function pays out a given credit with a fixed amount for period range specified, or until credit is paid out`
+  },
+  {
+    label: 'Resource: buy enough for X products',
+    type: BisFunctionType.BUY_RESOURCE_PRODUCT_FIXED_AMOUNT,
+    description: `This function buys that much resources, that would be enough to buy provided amount of products`
+  },
+  {
+    label: 'Product: Sell fixed amount',
+    type: BisFunctionType.SELL_PRODUCT_FIXED,
+  },
+  {
+    label: 'Product, Resource, Equipment: Change price',
+    type: BisFunctionType.CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE
+  }
+];
+
+export enum FormFieldType {
+  DROPDOWN = 'DROPDOWN',
+  STRING = 'STRING'
+}
+
 export type BisFunctionSettings = Record<BisFunctionType, {
   customValidation?: (...args: any[]) => any;
   fields: Record<string, {
+    type: FormFieldType;
     label: string;
     validate: joi.AnySchema;
     default: any;

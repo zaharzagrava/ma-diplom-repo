@@ -1,3 +1,4 @@
+import { Includeable } from 'sequelize';
 import {
   Column,
   Model,
@@ -9,9 +10,28 @@ import {
   IsUUID,
   DataType,
   Unique,
+  Scopes,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 
+export enum ResourceScope {
+  WithDepartment = 'WithDepartment',
+  WithAll = 'WithAll',
+}
+
+export interface ResourceWithAllFilters {
+  id?: string | string[];
+}
+
+@Scopes(() => ({
+  [ResourceScope.WithAll]: ({ id }: ResourceWithAllFilters = {}) => {
+    return {
+      where: {
+        ...(id && { id }),
+      },
+    };
+  },
+}))
 @Table({
   timestamps: true,
   tableName: 'Resource',

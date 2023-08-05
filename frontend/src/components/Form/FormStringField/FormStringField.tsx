@@ -2,6 +2,7 @@ import { ErrorMessage, Field, FieldProps } from 'formik';
 import React, { FunctionComponent, useState } from 'react';
 import styled from 'styled-components';
 import Icon from '../../Icon/Icon';
+import { FieldLabel } from '../../Utils/FieldLabel';
 import FormError from '../FormError/FormError';
 
 interface Props {
@@ -39,6 +40,9 @@ const Container = styled.div`
   grid-gap: 20px;
   grid-template-columns: auto 1fr;
   grid-auto-flow: row;
+
+  align-items: center;
+  margin: 10px 0px;
 `;
 
 const InputContainer = styled.div`
@@ -64,11 +68,12 @@ const FormStringField: FunctionComponent<Props> = ({
 
   return (
     <Container>
-      {label && <p>{label}</p>}
+      {label && <FieldLabel>{label}</FieldLabel>}
       <Field name={name}>
         {({ field }: FieldProps) => (
           <InputContainer>
             <input
+              style={{paddingLeft: 10, paddingRight: 10, paddingTop: 5, paddingBottom: 5, fontSize: 16}}
               type={type}
               name={name}
               placeholder={placeholder}

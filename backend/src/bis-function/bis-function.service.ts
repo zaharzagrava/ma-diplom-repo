@@ -25,6 +25,8 @@ import { BusinessState } from 'src/business/types';
 import { ProductService } from 'src/product/product.service';
 import { Transaction } from 'sequelize';
 import { PeriodService } from 'src/period/period.service';
+import { CreditService } from 'src/credit/credit.service';
+import { ResourceService } from 'src/resource/resource.service';
 
 @Injectable()
 export class BisFunctionService {
@@ -34,6 +36,8 @@ export class BisFunctionService {
     private readonly dbUtilsService: DbUtilsService,
     private readonly productService: ProductService,
     private readonly periodService: PeriodService,
+    private readonly creditService: CreditService,
+    private readonly resourceService: ResourceService,
 
     @InjectModel(BisFunction)
     private readonly bisFunctionModel: typeof BisFunction,
@@ -48,6 +52,14 @@ export class BisFunctionService {
     private readonly equipmentModel: typeof Equipment,
     @InjectConnection() private readonly sequelizeInstance: Sequelize,
   ) {}
+
+  public async findAllEntities() {
+    return await Promise.all([
+      this.productService.findAll(),
+      this.resourceService.findAll(),
+      this.creditService.findAll(),
+    ]);
+  }
 
   public async findAll(params?: BisFunctionWithAll, postProcess = true) {
     const bisFunctions = (await this.bisFunctionModel.findAll()).sort(

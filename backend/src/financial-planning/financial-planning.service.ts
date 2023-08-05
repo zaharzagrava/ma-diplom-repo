@@ -104,8 +104,8 @@ export class FinancialPlanningService {
 
           // ---
 
-          console.log('iState');
-          console.log(JSON.stringify(iState, null, 2));
+          // console.log('iState');
+          // console.log(JSON.stringify(iState, null, 2));
 
           state.push(iState);
         }

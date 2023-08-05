@@ -9,9 +9,28 @@ import {
   IsUUID,
   DataType,
   Unique,
+  Scopes,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 
+export enum CreditScope {
+  WithDepartment = 'WithDepartment',
+  WithAll = 'WithAll',
+}
+
+export interface CreditWithAllFilters {
+  id?: string | string[];
+}
+
+@Scopes(() => ({
+  [CreditScope.WithAll]: ({ id }: CreditWithAllFilters = {}) => {
+    return {
+      where: {
+        ...(id && { id }),
+      },
+    };
+  },
+}))
 @Table({
   timestamps: true,
   tableName: 'Credit',

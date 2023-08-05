@@ -37,6 +37,6 @@ fe:
   - create datepicker that
     - defines defaults for start and end period on frontend
     - allows to edit startPeriod and endPeriod in BisFunction
-  - create dropdown for choosing Resource / Product / Equipment
   - ---
   - create ability to add, edit, deactivate, remove, reorder BisFunctions
+  - production chain, where one product is used for other resources

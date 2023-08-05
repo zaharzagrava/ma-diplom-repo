@@ -1,7 +1,7 @@
 import produce from 'immer';
 import { ErrorCodes } from '../error';
 import { actionTypes, AppAction } from './actions';
-import { BisMetriscDto, Myself } from './types';
+import { BisMetriscDto, Entities, Entity, Myself } from './types';
 import { BisFunctionDto } from './bis-function.types';
 
 /* Initial State */
@@ -56,6 +56,12 @@ export const RootReducerInitialState = {
       success: null as boolean | null, // is there been at least one successful register
     },
 
+    entitiesGetAll: {
+      loading: false as boolean,
+      errors: null as ErrorCodes[] | null,
+      success: null as boolean | null, // is there been at least one successful register
+    },
+
     logoutEnduser: {
       loading: false as boolean,
       errors: null as ErrorCodes[] | null,
@@ -69,6 +75,7 @@ export const RootReducerInitialState = {
   myself: null as Myself | null,
 
   bisFunctions: null as BisFunctionDto[] | null,
+  entites: null as Entities | null,
   bisMetrics: null as BisMetriscDto | null,
 };
 
@@ -108,6 +115,20 @@ export const RootReducer = produce(
         draft.actions.plan.loading = false;
         break;
 
+      case actionTypes.BIS_FUNCTIONS_GET_ALL:
+        draft.actions.bisFunctionsGetAll.errors = null;
+        draft.actions.bisFunctionsGetAll.loading = true;
+        break;
+      case actionTypes.BIS_FUNCTIONS_GET_ALL_SUCCESS:
+        draft.bisFunctions = action.payload;
+        draft.actions.bisFunctionsGetAll.errors = null;
+        draft.actions.bisFunctionsGetAll.loading = false;
+        break;
+      case actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE:
+        draft.actions.bisFunctionsGetAll.errors = action.payload.errors;
+        draft.actions.bisFunctionsGetAll.loading = false;
+        break;
+
       case actionTypes.BIS_FUNCTION_UPSERT:
         draft.actions.bisFunctionUpsert.errors = null;
         draft.actions.bisFunctionUpsert.loading = true;
@@ -133,18 +154,18 @@ export const RootReducer = produce(
         draft.actions.bisFunctionUpsert.loading = false;
         break;
 
-      case actionTypes.BIS_FUNCTIONS_GET_ALL:
-        draft.actions.bisFunctionsGetAll.errors = null;
-        draft.actions.bisFunctionsGetAll.loading = true;
+      case actionTypes.ENTITIES_GET_ALL:
+        draft.actions.entitiesGetAll.errors = null;
+        draft.actions.entitiesGetAll.loading = true;
         break;
-      case actionTypes.BIS_FUNCTIONS_GET_ALL_SUCCESS:
-        draft.bisFunctions = action.payload;
-        draft.actions.bisFunctionsGetAll.errors = null;
-        draft.actions.bisFunctionsGetAll.loading = false;
+      case actionTypes.ENTITIES_GET_ALL_SUCCESS:
+        draft.entites = action.payload;
+        draft.actions.entitiesGetAll.errors = null;
+        draft.actions.entitiesGetAll.loading = false;
         break;
-      case actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE:
-        draft.actions.bisFunctionsGetAll.errors = action.payload.errors;
-        draft.actions.bisFunctionsGetAll.loading = false;
+      case actionTypes.ENTITIES_GET_ALL_FAILURE:
+        draft.actions.entitiesGetAll.errors = action.payload.errors;
+        draft.actions.entitiesGetAll.loading = false;
         break;
 
       case actionTypes.LOG_OUT_ENDUSER:

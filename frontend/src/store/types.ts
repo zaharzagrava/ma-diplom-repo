@@ -19,7 +19,7 @@ export interface Myself {
   country: string;
   postal_code: string;
 
-  gender: 'M' | 'F';
+  gender: "M" | "F";
   advice: string;
 
   guarded_email: string | null;
@@ -43,19 +43,17 @@ export interface ProviderForEnduser {
 }
 
 export enum NavigationTabOption {
-  DASHBOARD = 'dashboard',
-  SETTINGS = 'settings',
-  SERVICES = 'services',
-  BLOG = 'blog',
-  ABOUT_US = 'about-us',
-  CONTACT_US = 'contact-us',
-  LOG_OUT = 'log-out',
+  DASHBOARD = "dashboard",
+  SETTINGS = "settings",
+  SERVICES = "services",
+  BLOG = "blog",
+  ABOUT_US = "about-us",
+  CONTACT_US = "contact-us",
+  LOG_OUT = "log-out",
 }
 
-
-
 export interface BisMetriscDto {
-  balance: { balance: number; period: number; prompts: string[]}[]
+  balance: { balance: number; period: number; prompts: string[] }[];
 }
 
 export interface Credit {
@@ -77,6 +75,22 @@ export interface Product {
   updatedAt: Date;
 }
 
+export interface Resource {
+  id: string;
+  name: string;
+  price: number;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type Entity = Credit | Product | Resource;
+
+export interface Entities {
+  products: Product[]
+  resources: Resource[]
+  credits: Credit[]
+}
 
 export type CreateErrorObject<T extends { [key: string]: any }> = {
   [actionName in keyof T]?: string | string[];

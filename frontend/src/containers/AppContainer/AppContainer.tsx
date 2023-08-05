@@ -11,6 +11,7 @@ import { InterceptorService } from '../../services/Interceptors';
 import { config } from '../../config';
 import styled from 'styled-components';
 import MonitorAndPlanning from '../MonitorAndPlanning/MonitorAndPlanning';
+import axios from 'axios';
 
 // Bright Gray (#EEEEEE)
 // Gainsboro (#DDDDDD)
@@ -20,7 +21,6 @@ import MonitorAndPlanning from '../MonitorAndPlanning/MonitorAndPlanning';
 
 const Title = styled.h1`
   color: black;
-  font-size: 1.5rem;
 `;
 
 const Header = styled.header`
@@ -70,7 +70,6 @@ const List = styled.ul`
 
 const ListElem = styled.li`
   padding-top: 10px;
-  font-size: 18px;
 `;
 
 const AppContainer = () => {

@@ -6,6 +6,7 @@ import router from '../router';
 import {
   actionTypes, AppAction, BisFunctionUpsert, FailureAppAction, FailureAppActionTypes,
 } from './actions';
+import { Entities, Entity } from './types';
 
 function* errorHandler(
   error: any,
@@ -36,6 +37,46 @@ function* errorHandler(
         errors: [ErrorCodes.INTERNAL_FRONTEND_ERROR],
       },
     });
+  }
+}
+
+function* getMyself() {
+  try {
+    const response: {
+      data: any
+    } = yield call(() => {
+      return axios.get('http://localhost:8000/api/users/me');
+    });
+
+    router.navigate(`/home`);
+
+    yield put({
+      type: 'GET_MYSELF_SUCCESS',
+      payload: {
+        myself: response.data,
+      },
+    });
+  } catch (error) {
+    firebaseAuth.signOut();
+
+    yield call(errorHandler, error, 'GET_MYSELF_FAILURE');
+  }
+}
+
+function* plan() {
+  try {
+    const response: {
+      data: any
+    } = yield call(() => {
+      return axios.post('http://localhost:8000/api/fin-planning');
+    });
+
+    yield put<AppAction>({
+      type: 'PLAN_SUCCESS',
+      payload: response.data
+    });
+  } catch (error) {
+    yield call(errorHandler, error, 'PLAN_FAILURE');
   }
 }
 
@@ -76,49 +117,30 @@ function* bisFunctionUpsert(params: BisFunctionUpsert) {
   }
 }
 
-function* plan() {
+function* entitiesGetAll() {
   try {
     const response: {
-      data: any
+      data: Entities
     } = yield call(() => {
-      return axios.post('http://localhost:8000/api/fin-planning');
+      return axios.get('http://localhost:8000/api/entities');
     });
 
+    console.log('@response');
+    console.log(response);
+
     yield put<AppAction>({
-      type: 'PLAN_SUCCESS',
+      type: 'ENTITIES_GET_ALL_SUCCESS',
       payload: response.data
     });
   } catch (error) {
-    yield call(errorHandler, error, 'PLAN_FAILURE');
-  }
-}
-
-function* getMyself() {
-  try {
-    const response: {
-      data: any
-    } = yield call(() => {
-      return axios.get('http://localhost:8000/api/users/me');
-    });
-
-    router.navigate(`/home`);
-
-    yield put({
-      type: 'GET_MYSELF_SUCCESS',
-      payload: {
-        myself: response.data,
-      },
-    });
-  } catch (error) {
-    firebaseAuth.signOut();
-
-    yield call(errorHandler, error, 'GET_MYSELF_FAILURE');
+    yield call(errorHandler, error, 'ENTITIES_GET_ALL_FAILURE');
   }
 }
 
 export const rootSaga = function* rootSaga() {
   yield takeLeading(actionTypes.GET_MYSELF, getMyself);
   yield takeLeading(actionTypes.PLAN, plan);
-  yield takeLeading(actionTypes.BIS_FUNCTION_UPSERT, bisFunctionUpsert);
   yield takeLeading(actionTypes.BIS_FUNCTIONS_GET_ALL, bisFunctionsGetAll);
+  yield takeLeading(actionTypes.BIS_FUNCTION_UPSERT, bisFunctionUpsert);
+  yield takeLeading(actionTypes.ENTITIES_GET_ALL, entitiesGetAll);
 };

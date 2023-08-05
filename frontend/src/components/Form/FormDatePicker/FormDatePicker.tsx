@@ -6,18 +6,15 @@ import FormError from '../FormError/FormError';
 import 'react-datepicker/dist/react-datepicker.css';
 import styled from 'styled-components';
 import { DateTime } from 'luxon';
+import { FieldLabel } from '../../Utils/FieldLabel';
 
 const Container = styled.div`
-  flex: 1 0 0px;
+  display: grid;
+  grid-gap: 20px;
+  grid-template-rows: auto 1fr;
+  grid-auto-flow: row;
 
-  display: flex;
-  flex-direction: column;
-
-  position: relative;
-`;
-
-const FieldLabel = styled.p`  
-
+  margin: 10px 0px;
 `;
 
 interface Props {
@@ -30,10 +27,10 @@ const FormDatepicker: FunctionComponent<Props> = ({
   label,
 }: Props) => (
   <Container>
+    {label && <FieldLabel>{label}</FieldLabel>}
     <Field name={name}>
       {({ field, form }: FieldProps<Date>) => (
         <div>
-          {label && <FieldLabel>{label}</FieldLabel>}
           <DatePicker
             dateFormat="MMMM yyyy"
             showMonthYearPicker

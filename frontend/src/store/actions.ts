@@ -1,38 +1,52 @@
-import { ErrorCodes } from '../error';
-import { BisFunctionDto, BisFunctionEditDto } from './bis-function.types';
-import { BisMetriscDto, Myself } from './types';
+import { ErrorCodes } from "../error";
+import { BisFunctionDto, BisFunctionEditDto } from "./bis-function.types";
+import { BisMetriscDto, Credit, Entities, Entity, Myself, Product, Resource } from "./types";
 
 /* Action Types */
 export const actionTypes = {
-  LOGGED_IN: 'LOGGED_IN' as 'LOGGED_IN',
+  LOGGED_IN: "LOGGED_IN" as "LOGGED_IN",
 
   //
 
-  GET_MYSELF: 'GET_MYSELF' as 'GET_MYSELF',
-  GET_MYSELF_SUCCESS: 'GET_MYSELF_SUCCESS' as 'GET_MYSELF_SUCCESS',
-  GET_MYSELF_FAILURE: 'GET_MYSELF_FAILURE' as 'GET_MYSELF_FAILURE',
+  GET_MYSELF: "GET_MYSELF" as "GET_MYSELF",
+  GET_MYSELF_SUCCESS: "GET_MYSELF_SUCCESS" as "GET_MYSELF_SUCCESS",
+  GET_MYSELF_FAILURE: "GET_MYSELF_FAILURE" as "GET_MYSELF_FAILURE",
 
-  PLAN: 'PLAN' as 'PLAN',
-  PLAN_SUCCESS: 'PLAN_SUCCESS' as 'PLAN_SUCCESS',
-  PLAN_FAILURE: 'PLAN_FAILURE' as 'PLAN_FAILURE',
+  PLAN: "PLAN" as "PLAN",
+  PLAN_SUCCESS: "PLAN_SUCCESS" as "PLAN_SUCCESS",
+  PLAN_FAILURE: "PLAN_FAILURE" as "PLAN_FAILURE",
 
-  BIS_FUNCTIONS_GET_ALL: 'BIS_FUNCTIONS_GET_ALL' as 'BIS_FUNCTIONS_GET_ALL',
-  BIS_FUNCTIONS_GET_ALL_SUCCESS: 'BIS_FUNCTIONS_GET_ALL_SUCCESS' as 'BIS_FUNCTIONS_GET_ALL_SUCCESS',
-  BIS_FUNCTIONS_GET_ALL_FAILURE: 'BIS_FUNCTIONS_GET_ALL_FAILURE' as 'BIS_FUNCTIONS_GET_ALL_FAILURE',
+  BIS_FUNCTIONS_GET_ALL: "BIS_FUNCTIONS_GET_ALL" as "BIS_FUNCTIONS_GET_ALL",
+  BIS_FUNCTIONS_GET_ALL_SUCCESS:
+    "BIS_FUNCTIONS_GET_ALL_SUCCESS" as "BIS_FUNCTIONS_GET_ALL_SUCCESS",
+  BIS_FUNCTIONS_GET_ALL_FAILURE:
+    "BIS_FUNCTIONS_GET_ALL_FAILURE" as "BIS_FUNCTIONS_GET_ALL_FAILURE",
 
-  BIS_FUNCTION_UPSERT: 'BIS_FUNCTION_UPSERT' as 'BIS_FUNCTION_UPSERT',
-  BIS_FUNCTION_UPSERT_SUCCESS: 'BIS_FUNCTION_UPSERT_SUCCESS' as 'BIS_FUNCTION_UPSERT_SUCCESS',
-  BIS_FUNCTION_UPSERT_FAILURE: 'BIS_FUNCTION_UPSERT_FAILURE' as 'BIS_FUNCTION_UPSERT_FAILURE',
+  BIS_FUNCTION_UPSERT: "BIS_FUNCTION_UPSERT" as "BIS_FUNCTION_UPSERT",
+  BIS_FUNCTION_UPSERT_SUCCESS:
+    "BIS_FUNCTION_UPSERT_SUCCESS" as "BIS_FUNCTION_UPSERT_SUCCESS",
+  BIS_FUNCTION_UPSERT_FAILURE:
+    "BIS_FUNCTION_UPSERT_FAILURE" as "BIS_FUNCTION_UPSERT_FAILURE",
 
-  LOG_OUT_ENDUSER: 'LOG_OUT_ENDUSER' as 'LOG_OUT_ENDUSER',
-  LOG_OUT_ENDUSER_SUCCESS: 'LOG_OUT_ENDUSER_SUCCESS' as 'LOG_OUT_ENDUSER_SUCCESS',
-  LOG_OUT_ENDUSER_FAILURE: 'LOG_OUT_ENDUSER_FAILURE' as 'LOG_OUT_ENDUSER_FAILURE',
+  ENTITIES_GET_ALL: "ENTITIES_GET_ALL" as "ENTITIES_GET_ALL",
+  ENTITIES_GET_ALL_SUCCESS:
+    "ENTITIES_GET_ALL_SUCCESS" as "ENTITIES_GET_ALL_SUCCESS",
+  ENTITIES_GET_ALL_FAILURE:
+    "ENTITIES_GET_ALL_FAILURE" as "ENTITIES_GET_ALL_FAILURE",
+
+  LOG_OUT_ENDUSER: "LOG_OUT_ENDUSER" as "LOG_OUT_ENDUSER",
+  LOG_OUT_ENDUSER_SUCCESS:
+    "LOG_OUT_ENDUSER_SUCCESS" as "LOG_OUT_ENDUSER_SUCCESS",
+  LOG_OUT_ENDUSER_FAILURE:
+    "LOG_OUT_ENDUSER_FAILURE" as "LOG_OUT_ENDUSER_FAILURE",
 
   /** ui actions */
-  SET_PROVIDER_INITIAL_VALUES: 'SET_PROVIDER_INITIAL_VALUES' as 'SET_PROVIDER_INITIAL_VALUES',
-  SET_PROVIDER_VALUES: 'SET_PROVIDER_VALUES' as 'SET_PROVIDER_VALUES',
+  SET_PROVIDER_INITIAL_VALUES:
+    "SET_PROVIDER_INITIAL_VALUES" as "SET_PROVIDER_INITIAL_VALUES",
+  SET_PROVIDER_VALUES: "SET_PROVIDER_VALUES" as "SET_PROVIDER_VALUES",
 
-  SET_CHOSEN_SERVICE_TYPE: 'SET_CHOSEN_SERVICE_TYPE' as 'SET_CHOSEN_SERVICE_TYPE',
+  SET_CHOSEN_SERVICE_TYPE:
+    "SET_CHOSEN_SERVICE_TYPE" as "SET_CHOSEN_SERVICE_TYPE",
 };
 
 /* Actions */
@@ -109,6 +123,22 @@ export interface BisFunctionUpsertFailure {
   };
 }
 
+export interface EntitiesGetAll {
+  type: typeof actionTypes.ENTITIES_GET_ALL;
+}
+
+export interface EntitiesGetAllSuccess {
+  type: typeof actionTypes.ENTITIES_GET_ALL_SUCCESS;
+  payload: Entities;
+}
+
+export interface EntitiesGetAllFailure {
+  type: typeof actionTypes.ENTITIES_GET_ALL_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
 export interface LogOutEnduser {
   type: typeof actionTypes.LOG_OUT_ENDUSER;
 }
@@ -135,24 +165,27 @@ export interface SetProviderValues {
   payload: any;
 }
 
-
 export interface SetChosenServiceType {
   type: typeof actionTypes.SET_CHOSEN_SERVICE_TYPE;
   payload: any;
 }
 
 export type FailureAppActionTypes =
-  typeof actionTypes.GET_MYSELF_FAILURE |
-  typeof actionTypes.PLAN_FAILURE | 
-  typeof actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE | 
-  typeof actionTypes.BIS_FUNCTION_UPSERT_FAILURE 
+  | typeof actionTypes.GET_MYSELF_FAILURE
+  | typeof actionTypes.PLAN_FAILURE
+  | typeof actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE
+  | typeof actionTypes.BIS_FUNCTION_UPSERT_FAILURE
+  | typeof actionTypes.ENTITIES_GET_ALL_FAILURE
   ;
+
+
 
 export type FailureAppAction =
   | GetMyselfFailure
   | PlanFailure
-  | BisFunctionUpsertFailure
   | BisFunctionsGetAllFailure
+  | BisFunctionUpsertFailure
+  | EntitiesGetAllFailure
   | LogOutEnduserFailure;
 
 export type AppAction =
@@ -169,6 +202,9 @@ export type AppAction =
   | BisFunctionUpsert
   | BisFunctionUpsertSuccess
   | BisFunctionUpsertFailure
+  | EntitiesGetAll
+  | EntitiesGetAllSuccess
+  | EntitiesGetAllFailure
   | LogOutEnduser
   | LogOutEnduserSuccess
   | LogOutEnduserFailure

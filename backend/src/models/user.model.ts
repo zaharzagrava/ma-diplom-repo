@@ -21,6 +21,13 @@ import { Includeable, Op } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import Department from './department.model';
 
+export enum UserType {
+  // Швея
+  SEAMSTRESS = 'SEAMSTRESS',
+  // Закройщик
+  CUTTER = 'CUTTER',
+}
+
 export enum UserScope {
   WithDepartment = 'WithDepartment',
   WithAll = 'WithAll',
@@ -115,4 +122,16 @@ export default class User extends Model<User, Partial<User>> {
 
   @UpdatedAt
   updatedAt: Date;
+
+  @DeletedAt
+  deletedAt: Date | null;
 }
+
+// Resource1 - 50
+// Resource2 - 10
+// Resource3 - 100
+
+// Equipment1 - 1
+// Equipment2 - 2
+
+// User - 100

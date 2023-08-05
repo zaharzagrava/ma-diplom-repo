@@ -1,7 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
-import Product from 'src/models/product.model';
+import Product, {
+  ProductScope,
+  ProductWithAllFilters,
+} from 'src/models/product.model';
 import { Transaction } from 'sequelize';
 
 @Injectable()
@@ -14,6 +17,19 @@ export class ProductService {
     @InjectModel(Product)
     private readonly productModel: typeof Product,
   ) {}
+
+  public findAll(
+    params?: ProductWithAllFilters,
+    tx?: Transaction,
+  ): Promise<Product[] | null> {
+    return this.productModel
+      .scope({
+        method: [ProductScope.WithAll, <ProductWithAllFilters>params],
+      })
+      .findAll({
+        transaction: tx,
+      });
+  }
 
   public async sellProduct({
     product,
@@ -28,6 +44,7 @@ export class ProductService {
     income: number;
   }> {
     console.log('ProductService.sellProduct');
+
     return await this.dbUtilsService.wrapInTransaction(async (tx) => {
       const _sellAmount = Math.min(product.amount, sellAmount);
       const income = product.price * _sellAmount;

@@ -62,7 +62,27 @@ export class AdminService {
 
       // ---
 
-      // ---
+      // --- Business
+
+      await this.businessModel.create({
+        name: 'My business',
+        balance: 1000,
+      });
+
+      // --- User
+
+      await this.userModel.create({
+        email: 'zaharzagrava@gmail.com',
+        fullName: 'Alpha Userus',
+      });
+
+      const user1 = await this.userModel.create({
+        email: 'ivanpetrovych@gmail.com',
+        fullName: 'Ivan Petrovych',
+      });
+
+      // --- Resource
+
       const resource1 = await this.resourceModel.create({
         name: 'Деревяні дощечки',
         amount: 100,
@@ -81,16 +101,22 @@ export class AdminService {
         price: 0.5,
       });
 
+      // --- Product
+
       const tableProduct = await this.productModel.create({
         name: 'Стіл',
         amount: 120,
         price: 50,
       });
 
+      // --- ProductionChain
+
       const productionChain = await this.productionChainModel.create({
-        name: 'Стіл',
+        name: 'Виробництво мішків',
         productId: tableProduct.id,
       });
+
+      // --- ProductionChainResource
 
       await this.productionChainResourceModel.create({
         amount: 3,
@@ -108,15 +134,7 @@ export class AdminService {
         productionChainId: productionChain.id,
       });
 
-      await this.businessModel.create({
-        name: 'My business',
-        balance: 1000,
-      });
-
-      await this.userModel.create({
-        email: 'zaharzagrava@gmail.com',
-        fullName: 'Alpha Userus',
-      });
+      // --- Credit
 
       const credit = await this.creditModel.create({
         name: 'Credit from Bank of America',
@@ -124,6 +142,15 @@ export class AdminService {
         sum: 10000,
         rate: 0.05,
       });
+
+      const credit2 = await this.creditModel.create({
+        name: 'Credit from Bank of Ukraine',
+        startPeriod: 202203,
+        sum: 1000,
+        rate: 0.05,
+      });
+
+      // --- BisFunction
 
       await this.bisFunctionModel.create({
         name: 'Payout credit',
@@ -149,7 +176,7 @@ export class AdminService {
         productId: tableProduct.id,
       });
     } catch (error) {
-      console.log('@error');
+      console.log('Admin seeding error');
       console.log(error);
     }
   }

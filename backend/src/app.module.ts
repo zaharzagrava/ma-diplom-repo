@@ -11,6 +11,7 @@ import { UsersModule } from './users/users.module';
 import { AdminModule } from './admin/admin.module';
 import { BisFunctionModule } from './bis-function/bis-function.module';
 import { FinancialPlanningModule } from './financial-planning/financial-planning.module';
+import { EntitiesModule } from './entities/entities.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { FinancialPlanningModule } from './financial-planning/financial-planning
       http: process.env.NODE_ENV !== 'production',
       port: 8001,
     }),
+    EntitiesModule,
     SequelizeModule.forRootAsync({
       imports: [ApiConfigModule],
       inject: [ApiConfigService],

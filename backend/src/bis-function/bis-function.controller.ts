@@ -39,6 +39,15 @@ export class BisFunctionController {
   ) {}
 
   @Firewall()
+  @Get('/entities')
+  public async findAllEntities() {
+    // Returns all entities of the business (people, credits, etc.)
+    const entities = await this.bisFunctionService.findAllEntities();
+
+    return entities;
+  }
+
+  @Firewall()
   @Get('/')
   public async findAll() {
     return await this.bisFunctionService.findAll();
