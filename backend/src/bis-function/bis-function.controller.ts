@@ -17,7 +17,10 @@ import { Firewall } from 'src/auth/decorators/firewall.decorator';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/auth/decorators/user.decorator';
 import { UserRawDto } from 'src/users/types';
-import { BisFunctionUpsertDto } from './bis-function.types';
+import {
+  BisFunctionChangeOrderDto,
+  BisFunctionUpsertDto,
+} from './bis-function.types';
 
 @ApiTags('bis-function')
 @Controller('bis-function')
@@ -54,14 +57,26 @@ export class BisFunctionController {
   }
 
   @Firewall()
+  @Post('/order')
+  public async changeOrder(
+    @User() user: UserRawDto,
+    @Body() params: BisFunctionChangeOrderDto,
+  ) {
+    console.log('--- /api/bis-function/upsert');
+    console.log(params);
+
+    return await this.bisFunctionService.changeOrder({
+      bisFunctionChangeOrder: params,
+    });
+  }
+
+  @Firewall()
   @Post('/upsert')
   public async upsert(
     @User() user: UserRawDto,
     @Body() params: BisFunctionUpsertDto,
   ) {
     console.log('--- /api/bis-function/upsert');
-
-    console.log('@params');
     console.log(params);
 
     return await this.bisFunctionService.upsert({

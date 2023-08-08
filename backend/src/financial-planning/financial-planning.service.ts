@@ -7,7 +7,6 @@ import { BisFunctionService } from 'src/bis-function/bis-function.service';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
 import BisFunction, { BisFunctionType } from 'src/models/bis-function.model';
 import { BusinessState } from 'src/business/types';
-import { BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT } from 'src/bis-function/bis-function.types';
 import Business from 'src/models/business.model';
 
 @Injectable()

@@ -2,6 +2,7 @@ import React, { FC, useCallback, useEffect } from "react";
 import * as joi from "joi";
 
 import {
+  BisFunctionChangeOrderDto,
   BisFunctionDto,
   BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT,
   BisFunctionDto_SELL_PRODUCT_FIXED,
@@ -16,10 +17,12 @@ import {
 import BisFunction from "./BisFunction";
 import { CreateErrorObject } from "../../store/types";
 import { useDispatch } from "react-redux";
-import { BisFunctionUpsert } from "../../store/actions";
+import { BisFunctionOrderChange, BisFunctionUpsert } from "../../store/actions";
 import { Card } from "../Utils/Card";
 import { useSelector } from "react-redux";
 import { AppState } from "../../store/reducer";
+import { DateTime } from "luxon";
+import OrderChanger from "./OrderChanger";
 
 export const bisFunctionGeneralSettings = {
   name: {
@@ -53,6 +56,7 @@ export const bisFunctionsSettings: BisFunctionSettings = {
       creditId: {
         type: FormFieldType.DROPDOWN,
         label: "The credit to pay out:",
+        placeholder: 'Choose credit',
         validate: joi.string().required(),
         default: null,
       },
@@ -79,9 +83,26 @@ export const bisFunctionsSettings: BisFunctionSettings = {
   [BisFunctionType.BUY_RESOURCE_PRODUCT_FIXED_AMOUNT]: undefined,
 };
 
-export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto) => {
-  switch (bisFunction.type) {
+export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto | BisFunctionType): BisFunctionEditDto => {
+
+  // console.log('@bisFunction ---');
+  // console.log(bisFunction);
+
+  switch (typeof bisFunction === 'object' ? bisFunction.type : bisFunction) {
     case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
+      console.log('@111');
+      if(typeof bisFunction !== 'object' ) {
+        return {
+          id: undefined,
+          name: undefined,
+          type: bisFunction,
+          amount: undefined,
+          creditId: undefined,
+          startPeriod: Number(DateTime.now().toFormat('yyyyMM')),
+          endPeriod: Number(DateTime.now().toFormat('yyyyMM')),
+        } as BisFunctionEditDto_PAYOUT_CREDIT_FIXED_AMOUNT;
+      }
+
       const bisFunction_PAYOUT_CREDIT_FIXED_AMOUNT =
         bisFunction as BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT;
       return {
@@ -108,7 +129,7 @@ export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto) => {
       } as BisFunctionEditDto_SELL_PRODUCT_FIXED;
 
     default:
-      break;
+      throw new Error('')
   }
 };
 
@@ -140,11 +161,14 @@ export const bisFunctionsToUpsertTransform = (
 };
 
 type Props = {
-  mode: "edit" | "create";
-  bisFunction: BisFunctionDto;
+  bisFunction: BisFunctionDto | BisFunctionType;
+  onSubmitCallback?: () => void
 };
 
-const BisFunctionContainer: FC<Props> = (params) => {
+const BisFunctionContainer: FC<Props> = ({
+  bisFunction,
+  onSubmitCallback
+}) => {
   // Convert bisFunction into bisFunctionUpsert
   const dispatch = useDispatch();
   const entities = useSelector((state: AppState) => state.entites);
@@ -184,11 +208,31 @@ const BisFunctionContainer: FC<Props> = (params) => {
         type: "BIS_FUNCTION_UPSERT",
         payload: preProcessedValues,
       });
+
+      if(onSubmitCallback) onSubmitCallback();
     },
-    [dispatch]
+    [dispatch, onSubmitCallback]
   );
 
-  const bisFunctionEditDto = bisFunctionsToEditTransform(params.bisFunction);
+  const onOrderChange = useCallback(
+    (direction: 'up' | 'down') => {
+      if(typeof bisFunction !== 'object') return;
+
+      dispatch<BisFunctionOrderChange>({
+        type: "BIS_FUNCTION_ORDER_CHANGE",
+        payload: {
+          dir: direction,
+          name: bisFunction.name
+        },
+      });
+    },
+    [dispatch, bisFunction]
+  );
+
+  // console.log('@bisFunction');
+  // console.log(bisFunction);
+
+  const bisFunctionEditDto = bisFunctionsToEditTransform(bisFunction);
 
   if (!bisFunctionEditDto) {
     return (
@@ -202,15 +246,20 @@ const BisFunctionContainer: FC<Props> = (params) => {
     );
   }
 
+  const isEdit = typeof bisFunction === "object";
+
   return (
-    <BisFunction
-      mode={params.mode}
-      bisFunction={params.bisFunction}
-      bisFunctionEdit={bisFunctionEditDto}
-      entities={entities}
-      onValidate={onBisFunctionValidate}
-      onSubmit={onBisFunctionSubmit}
-    />
+    <div>
+      {isEdit && <OrderChanger onOrderChange={onOrderChange} />}
+      <BisFunction
+        bisFunction={bisFunction}
+        bisFunctionEdit={bisFunctionEditDto}
+        entities={entities}
+        onValidate={onBisFunctionValidate}
+        onSubmit={onBisFunctionSubmit}
+        isEdit={isEdit}
+      />
+    </div>
   );
 };
 

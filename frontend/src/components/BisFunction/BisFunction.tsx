@@ -14,15 +14,13 @@ import {
 import { Entities } from "../../store/types";
 import Button from "../Button/Button";
 import FormDatepicker from "../Form/FormDatePicker/FormDatePicker";
-import FormDropdown from "../Form/FormDropdown/FormDropdown";
+import { FormDropdown } from "../Form/FormDropdown/FormDropdown";
 import FormStringField from "../Form/FormStringField/FormStringField";
 import { Card } from "../Utils/Card";
 import { HorizontalGrid } from "../Utils/HorizontalGrid";
 import { bisFunctionsSettings } from "./BisFunctionContainer";
 
 type Props = {
-  mode: "edit" | "create";
-
   /**
    * We maintain two separate objects, since they store somewhat different data
    *
@@ -33,8 +31,9 @@ type Props = {
    *
    * Combining data from both of them, we render the editable component
    */
-  bisFunction: BisFunctionDto;
+  bisFunction: BisFunctionDto | BisFunctionType; // if bisFunction is undefined - then 'create' mode
   bisFunctionEdit: BisFunctionEditDto;
+  isEdit?: boolean; // helper property
 
   entities: Entities;
 
@@ -49,8 +48,9 @@ export const FormComponent: FC<{
     label: string;
     validate: Joi.AnySchema<any>;
     default: any;
+    placeholder?: string;
   };
-  bisFunction: BisFunctionDto;
+  bisFunctionEdit: BisFunctionEditDto;
   entities: Entities;
 }> = (params) => {
   let formComponent;
@@ -64,10 +64,10 @@ export const FormComponent: FC<{
     );
     // FormFieldType.DROPDOWN
   } else {
-    let filteredEntities
+    let filteredEntities;
     try {
       filteredEntities = (() => {
-        switch (params.bisFunction.type) {
+        switch (params.bisFunctionEdit.type) {
           case BisFunctionType.SELL_PRODUCT_FIXED:
             return params.entities.products;
           case BisFunctionType.BUY_RESOURCE_PRODUCT_FIXED_AMOUNT:
@@ -77,21 +77,21 @@ export const FormComponent: FC<{
 
           default:
             throw new Error(
-              `No dropdown handler for ${params.bisFunction.id} of ${params.bisFunction.type} type`
+              `No dropdown handler of ${params.bisFunctionEdit.type} type`
             );
         }
       })();
     } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : 'Unkown error';
-      return <Card>{errorMsg}</Card>
+      const errorMsg = error instanceof Error ? error.message : "Unkown error";
+      return <Card>{errorMsg}</Card>;
     }
 
     formComponent = (
       <FormDropdown
         name={params.name}
-        placeholder={params.value.default}
+        placeholder={params.value.placeholder}
         label={params.value.label}
-        labelDirection='column'
+        labelDirection="column"
         options={filteredEntities.map((x) => x.id)}
         labels={filteredEntities.map((x) => x.name)}
       />
@@ -107,77 +107,90 @@ const BisFunction: FC<Props> = (params) => {
       params.bisFunctionEdit.type as keyof BisFunctionSettings
     ];
 
-  if (
-    bisFunctionsSettings[
-      params.bisFunctionEdit.type as keyof typeof bisFunctionsSettings
-    ]
-  ) {
+  if (!bisFunctionSettings)
     return (
-      <Card>
-        <Formik
-          initialValues={params.bisFunctionEdit}
-          enableReinitialize={true}
-          validate={params.onValidate}
-          onSubmit={params.onSubmit}
-        >
-          {({ handleSubmit }: FormikProps<BisFunctionEditDto>) => (
-            <div>
-              <h2>{params.bisFunction.name}</h2>
-              <HorizontalGrid>
-                <p>#{params.bisFunction.order}</p>
-                <FormDropdown
-                  name="type"
-                  placeholder="Function type"
-                  label="Type"
-                  options={bisFunctionTypes.map((x) => x.type)}
-                  labels={bisFunctionTypes.map((x) => x.label)}
-                />
-                <FormDatepicker name={"startPeriod"} label="Start period" />
-                <FormDatepicker name={"endPeriod"} label="End period" />
-              </HorizontalGrid>
-              <hr />
-              {bisFunctionSettings && (
-                <>
-                  {Object.entries(bisFunctionSettings.fields).map(
-                    ([key, value]) => {
-                      console.log('@key, value');
-                      console.log(key, value);
-                      return (
-                        <div key={key}>
-                          <FormComponent
-                            name={key}
-                            value={value}
-                            bisFunction={params.bisFunction}
-                            entities={params.entities}
-                          />
-                          <hr
-                            style={{
-                              marginTop: 0,
-                              marginBottom: 0,
-                              width: "30%",
-                              marginLeft: 0,
-                            }}
-                          />
-                        </div>
-                      );
-                    }
-                  )}
-                </>
-              )}
-
-              <div style={{ marginTop: 10 }}>
-                <Button buttonType="submit" onClick={() => handleSubmit()}>
-                  Update
-                </Button>
-              </div>
-            </div>
-          )}
-        </Formik>
-      </Card>
+      <Card>Error: No renderer for type {params.bisFunctionEdit.type}</Card>
     );
-  }
 
-  return <Card>Error: No renderer for type {params.bisFunctionEdit.type}</Card>;
+  return (
+    <Card>
+      <Formik
+        initialValues={params.bisFunctionEdit}
+        enableReinitialize={true}
+        validate={params.onValidate}
+        onSubmit={params.onSubmit}
+      >
+        {({ handleSubmit }: FormikProps<BisFunctionEditDto>) => (
+          <div>
+            <HorizontalGrid>
+              {params.isEdit ? (
+                <h2>
+                  {typeof params.bisFunction === "object" &&
+                    params.bisFunction.name}
+                </h2>
+              ) : (
+                <FormStringField
+                  name={"name"}
+                  placeholder={"Function name"}
+                />
+              )}
+              <FormDropdown
+                name="type"
+                placeholder="Function type"
+                defaultValue={bisFunctionTypes[0].type}
+                options={bisFunctionTypes.map((x) => x.type)}
+                labels={bisFunctionTypes.map((x) => x.label)}
+                editable={!params.isEdit}
+                resetOnChoose={true}
+              />
+              <FormDatepicker name={"startPeriod"} />
+              <FormDatepicker name={"endPeriod"} />
+            </HorizontalGrid>
+            <hr />
+            {Object.entries(bisFunctionSettings.fields).map(
+              ([key, value], index) => {
+                return (
+                  <div key={key}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <FormComponent
+                        name={key}
+                        value={value}
+                        bisFunctionEdit={params.bisFunctionEdit}
+                        entities={params.entities}
+                      />
+                      {index ===
+                        Object.entries(bisFunctionSettings.fields).length -
+                          1 && (
+                        <Button
+                          buttonType="submit"
+                          onClick={() => handleSubmit()}
+                        >
+                          {params.isEdit ? 'Update' : 'Create'}
+                        </Button>
+                      )}
+                    </div>
+                    <hr
+                      style={{
+                        marginTop: 0,
+                        marginBottom: 0,
+                        width: "5%",
+                        marginLeft: 0,
+                      }}
+                    />
+                  </div>
+                );
+              }
+            )}
+          </div>
+        )}
+      </Formik>
+    </Card>
+  );
 };
 
 export default BisFunction;

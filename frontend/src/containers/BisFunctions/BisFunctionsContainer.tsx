@@ -12,7 +12,7 @@ type Props = {
 
 const BisFunctionsContainer: FC<Props> = ({bisFunctions}) => {
   return <VerticalGrid>
-    {bisFunctions.map(bisFunction => <BisFunctionContainer mode='edit' bisFunction={bisFunction} key={bisFunction.id} />)}
+    {bisFunctions.map(bisFunction => <BisFunctionContainer bisFunction={bisFunction} key={bisFunction.id} />)}
   </VerticalGrid>;
 };
 

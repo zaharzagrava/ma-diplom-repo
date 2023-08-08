@@ -66,6 +66,21 @@ module.exports = {
           allowNull: false,
         },
 
+        type: {
+          type: Sequelize.ENUM('SEAMSTRESS', 'CUTTER', 'MANAGER'),
+          allowNull: false,
+        },
+
+        salary: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+
+        employedAt: {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        },
+
         createdAt: {
           allowNull: false,
           type: Sequelize.DATE,
@@ -300,7 +315,7 @@ module.exports = {
 
         startPeriod: {
           type: Sequelize.INTEGER,
-          allowNull: false,
+          allowNull: true,
         },
 
         createdAt: {
@@ -494,6 +509,8 @@ module.exports = {
     );
 
     // ProductionChainEquipment
+    // Specifies which and how much equipment each user invlolved in creation of a given product (specified in ProductionChainUser) is needed
+    // to create 1 of product
     await queryInterface.createTable(
       'ProductionChainEquipment',
       {
@@ -521,7 +538,7 @@ module.exports = {
 
         productionChainId: {
           type: Sequelize.UUID,
-          allowNull: true,
+          allowNull: false,
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
           references: {
@@ -547,6 +564,7 @@ module.exports = {
     );
 
     // ProductionChainResource
+    // Specifies how much of this resource is need to create 1 of product
     await queryInterface.createTable(
       'ProductionChainResource',
       {
@@ -574,7 +592,7 @@ module.exports = {
 
         productionChainId: {
           type: Sequelize.UUID,
-          allowNull: true,
+          allowNull: false,
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
           references: {
@@ -600,6 +618,9 @@ module.exports = {
     );
 
     // ProductionChainUser
+    // Specifies how which user types are needed / involved in development of 1 product
+    // if userId fields are null, it means that users are not specified, but those are the types that should be
+    // can have multiple records, each record specifying different users that are actually working here
     await queryInterface.createTable(
       'ProductionChainUser',
       {
@@ -607,6 +628,11 @@ module.exports = {
           type: Sequelize.UUID,
           defaultValue: Sequelize.literal('uuid_generate_v4()'),
           primaryKey: true,
+        },
+
+        type: {
+          type: Sequelize.ENUM('SEAMSTRESS', 'CUTTER', 'MANAGER'),
+          allowNull: false,
         },
 
         userId: {
@@ -622,7 +648,7 @@ module.exports = {
 
         productionChainId: {
           type: Sequelize.UUID,
-          allowNull: true,
+          allowNull: false,
           onDelete: 'CASCADE',
           onUpdate: 'CASCADE',
           references: {

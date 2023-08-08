@@ -4,8 +4,9 @@ import { ErrorCodes } from '../error';
 import { firebaseAuth } from '../firebase';
 import router from '../router';
 import {
-  actionTypes, AppAction, BisFunctionUpsert, FailureAppAction, FailureAppActionTypes,
+  actionTypes, AppAction, BisFunctionOrderChange, BisFunctionUpsert, FailureAppAction, FailureAppActionTypes,
 } from './actions';
+import { BisFunctionChangeOrderDto } from './bis-function.types';
 import { Entities, Entity } from './types';
 
 function* errorHandler(
@@ -110,10 +111,29 @@ function* bisFunctionUpsert(params: BisFunctionUpsert) {
       payload: response.data
     });
 
+    console.log('@response.data');
+    console.log(response.data);
+
     yield put<AppAction>({type: 'PLAN' });
-    yield put<AppAction>({type: 'BIS_FUNCTIONS_GET_ALL' });
   } catch (error) {
     yield call(errorHandler, error, 'BIS_FUNCTION_UPSERT_FAILURE');
+  }
+}
+
+function* bisFunctionOrderChange(params: BisFunctionOrderChange) {
+  try {
+    const response: {
+      data: any
+    } = yield call(() => {
+      return axios.post('http://localhost:8000/api/bis-function/order', params.payload);
+    });
+
+    yield put<AppAction>({
+      type: 'BIS_FUNCTION_ORDER_CHANGE_SUCCESS',
+      payload: response.data
+    });
+  } catch (error) {
+    yield call(errorHandler, error, 'BIS_FUNCTION_ORDER_CHANGE_FAILURE');
   }
 }
 
@@ -124,9 +144,6 @@ function* entitiesGetAll() {
     } = yield call(() => {
       return axios.get('http://localhost:8000/api/entities');
     });
-
-    console.log('@response');
-    console.log(response);
 
     yield put<AppAction>({
       type: 'ENTITIES_GET_ALL_SUCCESS',
@@ -142,5 +159,6 @@ export const rootSaga = function* rootSaga() {
   yield takeLeading(actionTypes.PLAN, plan);
   yield takeLeading(actionTypes.BIS_FUNCTIONS_GET_ALL, bisFunctionsGetAll);
   yield takeLeading(actionTypes.BIS_FUNCTION_UPSERT, bisFunctionUpsert);
+  yield takeLeading(actionTypes.BIS_FUNCTION_ORDER_CHANGE, bisFunctionOrderChange);
   yield takeLeading(actionTypes.ENTITIES_GET_ALL, entitiesGetAll);
 };

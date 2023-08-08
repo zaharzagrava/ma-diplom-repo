@@ -26,7 +26,11 @@ export enum UserType {
   SEAMSTRESS = 'SEAMSTRESS',
   // Закройщик
   CUTTER = 'CUTTER',
+  // Закройщик
+  MANAGER = 'MANAGER',
 }
+
+export const UserTypes = Object.values(UserType);
 
 export enum UserScope {
   WithDepartment = 'WithDepartment',
@@ -116,6 +120,15 @@ export default class User extends Model<User, Partial<User>> {
 
   @Column({ allowNull: false })
   fullName: string;
+
+  @Column(DataType.ENUM(...UserTypes))
+  type: UserType;
+
+  @Column({ type: DataType.INTEGER })
+  salary: number;
+
+  @Column({ type: DataType.INTEGER })
+  employedAt: number | null;
 
   @CreatedAt
   createdAt: Date;

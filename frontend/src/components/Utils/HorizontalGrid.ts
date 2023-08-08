@@ -5,4 +5,6 @@ export const HorizontalGrid = styled.div`
   grid-gap: 20px;
   grid-auto-flow: column;
   grid-auto-columns: 300px;
+
+  align-items: center;
 `;

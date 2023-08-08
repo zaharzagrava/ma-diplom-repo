@@ -3,6 +3,7 @@ import { ErrorCodes } from '../error';
 import { actionTypes, AppAction } from './actions';
 import { BisMetriscDto, Entities, Entity, Myself } from './types';
 import { BisFunctionDto } from './bis-function.types';
+import * as _ from 'lodash'
 
 /* Initial State */
 export const RootReducerInitialState = {
@@ -51,6 +52,12 @@ export const RootReducerInitialState = {
     },
 
     bisFunctionUpsert: {
+      loading: false as boolean,
+      errors: null as ErrorCodes[] | null,
+      success: null as boolean | null, // is there been at least one successful register
+    },
+
+    bisFunctionOrderChange: {
       loading: false as boolean,
       errors: null as ErrorCodes[] | null,
       success: null as boolean | null, // is there been at least one successful register
@@ -152,6 +159,38 @@ export const RootReducer = produce(
       case actionTypes.BIS_FUNCTION_UPSERT_FAILURE:
         draft.actions.bisFunctionUpsert.errors = action.payload.errors;
         draft.actions.bisFunctionUpsert.loading = false;
+        break;
+
+      case actionTypes.BIS_FUNCTION_ORDER_CHANGE:
+        draft.actions.bisFunctionOrderChange.errors = null;
+        draft.actions.bisFunctionOrderChange.loading = true;
+        break;
+      case actionTypes.BIS_FUNCTION_ORDER_CHANGE_SUCCESS:
+        if(draft.bisFunctions) {
+          const updatedBisFunctions = _.sortBy(draft.bisFunctions.map(x => {
+            if(x.id === action.payload.updated.id) {
+              return action.payload.updated;
+            }
+
+            if(x.id === action.payload.moved?.id) {
+              return {
+                ...x,
+                order: action.payload.moved?.newOrder
+              }
+            }
+
+            return x;
+          }), 'order', 'asc')
+
+          draft.bisFunctions = updatedBisFunctions
+        }
+
+        draft.actions.bisFunctionOrderChange.errors = null;
+        draft.actions.bisFunctionOrderChange.loading = false;
+        break;
+      case actionTypes.BIS_FUNCTION_ORDER_CHANGE_FAILURE:
+        draft.actions.bisFunctionOrderChange.errors = action.payload.errors;
+        draft.actions.bisFunctionOrderChange.loading = false;
         break;
 
       case actionTypes.ENTITIES_GET_ALL:

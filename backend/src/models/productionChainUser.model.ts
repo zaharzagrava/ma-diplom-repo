@@ -8,9 +8,10 @@ import {
   Default,
   IsUUID,
   ForeignKey,
+  DataType,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
-import User from './user.model';
+import User, { UserType, UserTypes } from './user.model';
 import ProductionChain from './productionChain.model';
 
 @Table({
@@ -34,6 +35,9 @@ export default class ProductionChainUser extends Model<
   @ForeignKey(() => ProductionChain)
   @Column
   productionChainId: string;
+
+  @Column(DataType.ENUM(...UserTypes))
+  type: UserType;
 
   @CreatedAt
   createdAt: Date;

@@ -11,6 +11,7 @@ import Product from 'src/models/product.model';
 import ProductionChain from 'src/models/productionChain.model';
 import ProductionChainEquipment from 'src/models/productionChainEquipment.model';
 import ProductionChainResource from 'src/models/productionChainResource.model';
+import ProductionChainUser from 'src/models/productionChainUser.model';
 import Resource from 'src/models/resource.model';
 import User from 'src/models/user.model';
 import { PeriodModule } from 'src/period/period.module';
@@ -33,6 +34,7 @@ import { AdminService } from './admin.service';
       ProductionChain,
       ProductionChainEquipment,
       ProductionChainResource,
+      ProductionChainUser,
     ]),
     PeriodModule,
   ],

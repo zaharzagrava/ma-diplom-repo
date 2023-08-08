@@ -9,6 +9,11 @@ export interface BisFunctionUpsertDto {
   endPeriod: number | null;
 }
 
+export interface BisFunctionChangeOrderDto {
+  name: string;
+  dir: 'up' | 'down';
+}
+
 export interface BisFunctionDto extends BisFunctionUpsertDto {
   id: string;
   order: number;
@@ -16,20 +21,18 @@ export interface BisFunctionDto extends BisFunctionUpsertDto {
 
 /**
  * @description
+ *    - PAYOUT_CREDIT_FIXED_AMOUNT
  *    - pays out a fixed amount of the credit each period
  */
-export interface BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT
-  extends BisFunctionUpsertDto {
-  creditId: string;
+export interface BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT
+  extends BisFunctionDto {
+  credit: Credit;
   amount: number;
 }
 
-/**
- * @description
- *    - pays out a fixed amount of the credit each period
- */
-export interface BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT extends BisFunctionDto {
-  credit: Credit;
+export interface BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT
+  extends BisFunctionUpsertDto {
+  creditId: string;
   amount: number;
 }
 
@@ -42,13 +45,10 @@ export interface BisFunctionDto_SELL_PRODUCT_FIXED extends BisFunctionDto {
   amount: number;
 }
 
-/**
- * @description
- *    - pays out a fixed amount of the credit each period
- */
-export interface BisFunctionEditDto_SELL_PRODUCT_FIXED extends BisFunctionDto {
-  productId?: string;
-  amount?: number;
+export interface BisFunctionUpsertDto_SELL_PRODUCT_FIXED
+  extends BisFunctionDto {
+  productId: string;
+  amount: number;
 }
 
 /**

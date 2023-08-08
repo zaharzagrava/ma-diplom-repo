@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  InternalServerErrorException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
@@ -15,18 +11,20 @@ import Resource from 'src/models/resource.model';
 import Equipment from 'src/models/equipment.model';
 import {
   BisFunctionUpsertDto,
-  BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT,
   BisFunctionDto_SELL_PRODUCT_FIXED,
   BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT,
-  BisFunctionEditDto_SELL_PRODUCT_FIXED,
+  BisFunctionUpsertDto_SELL_PRODUCT_FIXED,
+  BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT,
+  BisFunctionChangeOrderDto,
 } from './bis-function.types';
 import Credit from 'src/models/credit.model';
 import { BusinessState } from 'src/business/types';
 import { ProductService } from 'src/product/product.service';
-import { Transaction } from 'sequelize';
+import { CreationAttributes, Transaction } from 'sequelize';
 import { PeriodService } from 'src/period/period.service';
 import { CreditService } from 'src/credit/credit.service';
 import { ResourceService } from 'src/resource/resource.service';
+import * as _ from 'lodash';
 
 @Injectable()
 export class BisFunctionService {
@@ -66,18 +64,119 @@ export class BisFunctionService {
       (a, b) => a.order - b.order,
     );
 
-    const processedBisFunctions = bisFunctions.map(async (bisFunction) => {
-      switch (bisFunction.type) {
-        case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
-          return this.postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(bisFunction);
-        case BisFunctionType.SELL_PRODUCT_FIXED:
-          return this.postProcess_SELL_PRODUCT_FIXED(bisFunction);
-        default:
-          return bisFunction;
-      }
-    });
+    const processedBisFunctions = bisFunctions.map(async (bisFunction) =>
+      this.postProcessBisFunction(bisFunction),
+    );
 
     return await Promise.all(processedBisFunctions);
+  }
+
+  private postProcessBisFunction(bisFunction: BisFunction, tx?: Transaction) {
+    switch (bisFunction.type) {
+      case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
+        return this.postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(bisFunction, tx);
+      case BisFunctionType.SELL_PRODUCT_FIXED:
+        return this.postProcess_SELL_PRODUCT_FIXED(bisFunction, tx);
+      default:
+        return bisFunction;
+    }
+  }
+
+  public async changeOrder({
+    bisFunctionChangeOrder,
+  }: {
+    bisFunctionChangeOrder: BisFunctionChangeOrderDto;
+  }) {
+    return await this.dbUtilsService.wrapInTransaction(async (tx) => {
+      try {
+        const bisFunction = await this.bisFunctionModel.findOne({
+          where: { name: bisFunctionChangeOrder.name },
+          transaction: tx,
+        });
+
+        if (!bisFunction) {
+          throw new NotFoundException('Bis function is not found');
+        }
+
+        let movedBisFunction: { newOrder: number; id: string };
+        if (bisFunctionChangeOrder.dir === 'up') {
+          const upperBisFunction = await this.bisFunctionModel.findOne({
+            where: { order: bisFunction.order - 1 },
+            transaction: tx,
+          });
+
+          if (!upperBisFunction) return;
+
+          const newUpperBisFunctionOrder = upperBisFunction.order + 1;
+          const newBisFunctionOrder = bisFunction.order - 1;
+
+          await upperBisFunction.update(
+            { order: _.random(-100, -1, false) },
+            { transaction: tx },
+          );
+          await bisFunction.update(
+            { order: newBisFunctionOrder },
+            { transaction: tx },
+          );
+          await upperBisFunction.update(
+            { order: newUpperBisFunctionOrder },
+            { transaction: tx },
+          );
+
+          movedBisFunction = {
+            newOrder: upperBisFunction.order,
+            id: upperBisFunction.id,
+          };
+        } else {
+          const lowerBisFunction = await this.bisFunctionModel.findOne({
+            where: { order: bisFunction.order + 1 },
+            transaction: tx,
+          });
+
+          if (!lowerBisFunction) return;
+
+          const newLowerBisFunctionOrder = lowerBisFunction.order - 1;
+          const newBisFunctionOrder = bisFunction.order + 1;
+
+          await lowerBisFunction.update(
+            { order: _.random(-100, -1, false) },
+            { transaction: tx },
+          );
+          await bisFunction.update(
+            { order: newBisFunctionOrder },
+            { transaction: tx },
+          );
+          await lowerBisFunction.update(
+            { order: newLowerBisFunctionOrder },
+            { transaction: tx },
+          );
+
+          movedBisFunction = {
+            newOrder: lowerBisFunction.order,
+            id: lowerBisFunction.id,
+          };
+        }
+
+        const alpha = {
+          updated: await this.postProcessBisFunction(
+            (await this.bisFunctionModel.findOne({
+              where: { name: bisFunctionChangeOrder.name },
+              transaction: tx,
+            })) as BisFunction,
+          ),
+          moved: movedBisFunction,
+        };
+
+        console.log('@udpated');
+        console.log(123);
+
+        return alpha;
+      } catch (error) {
+        console.log('Bis function upsert error');
+        console.log(error);
+        console.log(JSON.stringify(error, null, 2));
+      }
+    });
   }
 
   public async upsert({
@@ -85,68 +184,97 @@ export class BisFunctionService {
   }: {
     bisFunctionUpsert: BisFunctionUpsertDto;
   }) {
-    console.log('@bisFunctionUpsert');
-    console.log(JSON.stringify(bisFunctionUpsert, null, 2));
+    return await this.dbUtilsService.wrapInTransaction(async (tx) => {
+      try {
+        const bisFunction = await this.bisFunctionModel.findOne({
+          where: { name: bisFunctionUpsert.name },
+          transaction: tx,
+        });
 
-    let _bisFunctionUpsert;
-    let updatedBisFunction;
+        const bisFunctionCount = await this.bisFunctionModel.count({
+          transaction: tx,
+        });
 
-    await this.bisFunctionModel.update(
-      {
-        ...(bisFunctionUpsert.startPeriod && {
-          startPeriod: bisFunctionUpsert.startPeriod,
-        }),
-        ...(bisFunctionUpsert.endPeriod && {
-          endPeriod: bisFunctionUpsert.endPeriod,
-        }),
-      },
-      {
-        where: { name: bisFunctionUpsert.name },
-        returning: true,
-      },
-    );
+        const upsertBody: CreationAttributes<BisFunction> = {
+          startPeriod:
+            bisFunctionUpsert.startPeriod ?? bisFunction?.startPeriod,
+          ...(bisFunctionUpsert.endPeriod && {
+            endPeriod: bisFunctionUpsert.endPeriod,
+          }),
+          name: bisFunction?.name ?? bisFunctionUpsert.name,
+          order: bisFunction?.order ?? bisFunctionCount + 1,
+          type: bisFunction?.type ?? bisFunctionUpsert.type,
+        };
 
-    switch (bisFunctionUpsert.type) {
-      case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
-        _bisFunctionUpsert =
-          bisFunctionUpsert as BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT;
+        switch (bisFunctionUpsert.type) {
+          case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
+            this.prepareUpsert_PAYOUT_CREDIT_FIXED_AMOUNT(
+              bisFunctionUpsert as BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT,
+              upsertBody,
+            );
+            break;
+          case BisFunctionType.SELL_PRODUCT_FIXED:
+            this.prepareUpsert_SELL_PRODUCT_FIXED(
+              bisFunctionUpsert as BisFunctionUpsertDto_SELL_PRODUCT_FIXED,
+              upsertBody,
+            );
+            break;
+        }
 
-        return await this.bisFunctionModel.update(
-          {
-            ...(_bisFunctionUpsert.amount && {
-              meta: {
-                amount: _bisFunctionUpsert.amount,
-              },
-            }),
-            creditId: _bisFunctionUpsert.creditId,
-          },
-          {
+        if (!bisFunction) {
+          await this.bisFunctionModel.create(upsertBody, {
+            transaction: tx,
+          });
+        } else {
+          await this.bisFunctionModel.update(upsertBody, {
+            where: { name: bisFunction.name },
+            transaction: tx,
+          });
+        }
+
+        return await this.postProcessBisFunction(
+          (await this.bisFunctionModel.findOne({
             where: { name: bisFunctionUpsert.name },
-            returning: true,
-          },
+            transaction: tx,
+          })) as BisFunction,
         );
-      case BisFunctionType.SELL_PRODUCT_FIXED:
-        _bisFunctionUpsert =
-          bisFunctionUpsert as BisFunctionEditDto_SELL_PRODUCT_FIXED;
+      } catch (error) {
+        console.log('Bis function upsert error');
+        console.log(error);
+        console.log(JSON.stringify(error, null, 2));
+      }
+    });
+  }
 
-        return await this.bisFunctionModel.update(
-          {
-            ...(_bisFunctionUpsert.amount && {
-              meta: {
-                amount: _bisFunctionUpsert.amount,
-              },
-            }),
-            productId: _bisFunctionUpsert.productId,
-          },
-          {
-            where: { name: bisFunctionUpsert.name },
-            returning: true,
-          },
-        );
-    }
+  private prepareUpsert_PAYOUT_CREDIT_FIXED_AMOUNT(
+    _bisFunctionUpsert: BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT,
+    upsertBody: CreationAttributes<BisFunction>,
+  ) {
+    upsertBody.meta = {
+      ...(_bisFunctionUpsert.amount && {
+        amount: _bisFunctionUpsert.amount,
+      }),
+    };
 
-    const bisFunctions = await this.findAll();
-    return bisFunctions.find((x) => x.name);
+    upsertBody.creditId = _bisFunctionUpsert.creditId;
+
+    return _bisFunctionUpsert;
+  }
+
+  private prepareUpsert_SELL_PRODUCT_FIXED(
+    _bisFunctionUpsert: BisFunctionUpsertDto_SELL_PRODUCT_FIXED,
+    upsertBody: CreationAttributes<BisFunction>,
+  ) {
+    upsertBody.meta = {
+      ...(_bisFunctionUpsert.amount && {
+        amount: _bisFunctionUpsert.amount,
+      }),
+      ...(_bisFunctionUpsert.productId && {
+        productId: _bisFunctionUpsert.productId,
+      }),
+    };
+
+    return _bisFunctionUpsert;
   }
 
   public async exec(
@@ -247,7 +375,7 @@ export class BisFunctionService {
   private async postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(
     bisFunction: BisFunction,
     tx?: Transaction,
-  ): Promise<BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT> {
+  ): Promise<BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT> {
     if (bisFunction.type !== BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT) {
       throw new Error('Not a valid type');
     }
@@ -280,7 +408,7 @@ export class BisFunctionService {
    */
   private exec_PAYOUT_CREDIT_FIXED_AMOUNT(
     businessState: BusinessState,
-    bisFunction: BisFunction_PAYOUT_CREDIT_FIXED_AMOUNT,
+    bisFunction: BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT,
     tx?: Transaction,
   ): BusinessState {
     this.pushAndRecordPrompt(

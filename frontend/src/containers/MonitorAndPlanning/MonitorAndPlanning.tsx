@@ -8,18 +8,17 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { AppAction } from "../../store/actions";
 import { VerticalGrid } from "../../components/Utils/VerticalGrid";
-import { HorizontalGrid } from "../../components/Utils/HorizontalGrid";
 import { AlignCenter } from "../../components/Utils/AlignCenter";
 import { Table, TD, TR } from "../../components/Utils/TableUtils";
+import Button from "../../components/Button/Button";
+import NewBisFunctionContainer from "../NewBisFunctionContainer/NewBisFunctionContainer";
+import { HorizontalGrid } from "../../components/Utils/HorizontalGrid";
 
 const MonitorAndPlanningContainer = () => {
   // const {from, to} = useSelector((state: AppState) => state.ui.monitoringAndPlanning);
   const bisFunctions = useSelector((state: AppState) => state.bisFunctions);
   const bisMetrics = useSelector((state: AppState) => state.bisMetrics);
   const entities = useSelector((state: AppState) => state.entites);
-
-  console.log("@entities");
-  console.log(JSON.stringify(entities, null, 2));
 
   const dispatch = useDispatch();
 
@@ -29,19 +28,19 @@ const MonitorAndPlanningContainer = () => {
     dispatch<AppAction>({ type: "PLAN" });
   }, [dispatch]);
 
-  if (bisFunctions === null || bisMetrics === null) {
+  if (bisFunctions === null || bisMetrics === null || entities === null) {
     return <>Loading</>;
   }
+
+  console.log('@bisFunctions.map(x => x.name)');
+  console.log(bisFunctions.map(x => x.name));
 
   return (
     <VerticalGrid>
       <h2>Моніторинг та Планування</h2>
       <BisFunctionsContainer bisFunctions={bisFunctions} />
+      <NewBisFunctionContainer />
       <AlignCenter>
-        <button>Add new business function</button>
-      </AlignCenter>
-      <AlignCenter>
-        <button>Plan</button>
         <BisMetricsChart bisMetricsDto={bisMetrics.balance} />
         <BisFunctionsChart
           bisFunctions={bisFunctions.map((x) => ({

@@ -1,5 +1,5 @@
 import { ErrorCodes } from "../error";
-import { BisFunctionDto, BisFunctionEditDto } from "./bis-function.types";
+import { BisFunctionChangeOrderDto as BisFunctionOrderChangeDto, BisFunctionDto, BisFunctionEditDto } from "./bis-function.types";
 import { BisMetriscDto, Credit, Entities, Entity, Myself, Product, Resource } from "./types";
 
 /* Action Types */
@@ -27,6 +27,12 @@ export const actionTypes = {
     "BIS_FUNCTION_UPSERT_SUCCESS" as "BIS_FUNCTION_UPSERT_SUCCESS",
   BIS_FUNCTION_UPSERT_FAILURE:
     "BIS_FUNCTION_UPSERT_FAILURE" as "BIS_FUNCTION_UPSERT_FAILURE",
+
+    BIS_FUNCTION_ORDER_CHANGE: "BIS_FUNCTION_ORDER_CHANGE" as "BIS_FUNCTION_ORDER_CHANGE",
+    BIS_FUNCTION_ORDER_CHANGE_SUCCESS:
+      "BIS_FUNCTION_ORDER_CHANGE_SUCCESS" as "BIS_FUNCTION_ORDER_CHANGE_SUCCESS",
+    BIS_FUNCTION_ORDER_CHANGE_FAILURE:
+      "BIS_FUNCTION_ORDER_CHANGE_FAILURE" as "BIS_FUNCTION_ORDER_CHANGE_FAILURE",
 
   ENTITIES_GET_ALL: "ENTITIES_GET_ALL" as "ENTITIES_GET_ALL",
   ENTITIES_GET_ALL_SUCCESS:
@@ -123,6 +129,29 @@ export interface BisFunctionUpsertFailure {
   };
 }
 
+export interface BisFunctionOrderChange {
+  type: typeof actionTypes.BIS_FUNCTION_ORDER_CHANGE;
+  payload: BisFunctionOrderChangeDto;
+}
+
+export interface BisFunctionOrderChangeSuccess {
+  type: typeof actionTypes.BIS_FUNCTION_ORDER_CHANGE_SUCCESS;
+  payload: {
+    updated: BisFunctionDto;
+    moved?: {
+      newOrder: number;
+      id: string;
+    }
+  };
+}
+
+export interface BisFunctionOrderChangeFailure {
+  type: typeof actionTypes.BIS_FUNCTION_ORDER_CHANGE_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
 export interface EntitiesGetAll {
   type: typeof actionTypes.ENTITIES_GET_ALL;
 }
@@ -175,6 +204,7 @@ export type FailureAppActionTypes =
   | typeof actionTypes.PLAN_FAILURE
   | typeof actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE
   | typeof actionTypes.BIS_FUNCTION_UPSERT_FAILURE
+  | typeof actionTypes.BIS_FUNCTION_ORDER_CHANGE_FAILURE
   | typeof actionTypes.ENTITIES_GET_ALL_FAILURE
   ;
 
@@ -185,6 +215,7 @@ export type FailureAppAction =
   | PlanFailure
   | BisFunctionsGetAllFailure
   | BisFunctionUpsertFailure
+  | BisFunctionOrderChangeFailure
   | EntitiesGetAllFailure
   | LogOutEnduserFailure;
 
@@ -202,6 +233,9 @@ export type AppAction =
   | BisFunctionUpsert
   | BisFunctionUpsertSuccess
   | BisFunctionUpsertFailure
+  | BisFunctionOrderChange
+  | BisFunctionOrderChangeSuccess
+  | BisFunctionOrderChangeFailure
   | EntitiesGetAll
   | EntitiesGetAllSuccess
   | EntitiesGetAllFailure

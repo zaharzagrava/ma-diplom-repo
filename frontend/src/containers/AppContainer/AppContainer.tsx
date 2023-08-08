@@ -109,7 +109,7 @@ const AppContainer = () => {
               </List>
             </Aside>
             <Main>
-              <MonitorAndPlanning/>
+              <MonitorAndPlanning />
             </Main>
         </Content>
         <Footer>Вийти</Footer>

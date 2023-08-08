@@ -59,10 +59,13 @@ export default class Credit extends Model<Credit, Partial<Credit>> {
   rate: number;
 
   /**
-   * @description - when this credit was taked
+   * @description
+   *    - when this credit was taked
+   *    - null means that this credit is defined, but not taken yet
+   *
    */
   @Column({ type: DataType.INTEGER })
-  startPeriod: number;
+  startPeriod: number | null;
 
   @CreatedAt
   createdAt: Date;

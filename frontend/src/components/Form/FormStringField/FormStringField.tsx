@@ -42,7 +42,7 @@ const Container = styled.div`
   grid-auto-flow: row;
 
   align-items: center;
-  margin: 10px 0px;
+  margin: 5px 0px;
 `;
 
 const InputContainer = styled.div`
@@ -73,7 +73,14 @@ const FormStringField: FunctionComponent<Props> = ({
         {({ field }: FieldProps) => (
           <InputContainer>
             <input
-              style={{paddingLeft: 10, paddingRight: 10, paddingTop: 5, paddingBottom: 5, fontSize: 16}}
+              style={{
+                paddingLeft: 10,
+                paddingRight: 10,
+                paddingTop: 5,
+                paddingBottom: 5,
+                fontSize: 16,
+                width: '100%'
+              }}
               type={type}
               name={name}
               placeholder={placeholder}
