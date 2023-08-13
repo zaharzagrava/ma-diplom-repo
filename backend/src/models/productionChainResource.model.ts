@@ -9,6 +9,7 @@ import {
   IsUUID,
   DataType,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 import Resource from './resource.model';
@@ -35,6 +36,9 @@ export default class ProductionChainResource extends Model<
    */
   @Column({ type: DataType.NUMBER })
   amount: number;
+
+  @BelongsTo(() => Resource)
+  resource: Resource;
 
   @ForeignKey(() => Resource)
   @Column({ type: DataType.STRING, allowNull: true })

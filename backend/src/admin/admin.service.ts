@@ -99,7 +99,7 @@ export class AdminService {
         fullName: 'Ivan Petrovych',
         type: UserType.SEAMSTRESS,
         salary: 1000,
-        employedAt: 202201,
+        employedAt: null,
       });
 
       console.log('@user2');
@@ -108,6 +108,15 @@ export class AdminService {
         fullName: 'Petro Ivanovych',
         type: UserType.CUTTER,
         salary: 1200,
+        employedAt: null,
+      });
+
+      console.log('@user3');
+      const user3 = await this.userModel.create({
+        email: 'annakarenina@gmail.com',
+        fullName: 'Anna Karenina',
+        type: UserType.SEAMSTRESS,
+        salary: 2200,
         employedAt: 202201,
       });
 
@@ -198,12 +207,12 @@ export class AdminService {
       // --- ProductionChainUser
 
       await this.productionChainUserModel.create({
-        userId: user1.id,
+        userId: null,
         productionChainId: productionChain.id,
         type: UserType.SEAMSTRESS,
       });
       await this.productionChainUserModel.create({
-        userId: user2.id,
+        userId: null,
         productionChainId: productionChain.id,
         type: UserType.CUTTER,
       });
@@ -211,14 +220,14 @@ export class AdminService {
       // --- Credit
 
       const credit = await this.creditModel.create({
-        name: 'Кредит з НБУ',
+        name: 'NBU Credit',
         startPeriod: 202201,
-        sum: 10000,
-        rate: 0.05,
+        sum: 3000,
+        rate: 0.02,
       });
 
       const credit2 = await this.creditModel.create({
-        name: 'Кредит з Приват Банку',
+        name: 'Privatbank credit',
         startPeriod: null,
         sum: 1000,
         rate: 0.05,
@@ -226,17 +235,70 @@ export class AdminService {
 
       // --- BisFunction
 
-      await this.bisFunctionModel.create({
-        name: 'Payout NBU credit',
-        type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
-        startPeriod: 202201,
-        endPeriod: 202205,
-        meta: {
-          amount: 500,
-        },
-        order: 1,
-        creditId: credit.id,
-      });
+      // await this.bisFunctionModel.create({
+      //   name: 'Hire SEAMSTRESS',
+      //   type: BisFunctionType.HIRE_EMPLOYEE,
+      //   startPeriod: 202201,
+      //   endPeriod: 202201,
+      //   order: 1,
+      //   userId: user1.id,
+      //   productionChainId: productionChain.id,
+      // });
+
+      // await this.bisFunctionModel.create({
+      //   name: 'Hire CUTTER',
+      //   type: BisFunctionType.HIRE_EMPLOYEE,
+      //   startPeriod: 202201,
+      //   endPeriod: 202201,
+      //   order: 2,
+      //   userId: user2.id,
+      //   productionChainId: productionChain.id,
+      // });
+
+      // await this.bisFunctionModel.create({
+      //   name: 'Fire Anna',
+      //   type: BisFunctionType.FIRE_EMPLOYEE,
+      //   startPeriod: 202201,
+      //   endPeriod: 202201,
+      //   order: 3,
+      //   userId: user3.id,
+      // });
+
+      // await this.bisFunctionModel.create({
+      //   name: 'Buy resources',
+      //   type: BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
+      //   startPeriod: 202201,
+      //   endPeriod: 202212,
+      //   meta: {
+      //     amount: 1,
+      //   },
+      //   order: 4,
+      //   productionChainId: productionChain.id,
+      // });
+
+      // await this.bisFunctionModel.create({
+      //   name: 'Buy Equipment',
+      //   type: BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
+      //   startPeriod: 202201,
+      //   endPeriod: 202201,
+      //   meta: {
+      //     amount: 1,
+      //   },
+      //   order: 5,
+      //   productionChainId: productionChain.id,
+      // });
+
+      // await this.bisFunctionModel.create({
+      //   name: 'Produce tables',
+      //   type: BisFunctionType.PRODUCE_PRODUCTS,
+      //   startPeriod: 202201,
+      //   endPeriod: 202212,
+      //   meta: {
+      //     amount: 1,
+      //   },
+      //   order: 6,
+      //   productionChainId: productionChain.id,
+      // });
 
       await this.bisFunctionModel.create({
         name: 'Sell products',
@@ -244,11 +306,40 @@ export class AdminService {
         startPeriod: 202203,
         endPeriod: 202203,
         meta: {
-          amount: 100,
+          amount: 1,
         },
-        order: 2,
+        order: 7,
         productId: tableProduct.id,
       });
+
+      await this.bisFunctionModel.create({
+        name: 'Payout NBU credit',
+        type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
+        startPeriod: 202201,
+        endPeriod: 202205,
+        meta: {
+          amount: 200,
+        },
+        order: 8,
+        creditId: credit.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Take PrivatBank Credit',
+        type: BisFunctionType.TAKE_CREDIT,
+        startPeriod: 202205,
+        endPeriod: 202205,
+        order: 9,
+        creditId: credit2.id,
+      });
+
+      // await this.bisFunctionModel.create({
+      //   name: 'Payout Salaries',
+      //   type: BisFunctionType.PAYOUT_SALARIES,
+      //   startPeriod: 202201,
+      //   endPeriod: 202212,
+      //   order: 10,
+      // });
     } catch (error) {
       console.log('Admin seeding error');
       console.log(error);

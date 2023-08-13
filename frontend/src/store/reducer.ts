@@ -63,6 +63,12 @@ export const RootReducerInitialState = {
       success: null as boolean | null, // is there been at least one successful register
     },
 
+    bisFunctionDelete: {
+      loading: false as boolean,
+      errors: null as ErrorCodes[] | null,
+      success: null as boolean | null, // is there been at least one successful register
+    },
+
     entitiesGetAll: {
       loading: false as boolean,
       errors: null as ErrorCodes[] | null,
@@ -188,9 +194,23 @@ export const RootReducer = produce(
         draft.actions.bisFunctionOrderChange.errors = null;
         draft.actions.bisFunctionOrderChange.loading = false;
         break;
-      case actionTypes.BIS_FUNCTION_ORDER_CHANGE_FAILURE:
-        draft.actions.bisFunctionOrderChange.errors = action.payload.errors;
-        draft.actions.bisFunctionOrderChange.loading = false;
+
+      case actionTypes.BIS_FUNCTION_DELETE:
+        draft.actions.bisFunctionDelete.errors = null;
+        draft.actions.bisFunctionDelete.loading = true;
+        break;
+      case actionTypes.BIS_FUNCTION_DELETE_SUCCESS:
+        if(draft.bisFunctions?.length) {
+          draft.bisFunctions = draft.bisFunctions?.filter(x => x.name !== action.payload)
+        }
+
+        draft.actions.bisFunctionDelete.errors = null;
+        draft.actions.bisFunctionDelete.loading = false;
+        break;
+
+      case actionTypes.BIS_FUNCTION_DELETE_FAILURE:
+        draft.actions.bisFunctionDelete.errors = action.payload.errors;
+        draft.actions.bisFunctionDelete.loading = false;
         break;
 
       case actionTypes.ENTITIES_GET_ALL:

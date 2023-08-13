@@ -11,10 +11,31 @@ import {
   Unique,
   ForeignKey,
   BelongsTo,
+  Scopes,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 import Product from './product.model';
 
+export enum ProductionChainScope {
+  WithDepartment = 'WithDepartment',
+  WithAll = 'WithAll',
+}
+
+export interface ProductionChainWithAllFilters {
+  id?: string | string[];
+}
+
+@Scopes(() => ({
+  [ProductionChainScope.WithAll]: ({
+    id,
+  }: ProductionChainWithAllFilters = {}) => {
+    return {
+      where: {
+        ...(id && { id }),
+      },
+    };
+  },
+}))
 @Table({
   timestamps: true,
   tableName: 'ProductionChain',

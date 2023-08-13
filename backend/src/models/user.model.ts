@@ -39,13 +39,7 @@ export enum UserScope {
 
 export interface UserWithAllFilters {
   id?: string | string[];
-  departmentId?: string[];
-  country?: string[] | string;
-  legalLocation?: string[] | string;
-  email?: string[] | string;
-  active?: boolean;
-
-  includeDepartment?: boolean;
+  employed?: boolean;
 }
 
 @DefaultScope(() => ({
@@ -65,36 +59,14 @@ export interface UserWithAllFilters {
       exclude: ['refreshToken'],
     },
   }),
-  [UserScope.WithAll]: ({
-    id,
-    active,
-    departmentId,
-    country,
-    legalLocation,
-    email,
-    includeDepartment = true,
-  }: UserWithAllFilters = {}) => {
-    const includes: Includeable[] = [];
-
-    if (includeDepartment) {
-      includes.push({
-        model: Department,
-        as: 'department',
-      });
-    }
-
+  [UserScope.WithAll]: ({ id, employed }: UserWithAllFilters = {}) => {
     return {
       where: {
-        ...(active !== undefined && {
-          deactivatedAt: active ? null : { [Op.not]: null },
-        }),
         ...(id && { id }),
-        ...(departmentId && { departmentId }),
-        ...(country && { country }),
-        ...(legalLocation && { legalLocation }),
-        ...(email && { email }),
+        ...(employed !== undefined && {
+          employedAt: employed ? { [Op.not]: null } : null,
+        }),
       },
-      include: includes,
       attributes: {
         exclude: ['refreshToken'],
       },

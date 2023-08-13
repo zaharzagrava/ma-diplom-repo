@@ -9,6 +9,7 @@ import {
   IsUUID,
   ForeignKey,
   DataType,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 import User, { UserType, UserTypes } from './user.model';
@@ -29,8 +30,11 @@ export default class ProductionChainUser extends Model<
   id: string;
 
   @ForeignKey(() => User)
-  @Column
-  userId: string;
+  @Column({ type: DataType.STRING, allowNull: true })
+  userId: string | null;
+
+  @BelongsTo(() => ProductionChain, { foreignKey: 'productionChainId' })
+  productionChain: ProductionChain;
 
   @ForeignKey(() => ProductionChain)
   @Column

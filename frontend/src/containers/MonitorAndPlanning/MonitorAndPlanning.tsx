@@ -13,6 +13,17 @@ import { Table, TD, TR } from "../../components/Utils/TableUtils";
 import Button from "../../components/Button/Button";
 import NewBisFunctionContainer from "../NewBisFunctionContainer/NewBisFunctionContainer";
 import { HorizontalGrid } from "../../components/Utils/HorizontalGrid";
+import { styled } from "styled-components";
+
+const GraphGrid = styled.div`
+  padding: 20px;
+
+  display: grid;
+  grid-gap: 20px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 400px;
+  grid-auto-flow: row;
+`;
 
 const MonitorAndPlanningContainer = () => {
   // const {from, to} = useSelector((state: AppState) => state.ui.monitoringAndPlanning);
@@ -32,23 +43,23 @@ const MonitorAndPlanningContainer = () => {
     return <>Loading</>;
   }
 
-  console.log('@bisFunctions.map(x => x.name)');
-  console.log(bisFunctions.map(x => x.name));
-
   return (
     <VerticalGrid>
       <h2>Моніторинг та Планування</h2>
       <BisFunctionsContainer bisFunctions={bisFunctions} />
       <NewBisFunctionContainer />
-      <AlignCenter>
-        <BisMetricsChart bisMetricsDto={bisMetrics.balance} />
+      <GraphGrid>
+        <BisMetricsChart bisMetricsDto={bisMetrics.balance.map(x => ({
+          ...x,
+          balance1: x.balance + 300
+        }))} />
         <BisFunctionsChart
           bisFunctions={bisFunctions.map((x) => ({
             name: x.name,
             periodRange: [x.startPeriod, x.endPeriod ?? 202212],
           }))}
         />
-      </AlignCenter>
+      </GraphGrid>
       <AlignCenter>
         <Table>
           <tbody>

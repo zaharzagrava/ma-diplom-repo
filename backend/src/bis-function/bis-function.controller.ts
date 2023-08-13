@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import BisFunction, { BisFunctionType } from 'src/models/bis-function.model';
+import BisFunction from 'src/models/bis-function.model';
 import Product from 'src/models/product.model';
 import Resource from 'src/models/resource.model';
 import Equipment from 'src/models/equipment.model';
@@ -19,6 +19,7 @@ import { User } from 'src/auth/decorators/user.decorator';
 import { UserRawDto } from 'src/users/types';
 import {
   BisFunctionChangeOrderDto,
+  BisFunctionDeleteDto,
   BisFunctionUpsertDto,
 } from './bis-function.types';
 
@@ -40,15 +41,6 @@ export class BisFunctionController {
     private readonly equipmentModel: typeof Equipment,
     @InjectConnection() private readonly sequelizeInstance: Sequelize,
   ) {}
-
-  @Firewall()
-  @Get('/entities')
-  public async findAllEntities() {
-    // Returns all entities of the business (people, credits, etc.)
-    const entities = await this.bisFunctionService.findAllEntities();
-
-    return entities;
-  }
 
   @Firewall()
   @Get('/')
@@ -82,5 +74,17 @@ export class BisFunctionController {
     return await this.bisFunctionService.upsert({
       bisFunctionUpsert: params,
     });
+  }
+
+  @Firewall()
+  @Post('/delete')
+  public async delete(
+    @User() user: UserRawDto,
+    @Body() params: BisFunctionDeleteDto,
+  ) {
+    console.log('--- /api/bis-function/delete');
+    console.log(params);
+
+    return await this.bisFunctionService.delete(params);
   }
 }

@@ -9,7 +9,7 @@ interface Props {
 }
 
 const InnerContent = styled.div`
-  text-align: left;
+  text-align: center;
   text-decoration: none;
 `;
 

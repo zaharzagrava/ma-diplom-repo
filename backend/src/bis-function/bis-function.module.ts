@@ -14,6 +14,10 @@ import { ProductModule } from 'src/product/product.module';
 import { PeriodModule } from 'src/period/period.module';
 import { CreditModule } from 'src/credit/credit.module';
 import { ResourceModule } from 'src/resource/resource.module';
+import { UtilsModule } from 'src/utils/utils/utils.module';
+import { ProductionChainModule } from 'src/production-chain/production-chain.module';
+import { UsersModule } from 'src/users/users.module';
+import { EquipmentModule } from 'src/equipment/equipment.module';
 
 @Module({
   imports: [
@@ -31,6 +35,10 @@ import { ResourceModule } from 'src/resource/resource.module';
     PeriodModule,
     CreditModule,
     ResourceModule,
+    UtilsModule,
+    UsersModule,
+    ProductionChainModule,
+    EquipmentModule,
   ],
   controllers: [BisFunctionController],
   providers: [BisFunctionService],

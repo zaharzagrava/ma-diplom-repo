@@ -17,8 +17,17 @@ import FormDatepicker from "../Form/FormDatePicker/FormDatePicker";
 import { FormDropdown } from "../Form/FormDropdown/FormDropdown";
 import FormStringField from "../Form/FormStringField/FormStringField";
 import { Card } from "../Utils/Card";
-import { HorizontalGrid } from "../Utils/HorizontalGrid";
 import { bisFunctionsSettings } from "./BisFunctionContainer";
+import OrderChanger from "./OrderChanger";
+
+export const HorizontalGrid = styled.div`
+  display: grid;
+  grid-gap: 20px;
+  grid-auto-flow: column;
+  grid-template-columns: 120px 300px 300px 250px 250px 100px;
+
+  align-items: center;
+`;
 
 type Props = {
   /**
@@ -39,6 +48,8 @@ type Props = {
 
   onValidate: (values: BisFunctionEditDto) => any;
   onSubmit: (values: BisFunctionEditDto) => void;
+  onDelete: () => void;
+  onOrderChange: (direction: 'up' | 'down') => void;
 };
 
 export const FormComponent: FC<{
@@ -68,10 +79,22 @@ export const FormComponent: FC<{
     try {
       filteredEntities = (() => {
         switch (params.bisFunctionEdit.type) {
+          case BisFunctionType.HIRE_EMPLOYEE:
+            if(params.name === 'userId') {
+              return params.entities.users;
+            } else {
+              return params.entities.productionChains;
+            }
+
+          case BisFunctionType.FIRE_EMPLOYEE:
+            return params.entities.users;
           case BisFunctionType.SELL_PRODUCT_FIXED:
+          case BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT:
+          case BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT:
             return params.entities.products;
-          case BisFunctionType.BUY_RESOURCE_PRODUCT_FIXED_AMOUNT:
-            return params.entities.products;
+          case BisFunctionType.PRODUCE_PRODUCTS:
+            return params.entities.productionChains;
+          case BisFunctionType.TAKE_CREDIT:
           case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
             return params.entities.credits;
 
@@ -93,7 +116,7 @@ export const FormComponent: FC<{
         label={params.value.label}
         labelDirection="column"
         options={filteredEntities.map((x) => x.id)}
-        labels={filteredEntities.map((x) => x.name)}
+        labels={filteredEntities.map((x: any) => x.name || x.fullName)}
       />
     );
   }
@@ -123,6 +146,7 @@ const BisFunction: FC<Props> = (params) => {
         {({ handleSubmit }: FormikProps<BisFunctionEditDto>) => (
           <div>
             <HorizontalGrid>
+              {params.isEdit && <OrderChanger onOrderChange={params.onOrderChange} />}
               {params.isEdit ? (
                 <h2>
                   {typeof params.bisFunction === "object" &&
@@ -145,7 +169,21 @@ const BisFunction: FC<Props> = (params) => {
               />
               <FormDatepicker name={"startPeriod"} />
               <FormDatepicker name={"endPeriod"} />
-            </HorizontalGrid>
+              <Button
+                buttonType="submit"
+                onClick={() => handleSubmit()}
+              >
+                {params.isEdit ? 'Update' : 'Create'}
+              </Button>
+              {params.isEdit &&
+              <Button
+                buttonType="button"
+                onClick={() => params.onDelete()}
+              >
+                Delete
+              </Button>
+              }
+            </HorizontalGrid> 
             <hr />
             {Object.entries(bisFunctionSettings.fields).map(
               ([key, value], index) => {
@@ -163,16 +201,6 @@ const BisFunction: FC<Props> = (params) => {
                         bisFunctionEdit={params.bisFunctionEdit}
                         entities={params.entities}
                       />
-                      {index ===
-                        Object.entries(bisFunctionSettings.fields).length -
-                          1 && (
-                        <Button
-                          buttonType="submit"
-                          onClick={() => handleSubmit()}
-                        >
-                          {params.isEdit ? 'Update' : 'Create'}
-                        </Button>
-                      )}
                     </div>
                     <hr
                       style={{

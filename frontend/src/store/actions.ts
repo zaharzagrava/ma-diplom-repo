@@ -1,5 +1,5 @@
 import { ErrorCodes } from "../error";
-import { BisFunctionChangeOrderDto as BisFunctionOrderChangeDto, BisFunctionDto, BisFunctionEditDto } from "./bis-function.types";
+import { BisFunctionChangeOrderDto as BisFunctionOrderChangeDto, BisFunctionDeleteDto, BisFunctionDto, BisFunctionEditDto } from "./bis-function.types";
 import { BisMetriscDto, Credit, Entities, Entity, Myself, Product, Resource } from "./types";
 
 /* Action Types */
@@ -28,11 +28,17 @@ export const actionTypes = {
   BIS_FUNCTION_UPSERT_FAILURE:
     "BIS_FUNCTION_UPSERT_FAILURE" as "BIS_FUNCTION_UPSERT_FAILURE",
 
-    BIS_FUNCTION_ORDER_CHANGE: "BIS_FUNCTION_ORDER_CHANGE" as "BIS_FUNCTION_ORDER_CHANGE",
-    BIS_FUNCTION_ORDER_CHANGE_SUCCESS:
-      "BIS_FUNCTION_ORDER_CHANGE_SUCCESS" as "BIS_FUNCTION_ORDER_CHANGE_SUCCESS",
-    BIS_FUNCTION_ORDER_CHANGE_FAILURE:
-      "BIS_FUNCTION_ORDER_CHANGE_FAILURE" as "BIS_FUNCTION_ORDER_CHANGE_FAILURE",
+  BIS_FUNCTION_ORDER_CHANGE: "BIS_FUNCTION_ORDER_CHANGE" as "BIS_FUNCTION_ORDER_CHANGE",
+  BIS_FUNCTION_ORDER_CHANGE_SUCCESS:
+    "BIS_FUNCTION_ORDER_CHANGE_SUCCESS" as "BIS_FUNCTION_ORDER_CHANGE_SUCCESS",
+  BIS_FUNCTION_ORDER_CHANGE_FAILURE:
+    "BIS_FUNCTION_ORDER_CHANGE_FAILURE" as "BIS_FUNCTION_ORDER_CHANGE_FAILURE",
+
+  BIS_FUNCTION_DELETE: "BIS_FUNCTION_DELETE" as "BIS_FUNCTION_DELETE",
+  BIS_FUNCTION_DELETE_SUCCESS:
+    "BIS_FUNCTION_DELETE_SUCCESS" as "BIS_FUNCTION_DELETE_SUCCESS",
+  BIS_FUNCTION_DELETE_FAILURE:
+    "BIS_FUNCTION_DELETE_FAILURE" as "BIS_FUNCTION_DELETE_FAILURE",
 
   ENTITIES_GET_ALL: "ENTITIES_GET_ALL" as "ENTITIES_GET_ALL",
   ENTITIES_GET_ALL_SUCCESS:
@@ -152,6 +158,24 @@ export interface BisFunctionOrderChangeFailure {
   };
 }
 
+export interface BisFunctionDelete {
+  type: typeof actionTypes.BIS_FUNCTION_DELETE;
+  payload: BisFunctionDeleteDto;
+}
+
+export interface BisFunctionDeleteSuccess {
+  type: typeof actionTypes.BIS_FUNCTION_DELETE_SUCCESS;
+  // name of the deleted function
+  payload: string;
+}
+
+export interface BisFunctionDeleteFailure {
+  type: typeof actionTypes.BIS_FUNCTION_DELETE_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
 export interface EntitiesGetAll {
   type: typeof actionTypes.ENTITIES_GET_ALL;
 }
@@ -205,6 +229,7 @@ export type FailureAppActionTypes =
   | typeof actionTypes.BIS_FUNCTIONS_GET_ALL_FAILURE
   | typeof actionTypes.BIS_FUNCTION_UPSERT_FAILURE
   | typeof actionTypes.BIS_FUNCTION_ORDER_CHANGE_FAILURE
+  | typeof actionTypes.BIS_FUNCTION_DELETE_FAILURE
   | typeof actionTypes.ENTITIES_GET_ALL_FAILURE
   ;
 
@@ -216,6 +241,7 @@ export type FailureAppAction =
   | BisFunctionsGetAllFailure
   | BisFunctionUpsertFailure
   | BisFunctionOrderChangeFailure
+  | BisFunctionDeleteFailure
   | EntitiesGetAllFailure
   | LogOutEnduserFailure;
 
@@ -236,6 +262,9 @@ export type AppAction =
   | BisFunctionOrderChange
   | BisFunctionOrderChangeSuccess
   | BisFunctionOrderChangeFailure
+  | BisFunctionDelete
+  | BisFunctionDeleteSuccess
+  | BisFunctionDeleteFailure
   | EntitiesGetAll
   | EntitiesGetAllSuccess
   | EntitiesGetAllFailure

@@ -9,6 +9,7 @@ import { BisFunctionModule } from 'src/bis-function/bis-function.module';
 import { DbUtilsModule } from 'src/utils/db-utils/db-utils.module';
 import Business from 'src/models/business.model';
 import BisFunction from 'src/models/bis-function.model';
+import { CreditModule } from 'src/credit/credit.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import BisFunction from 'src/models/bis-function.model';
     BisFunctionModule,
     SequelizeModule.forFeature([User, Business, BisFunction]),
     DbUtilsModule,
+    CreditModule,
   ],
   providers: [FinancialPlanningService],
   exports: [FinancialPlanningService],

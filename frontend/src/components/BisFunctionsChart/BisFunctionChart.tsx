@@ -31,7 +31,7 @@ const BisFunctionsChart: FC<Props> = ({bisFunctions}) => {
   return (
     <BarChart
       width={1000}
-      height={300}
+      height={400}
       data={bisFunctions}
       layout='vertical'
       margin={{
@@ -43,7 +43,7 @@ const BisFunctionsChart: FC<Props> = ({bisFunctions}) => {
     >
       <CartesianGrid strokeDasharray="3 3" />
       <XAxis tickCount={12} domain={[202201, 202212]} type="number" dataKey="periodRange" />
-      <YAxis tickMargin={10} type='category' dataKey="name"  />
+      <YAxis tickMargin={10} type='category' dataKey="name" width={100}  />
       <Bar dataKey="periodRange" fill="#333333"  />
     </BarChart>
   );

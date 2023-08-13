@@ -6,6 +6,8 @@ import Product, {
   ProductWithAllFilters,
 } from 'src/models/product.model';
 import { Transaction } from 'sequelize';
+import { UtilsService } from 'src/utils/utils/utils.service';
+import { BusinessState } from 'src/business/types';
 
 @Injectable()
 export class ProductService {
@@ -13,10 +15,24 @@ export class ProductService {
 
   constructor(
     private readonly dbUtilsService: DbUtilsService,
+    private readonly u: UtilsService,
 
     @InjectModel(Product)
     private readonly productModel: typeof Product,
   ) {}
+
+  public findOne(
+    params?: ProductWithAllFilters,
+    tx?: Transaction,
+  ): Promise<Product | null> {
+    return this.productModel
+      .scope({
+        method: [ProductScope.WithAll, <ProductWithAllFilters>params],
+      })
+      .findOne({
+        transaction: tx,
+      });
+  }
 
   public findAll(
     params?: ProductWithAllFilters,
@@ -32,10 +48,12 @@ export class ProductService {
   }
 
   public async sellProduct({
+    businessState,
     product,
     sellAmount,
     tx,
   }: {
+    businessState: BusinessState;
     product: Product;
     sellAmount: number;
     tx?: Transaction;
@@ -43,20 +61,11 @@ export class ProductService {
     product: Product;
     income: number;
   }> {
-    console.log('ProductService.sellProduct');
-
     return await this.dbUtilsService.wrapInTransaction(async (tx) => {
       const _sellAmount = Math.min(product.amount, sellAmount);
       const income = product.price * _sellAmount;
 
-      console.log({
-        productAmount: product.amount,
-        _sellAmount,
-        income,
-      });
-
       if (_sellAmount !== 0) {
-        console.log('Selling');
         await this.productModel.update(
           {
             amount: product.amount - sellAmount,

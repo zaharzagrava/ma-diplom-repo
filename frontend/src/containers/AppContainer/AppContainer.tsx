@@ -106,6 +106,11 @@ const AppContainer = () => {
             <Aside>
               <List>
                 <ListElem>Моніторинг та Планування</ListElem>
+                <ListElem>Користувачі</ListElem>
+                <ListElem>Ресурси</ListElem>
+                <ListElem>Обладнання</ListElem>
+                <ListElem>Продукція</ListElem>
+                <ListElem>Ланцюги виробництва</ListElem>
               </List>
             </Aside>
             <Main>

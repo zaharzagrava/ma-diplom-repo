@@ -30,27 +30,16 @@ export interface Myself {
   age: number;
 }
 
-export interface ProviderForEnduser {
-  id: string;
-
-  name: string;
-  address: string;
-  email: string;
-  phone_number: string;
-  website: string;
-
-  description: string;
+export enum UserType {
+  // Швея
+  SEAMSTRESS = 'SEAMSTRESS',
+  // Закройщик
+  CUTTER = 'CUTTER',
+  // Закройщик
+  MANAGER = 'MANAGER',
 }
 
-export enum NavigationTabOption {
-  DASHBOARD = "dashboard",
-  SETTINGS = "settings",
-  SERVICES = "services",
-  BLOG = "blog",
-  ABOUT_US = "about-us",
-  CONTACT_US = "contact-us",
-  LOG_OUT = "log-out",
-}
+export const UserTypes = Object.values(UserType);
 
 export interface BisMetriscDto {
   balance: { balance: number; period: number; prompts: string[] }[];
@@ -84,12 +73,35 @@ export interface Resource {
   updatedAt: Date;
 }
 
-export type Entity = Credit | Product | Resource;
+export interface User {
+  id: string;
+  email: string;
+  fullName: string;
+  type: UserType;
+  salary: number;
+  employedAt: number | null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+}
+
+export interface ProductionChain {
+  id: string;
+  name: string;
+  productId: string;
+  product: Product;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type Entity = Credit | Product | Resource | User | ProductionChain;
 
 export interface Entities {
-  products: Product[]
-  resources: Resource[]
-  credits: Credit[]
+  products: Product[];
+  resources: Resource[];
+  credits: Credit[];
+  users: User[];
+  productionChains: ProductionChain[];
 }
 
 export type CreateErrorObject<T extends { [key: string]: any }> = {

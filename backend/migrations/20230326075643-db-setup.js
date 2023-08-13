@@ -369,102 +369,6 @@ module.exports = {
       },
     );
 
-    // BisFunction
-    await queryInterface.createTable(
-      'BisFunction',
-      {
-        id: {
-          type: Sequelize.UUID,
-          defaultValue: Sequelize.literal('uuid_generate_v4()'),
-          primaryKey: true,
-        },
-
-        name: {
-          type: Sequelize.STRING(255),
-          unique: true,
-          allowNull: false,
-        },
-
-        order: {
-          type: Sequelize.INTEGER,
-          unique: true,
-          allowNull: false,
-        },
-
-        type: {
-          type: Sequelize.ENUM(
-            'PAYOUT_CREDIT_FIXED_AMOUNT',
-            'BUY_RESOURCE_PRODUCT_FIXED_AMOUNT',
-            'SELL_PRODUCT_FIXED',
-            'CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE',
-          ),
-          allowNull: false,
-        },
-
-        meta: {
-          type: Sequelize.JSON,
-          allowNull: false,
-        },
-
-        startPeriod: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
-
-        endPeriod: {
-          type: Sequelize.INTEGER,
-          allowNull: true,
-        },
-
-        productId: {
-          type: Sequelize.UUID,
-          allowNull: true,
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
-          references: {
-            model: 'Product',
-            key: 'id',
-          },
-        },
-
-        resourceId: {
-          type: Sequelize.UUID,
-          allowNull: true,
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
-          references: {
-            model: 'Resource',
-            key: 'id',
-          },
-        },
-
-        creditId: {
-          type: Sequelize.UUID,
-          allowNull: true,
-          onDelete: 'CASCADE',
-          onUpdate: 'CASCADE',
-          references: {
-            model: 'Credit',
-            key: 'id',
-          },
-        },
-
-        createdAt: {
-          allowNull: false,
-          type: Sequelize.DATE,
-        },
-
-        updatedAt: {
-          allowNull: false,
-          type: Sequelize.DATE,
-        },
-      },
-      {
-        timestamps: true,
-        transaction,
-      },
-    );
-
     // ProductionChain
     await queryInterface.createTable(
       'ProductionChain',
@@ -618,9 +522,9 @@ module.exports = {
     );
 
     // ProductionChainUser
-    // Specifies how which user types are needed / involved in development of 1 product
-    // if userId fields are null, it means that users are not specified, but those are the types that should be
-    // can have multiple records, each record specifying different users that are actually working here
+    // Has two types of records
+    //   - the ones with userId = null, they specify what kind of users are needed on this ProductionChain, those records are static, and should not be modified
+    //   - the ones with userId, they specify what users are actually working on this ProductionChain
     await queryInterface.createTable(
       'ProductionChainUser',
       {
@@ -653,6 +557,141 @@ module.exports = {
           onUpdate: 'CASCADE',
           references: {
             model: 'ProductionChain',
+            key: 'id',
+          },
+        },
+
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+        },
+      },
+      {
+        timestamps: true,
+        transaction,
+      },
+    );
+
+    // BisFunction
+    await queryInterface.createTable(
+      'BisFunction',
+      {
+        id: {
+          type: Sequelize.UUID,
+          defaultValue: Sequelize.literal('uuid_generate_v4()'),
+          primaryKey: true,
+        },
+
+        name: {
+          type: Sequelize.STRING(255),
+          unique: true,
+          allowNull: false,
+        },
+
+        order: {
+          type: Sequelize.INTEGER,
+          unique: true,
+          allowNull: false,
+        },
+
+        type: {
+          type: Sequelize.ENUM(
+            'TAKE_CREDIT',
+            'PAYOUT_CREDIT_FIXED_AMOUNT',
+            'HIRE_EMPLOYEE',
+            'FIRE_EMPLOYEE',
+            'PAYOUT_SALARIES',
+            'BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT',
+            'BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT',
+            'PRODUCE_PRODUCTS',
+            'SELL_PRODUCT_FIXED',
+            'CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE',
+          ),
+          allowNull: false,
+        },
+
+        meta: {
+          type: Sequelize.JSON,
+          allowNull: true,
+        },
+
+        startPeriod: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+
+        endPeriod: {
+          type: Sequelize.INTEGER,
+          allowNull: true,
+        },
+
+        productId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'Product',
+            key: 'id',
+          },
+        },
+
+        resourceId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'Resource',
+            key: 'id',
+          },
+        },
+
+        creditId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'Credit',
+            key: 'id',
+          },
+        },
+
+        userId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'User',
+            key: 'id',
+          },
+        },
+
+        productionChainId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'ProductionChain',
+            key: 'id',
+          },
+        },
+
+        equipmentId: {
+          type: Sequelize.UUID,
+          allowNull: true,
+          onDelete: 'CASCADE',
+          onUpdate: 'CASCADE',
+          references: {
+            model: 'Equipment',
             key: 'id',
           },
         },

@@ -1,20 +1,21 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { DbUtilsModule } from 'src/utils/db-utils/db-utils.module';
-import Product from 'src/models/product.model';
 import { AuthModule } from 'src/auth/auth.module';
-import { ProductService } from './product.service';
+import { EquipmentService } from './equipment.service';
+import Equipment from 'src/models/equipment.model';
 import { UtilsModule } from 'src/utils/utils/utils.module';
+import ProductionChainEquipment from 'src/models/productionChainEquipment.model';
 
 @Module({
   imports: [
     AuthModule,
-    SequelizeModule.forFeature([Product]),
+    SequelizeModule.forFeature([Equipment, ProductionChainEquipment]),
     DbUtilsModule,
     UtilsModule,
   ],
   controllers: [],
-  providers: [ProductService],
-  exports: [ProductService],
+  providers: [EquipmentService],
+  exports: [EquipmentService],
 })
-export class ProductModule {}
+export class EquipmentModule {}

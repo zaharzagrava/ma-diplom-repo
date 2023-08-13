@@ -9,6 +9,7 @@ import {
   IsUUID,
   DataType,
   ForeignKey,
+  BelongsTo,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 import Equipment from './equipment.model';
@@ -35,6 +36,9 @@ export default class ProductionChainEquipment extends Model<
    */
   @Column({ type: DataType.NUMBER })
   amount: number;
+
+  @BelongsTo(() => Equipment)
+  equipment: Equipment;
 
   @ForeignKey(() => Equipment)
   @Column

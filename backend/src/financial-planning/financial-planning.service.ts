@@ -8,6 +8,7 @@ import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
 import BisFunction, { BisFunctionType } from 'src/models/bis-function.model';
 import { BusinessState } from 'src/business/types';
 import Business from 'src/models/business.model';
+import { CreditService } from 'src/credit/credit.service';
 
 @Injectable()
 export class FinancialPlanningService {
@@ -19,6 +20,8 @@ export class FinancialPlanningService {
     private readonly periodService: PeriodService,
     private readonly bisFunctionService: BisFunctionService,
     private readonly dbUtilsService: DbUtilsService,
+
+    private readonly creditService: CreditService,
   ) {}
 
   public async plan({
@@ -56,57 +59,43 @@ export class FinancialPlanningService {
           { balance: business.balance, period: fromPeriod, prompts: [] },
         ];
         let iPeriod = fromPeriod;
-        for (const bisFunction of bisFunctions) {
-          console.log('BisFunction Period');
-          console.log(
-            bisFunction.name,
-            bisFunction.startPeriod,
-            bisFunction.endPeriod,
-          );
-        }
-
-        console.log('Start State');
-        console.log(JSON.stringify(state[0], null, 2));
-
         while (iPeriod !== toPeriod) {
-          iPeriod = this.periodService.next(iPeriod);
           const prevState = state[state.length - 1];
           let iState: BusinessState = {
             balance: prevState.balance,
             period: iPeriod,
             prompts: [],
           };
-          // Buy, repair equipment
 
-          // Buy products
-
-          // Produce goods
-
-          // Sell goods
-
-          // Increase all credits amounts
-          // amount * (1 + rate)
+          // Execute ticks
+          await this.tickCredits(iState, tx);
 
           // Execute business functions
-          for (const bisFunction of bisFunctions.sort((a, b) => {
-            return a.order - b.order;
-          })) {
+          for (const bisFunction of bisFunctions
+            .filter((x) => {
+              return this.periodService.between(
+                x.startPeriod,
+                x.endPeriod,
+                iPeriod,
+              );
+            })
+            .sort((a, b) => {
+              return a.order - b.order;
+            })) {
+            console.log('@bisFunction.name');
+            console.log(bisFunction.name);
             iState = await this.bisFunctionService.exec(
               iState,
               bisFunction,
-              iPeriod,
               tx,
             );
+
+            console.log('@iState');
+            console.log(iState);
           }
 
-          // Payout salaries
-
-          // ---
-
-          // console.log('iState');
-          // console.log(JSON.stringify(iState, null, 2));
-
           state.push(iState);
+          iPeriod = this.periodService.next(iPeriod);
         }
 
         bisMetrics = {
@@ -128,5 +117,19 @@ export class FinancialPlanningService {
     }
 
     return bisMetrics;
+  }
+
+  /**
+   * @description
+   *    - tick all environment triggers
+   */
+  public async tickCredits(businessState: BusinessState, tx?: Transaction) {
+    const credits = await this.creditService.findAll({}, tx);
+
+    for (const credit of credits) {
+      await this.creditService.tick(businessState, credit, tx);
+    }
+
+    return businessState;
   }
 }

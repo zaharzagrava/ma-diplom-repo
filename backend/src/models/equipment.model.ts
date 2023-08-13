@@ -9,9 +9,27 @@ import {
   IsUUID,
   DataType,
   Unique,
+  Scopes,
 } from 'sequelize-typescript';
 import { v4 as uuidv4 } from 'uuid';
 
+export enum EquipmentScope {
+  WithAll = 'WithAll',
+}
+
+export interface EquipmentWithAllFilters {
+  id?: string | string[];
+}
+
+@Scopes(() => ({
+  [EquipmentScope.WithAll]: ({ id }: EquipmentWithAllFilters = {}) => {
+    return {
+      where: {
+        ...(id && { id }),
+      },
+    };
+  },
+}))
 @Table({
   timestamps: true,
   tableName: 'Equipment',

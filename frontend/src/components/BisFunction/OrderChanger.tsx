@@ -9,7 +9,7 @@ type Props = {
 
 const OrderChanger: FC<Props> = (params) => {
   return (
-    <Card>
+    <div>
       <Button
         buttonType="submit"
         onClick={() => params.onOrderChange('up')}
@@ -22,7 +22,7 @@ const OrderChanger: FC<Props> = (params) => {
       >
         Down
       </Button>
-    </Card>
+    </div>
   );
 };
 
