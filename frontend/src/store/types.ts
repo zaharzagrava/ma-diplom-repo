@@ -1,3 +1,5 @@
+import { EntityUpsertType } from "../containers/EntityUpsert/types";
+
 /**
  * Data types that are result of frontend quires
  * @description Stored in redux. Serve as single source of truth about data
@@ -30,6 +32,12 @@ export interface Myself {
   age: number;
 }
 
+export enum FormFieldType {
+  DROPDOWN = 'DROPDOWN',
+  STRING = 'STRING',
+  PERIOD = 'PERIOD'
+}
+
 export enum UserType {
   // Швея
   SEAMSTRESS = 'SEAMSTRESS',
@@ -45,35 +53,8 @@ export interface BisMetriscDto {
   balance: { balance: number; period: number; prompts: string[] }[];
 }
 
-export interface Credit {
-  id: string;
-  name: string;
-  sum: number;
-  rate: number;
-  startPeriod: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Product {
-  id: string;
-  name: string;
-  price: number;
-  amount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface Resource {
-  id: string;
-  name: string;
-  price: number;
-  amount: number;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
 export interface User {
+  __type__: EntityUpsertType.USER;
   id: string;
   email: string;
   fullName: string;
@@ -85,6 +66,56 @@ export interface User {
   deletedAt: Date | null;
 }
 
+export interface Credit {
+  __type__: EntityUpsertType.CREDIT;
+  id: string;
+  name: string;
+  sum: number;
+  rate: number;
+  startPeriod: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Equipment {
+  __type__: EntityUpsertType.EQUIPMENT;
+  id: string;
+  name: string;
+  price: number;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Product {
+  __type__: EntityUpsertType.PRODUCT;
+  id: string;
+  name: string;
+  price: number;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Resource {
+  __type__: EntityUpsertType.RESOURCE;
+  id: string;
+  name: string;
+  price: number;
+  amount: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Business {
+  // __type__: EntityUpsertType.BUSINESS;
+  id: string;
+  name: string;
+  balance: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface ProductionChain {
   id: string;
   name: string;
@@ -94,14 +125,25 @@ export interface ProductionChain {
   updatedAt: Date;
 }
 
-export type Entity = Credit | Product | Resource | User | ProductionChain;
+export type Entity = Credit | Product | Resource | User | Business | ProductionChain;
+
+export type EntityUpsertable = Credit | Product | Resource | User | Equipment;
 
 export interface Entities {
+  credits: Credit[];
+  products: Product[];
+  resources: Resource[];
+  users: User[];
+  equipments: Equipment[];
+  productionChains: ProductionChain[];
+}
+
+export interface EntitiesUpsertable {
   products: Product[];
   resources: Resource[];
   credits: Credit[];
   users: User[];
-  productionChains: ProductionChain[];
+  equipments: Equipment[];
 }
 
 export type CreateErrorObject<T extends { [key: string]: any }> = {

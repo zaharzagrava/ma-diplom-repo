@@ -15,6 +15,10 @@ import { v4 as uuidv4 } from 'uuid';
 import User, { UserType, UserTypes } from './user.model';
 import ProductionChain from './productionChain.model';
 
+// ProductionChainUser
+// Has two types of records
+//   - the ones with userId = null, they specify what kind of users are needed on this ProductionChain, those records are static, and should not be modified
+//   - the ones with userId, they specify what users are actually working on this ProductionChain
 @Table({
   timestamps: true,
   tableName: 'ProductionChainUser',

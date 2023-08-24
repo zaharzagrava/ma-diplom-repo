@@ -1,6 +1,7 @@
-import { Controller, Get, Logger } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Logger, Post } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { EntitiesService } from './entities.service';
+import { EntityDeleteDto, EntityUpsertDto } from './types';
 
 @ApiTags('entities')
 @Controller('entities')
@@ -16,4 +17,16 @@ export class EntitiesController {
 
     return entities;
   }
+
+  @Post('/')
+  public async upsertEntity(@Body() params: EntityUpsertDto) {
+    // Returns all entities of the business (people, credits, etc.)
+    return await this.entitiesService.upsert(params);
+  }
+
+  // @Delete('/')
+  // public async deleteEntity(@Body() params: EntityDeleteDto) {
+  //   // Returns all entities of the business (people, credits, etc.)
+  //   return await this.entitiesService.delete(params);
+  // }
 }

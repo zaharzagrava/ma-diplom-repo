@@ -1,13 +1,12 @@
 import axios from 'axios';
-import { put, call, takeLatest, takeLeading } from 'redux-saga/effects';
+import { put, call, takeLeading } from 'redux-saga/effects';
 import { ErrorCodes } from '../error';
 import { firebaseAuth } from '../firebase';
 import router from '../router';
 import {
-  actionTypes, AppAction, BisFunctionDelete, BisFunctionOrderChange, BisFunctionUpsert, FailureAppAction, FailureAppActionTypes,
+  actionTypes, AppAction, BisFunctionDelete, BisFunctionOrderChange, BisFunctionUpsert, EntityDelete, EntityUpsert, FailureAppAction, FailureAppActionTypes,
 } from './actions';
-import { BisFunctionChangeOrderDto } from './bis-function.types';
-import { Entities, Entity } from './types';
+import { Entities, Entity, EntityUpsertable } from './types';
 
 function* errorHandler(
   error: any,
@@ -48,8 +47,6 @@ function* getMyself() {
     } = yield call(() => {
       return axios.get('http://localhost:8000/api/users/me');
     });
-
-    router.navigate(`/home`);
 
     yield put({
       type: 'GET_MYSELF_SUCCESS',
@@ -172,6 +169,42 @@ function* entitiesGetAll() {
   }
 }
 
+function* entityUpsert(params: EntityUpsert) {
+  try {
+    const response: {
+      data: EntityUpsertable
+    } = yield call(() => {
+      return axios.post('http://localhost:8000/api/entities', params.payload);
+    });
+
+    yield put<AppAction>({
+      type: 'ENTITY_UPSERT_SUCCESS',
+      payload: response.data
+    });
+  } catch (error) {
+    yield call(errorHandler, error, 'ENTITY_UPSERT_FAILURE');
+  }
+}
+
+function* entityDelete(params: EntityDelete) {
+  try {
+    const response: {
+      data: string
+    } = yield call(() => {
+      return axios.delete('http://localhost:8000/api/entities', {
+        data: params.payload
+      });
+    });
+
+    yield put<AppAction>({
+      type: 'ENTITY_DELETE_SUCCESS',
+      payload: response.data
+    });
+  } catch (error) {
+    yield call(errorHandler, error, 'ENTITY_DELETE_FAILURE');
+  }
+}
+
 export const rootSaga = function* rootSaga() {
   yield takeLeading(actionTypes.GET_MYSELF, getMyself);
   yield takeLeading(actionTypes.PLAN, plan);
@@ -180,4 +213,6 @@ export const rootSaga = function* rootSaga() {
   yield takeLeading(actionTypes.BIS_FUNCTION_ORDER_CHANGE, bisFunctionOrderChange);
   yield takeLeading(actionTypes.BIS_FUNCTION_DELETE, bisFunctionDelete);
   yield takeLeading(actionTypes.ENTITIES_GET_ALL, entitiesGetAll);
+  yield takeLeading(actionTypes.ENTITY_UPSERT, entityUpsert);
+  yield takeLeading(actionTypes.ENTITY_DELETE, entityDelete);
 };

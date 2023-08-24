@@ -4,6 +4,7 @@ import { actionTypes, AppAction } from './actions';
 import { BisMetriscDto, Entities, Entity, Myself } from './types';
 import { BisFunctionDto } from './bis-function.types';
 import * as _ from 'lodash'
+import { upsertTypeToKey } from '../containers/EntityUpsert/types';
 
 /* Initial State */
 export const RootReducerInitialState = {
@@ -70,6 +71,18 @@ export const RootReducerInitialState = {
     },
 
     entitiesGetAll: {
+      loading: false as boolean,
+      errors: null as ErrorCodes[] | null,
+      success: null as boolean | null, // is there been at least one successful register
+    },
+
+    entityUpsert: {
+      loading: false as boolean,
+      errors: null as ErrorCodes[] | null,
+      success: null as boolean | null, // is there been at least one successful register
+    },
+
+    entityDelete: {
       loading: false as boolean,
       errors: null as ErrorCodes[] | null,
       success: null as boolean | null, // is there been at least one successful register
@@ -225,6 +238,48 @@ export const RootReducer = produce(
       case actionTypes.ENTITIES_GET_ALL_FAILURE:
         draft.actions.entitiesGetAll.errors = action.payload.errors;
         draft.actions.entitiesGetAll.loading = false;
+        break;
+
+      case actionTypes.ENTITY_UPSERT:
+        draft.actions.entityUpsert.errors = null;
+        draft.actions.entityUpsert.loading = true;
+        break;
+      case actionTypes.ENTITY_UPSERT_SUCCESS:
+        if(draft.entites) {
+          const key = upsertTypeToKey(action.payload.__type__)
+          const index = draft.entites[key].findIndex(x => x.id === action.payload.id)
+          if(index !== -1) {
+            draft.entites[key].splice(index, 1, action.payload as any);
+          } else {
+            draft.entites[key].push(action.payload as any);
+          }
+        }
+
+        draft.actions.entityUpsert.errors = null;
+        draft.actions.entityUpsert.loading = false;
+        break;
+      case actionTypes.ENTITY_UPSERT_FAILURE:
+        draft.actions.entityUpsert.errors = action.payload.errors;
+        draft.actions.entityUpsert.loading = false;
+        break;
+
+      case actionTypes.ENTITY_DELETE:
+        draft.actions.entityDelete.errors = null;
+        draft.actions.entityDelete.loading = true;
+        break;
+      case actionTypes.ENTITY_DELETE_SUCCESS:
+        if(draft.entites) {
+          for (const [entityKey, entityList] of Object.entries(draft.entites)) {
+            draft.entites[entityKey as keyof Entities] = entityList.filter((x: any) => x.id !== action.payload)
+          }
+        }
+
+        draft.actions.entityDelete.errors = null;
+        draft.actions.entityDelete.loading = false;
+        break;
+      case actionTypes.ENTITY_DELETE_FAILURE:
+        draft.actions.entityDelete.errors = action.payload.errors;
+        draft.actions.entityDelete.loading = false;
         break;
 
       case actionTypes.LOG_OUT_ENDUSER:

@@ -2,14 +2,12 @@ import React, { FC, useCallback, useEffect } from "react";
 import * as joi from "joi";
 
 import {
-  BisFunctionChangeOrderDto,
   BisFunctionDto,
   BisFunctionDto_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
   BisFunctionDto_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
   BisFunctionDto_FIRE_EMPLOYEE,
   BisFunctionDto_HIRE_EMPLOYEE,
   BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT,
-  BisFunctionDto_PAYOUT_SALARIES,
   BisFunctionDto_PRODUCE_PRODUCTS,
   BisFunctionDto_SELL_PRODUCT_FIXED,
   BisFunctionDto_TAKE_CREDIT,
@@ -24,19 +22,16 @@ import {
   BisFunctionEditDto_SELL_PRODUCT_FIXED,
   BisFunctionEditDto_TAKE_CREDIT,
   BisFunctionSettings,
-  BisFunctionToEditTransform,
   BisFunctionType,
-  FormFieldType,
 } from "../../store/bis-function.types";
 import BisFunction from "./BisFunction";
-import { CreateErrorObject } from "../../store/types";
+import { CreateErrorObject, FormFieldType } from "../../store/types";
 import { useDispatch } from "react-redux";
 import { BisFunctionDelete, BisFunctionOrderChange, BisFunctionUpsert } from "../../store/actions";
 import { Card } from "../Utils/Card";
 import { useSelector } from "react-redux";
 import { AppState } from "../../store/reducer";
 import { DateTime } from "luxon";
-import OrderChanger from "./OrderChanger";
 
 export const bisFunctionGeneralSettings = {
   name: {
@@ -133,6 +128,12 @@ export const bisFunctionsSettings: BisFunctionSettings = {
         validate: joi.string().required(),
         default: null,
       },
+      amount: {
+        type: FormFieldType.STRING,
+        label: "Amount:",
+        validate: joi.number().min(1).max(10000).required(),
+        default: 0,
+      },
     },
   },
   [BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT]: {
@@ -144,6 +145,12 @@ export const bisFunctionsSettings: BisFunctionSettings = {
         placeholder: 'Choose product',
         validate: joi.string().required(),
         default: null,
+      },
+      amount: {
+        type: FormFieldType.STRING,
+        label: "Amount:",
+        validate: joi.number().min(1).max(10000).required(),
+        default: 0,
       },
     },
   },

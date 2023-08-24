@@ -1,11 +1,8 @@
 import {
-  BelongsTo,
   Column,
   CreatedAt,
   Default,
   DeletedAt,
-  ForeignKey,
-  HasMany,
   IsEmail,
   IsUUID,
   Model,
@@ -17,7 +14,7 @@ import {
   DefaultScope,
   DataType,
 } from 'sequelize-typescript';
-import { Includeable, Op } from 'sequelize';
+import { Op } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import Department from './department.model';
 
@@ -111,12 +108,3 @@ export default class User extends Model<User, Partial<User>> {
   @DeletedAt
   deletedAt: Date | null;
 }
-
-// Resource1 - 50
-// Resource2 - 10
-// Resource3 - 100
-
-// Equipment1 - 1
-// Equipment2 - 2
-
-// User - 100

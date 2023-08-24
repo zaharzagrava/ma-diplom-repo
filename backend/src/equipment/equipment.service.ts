@@ -10,7 +10,7 @@ import ProductionChainEquipment from 'src/models/productionChainEquipment.model'
 import { BusinessState } from 'src/business/types';
 import ProductionChain from 'src/models/productionChain.model';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
-import { UtilsService } from 'src/utils/utils/utils.service';
+import { EquipmentUpsertDto } from 'src/entities/types';
 
 @Injectable()
 export class EquipmentService {
@@ -18,10 +18,9 @@ export class EquipmentService {
 
   constructor(
     private readonly dbU: DbUtilsService,
-    private readonly u: UtilsService,
 
     @InjectModel(Equipment)
-    private readonly creditModel: typeof Equipment,
+    private readonly equipmentModel: typeof Equipment,
     @InjectModel(ProductionChainEquipment)
     private readonly productionChainEquipmentModel: typeof ProductionChainEquipment,
   ) {}
@@ -30,13 +29,38 @@ export class EquipmentService {
     params?: EquipmentWithAllFilters,
     tx?: Transaction,
   ): Promise<Equipment | null> {
-    return this.creditModel
+    return this.equipmentModel
       .scope({
         method: [EquipmentScope.WithAll, <EquipmentWithAllFilters>params],
       })
       .findOne({
         transaction: tx,
       });
+  }
+
+  public async upsert(entityUpsert: EquipmentUpsertDto) {
+    return await this.dbU.wrapInTransaction(async (tx) => {
+      const equipment = await this.equipmentModel.findOne({
+        where: { name: entityUpsert.name },
+        transaction: tx,
+      });
+
+      if (!equipment) {
+        await this.equipmentModel.create(entityUpsert, {
+          transaction: tx,
+        });
+      } else {
+        await this.equipmentModel.update(entityUpsert, {
+          where: { name: entityUpsert.name },
+          transaction: tx,
+        });
+      }
+
+      return await this.equipmentModel.findOne({
+        where: { name: entityUpsert.name },
+        transaction: tx,
+      });
+    });
   }
 
   public async buyEquipmentForProductionChain({
@@ -72,8 +96,8 @@ export class EquipmentService {
         businessState.balance -= price;
 
         await this.buyEquipment({
-          equipmentId: prodChainEquipment.equipmentId,
-          amount: amount * prodChainEquipment.amount,
+          equipment: prodChainEquipment.equipment,
+          buyAmount,
         });
 
         boughtEquipment.push({
@@ -88,12 +112,17 @@ export class EquipmentService {
   }
 
   private async buyEquipment({
-    equipmentId,
-    amount,
+    equipment,
+    buyAmount,
+    tx,
   }: {
-    equipmentId: string;
-    amount: number;
+    equipment: Equipment;
+    buyAmount: number;
+    tx?: Transaction;
   }) {
-    return 'stub';
+    return await equipment.update(
+      { amount: equipment.amount + buyAmount },
+      { transaction: tx },
+    );
   }
 }

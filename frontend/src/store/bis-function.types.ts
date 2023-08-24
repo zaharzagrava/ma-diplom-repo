@@ -1,4 +1,4 @@
-import { Credit, Product, ProductionChain, User } from "./types";
+import { Credit, FormFieldType, Product, ProductionChain, User } from "./types";
 import * as joi from 'joi';
 
 export enum BisFunctionType {
@@ -35,29 +35,50 @@ export interface BisFunctionTypeDescDto {
 
 export const bisFunctionTypes: BisFunctionTypeDescDto[] = [
   {
-    label: 'Credit: Payout fixed amount',
+    label: 'Credit: Tale',
+    type: BisFunctionType.TAKE_CREDIT,
+    description: `Takes a given credit, icnreases balance by the sum, and starts paying out interest from the same period`
+  },
+  {
+    label: 'Credit: Payout',
     type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
-    description: `This function pays out a given credit with a fixed amount for period range specified, or until credit is paid out`
+    description: `Pays out a fixed amount of credit sum`
+  },
+  {
+    label: 'User: Hire',
+    type: BisFunctionType.HIRE_EMPLOYEE,
+    description: `(Re)Hire 1 employee to 1 ProductionChain, one employee can only be assigned to 1 ProdutionChain at the same time`
+  },
+  {
+    label: 'User: Fire',
+    type: BisFunctionType.FIRE_EMPLOYEE,
+    description: `Fire an employee, making him inactive. Inactive employees do not receive salaries`
+  },
+  {
+    label: 'User: Payout salaries',
+    type: BisFunctionType.PAYOUT_SALARIES,
+    description: `Payout salaries to all active employees`
   },
   {
     label: 'Resource: buy enough for X products',
     type: BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
-    description: `This function buys that much resources, that would be enough to buy provided amount of products`
+    description: `Buy enough resources to produce X products in one period`
+  },
+  {
+    label: 'Eqipment: buy enough for X products',
+    type: BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
+    description: `Buy enough equipment to produce X products in one period`
+  },
+  {
+    label: 'Product: produce',
+    type: BisFunctionType.PRODUCE_PRODUCTS,
+    description: `Produce goods according to instructions of the given Production Chain`
   },
   {
     label: 'Product: Sell fixed amount',
     type: BisFunctionType.SELL_PRODUCT_FIXED,
   },
-  {
-    label: 'Product, Resource, Equipment: Change price',
-    type: BisFunctionType.CHANGE_PRODUCT_RESOURCE_EQUIPMENT_PRICE
-  }
 ];
-
-export enum FormFieldType {
-  DROPDOWN = 'DROPDOWN',
-  STRING = 'STRING'
-}
 
 export type BisFunctionSettings = Record<BisFunctionType, {
   customValidation?: (...args: any[]) => any;

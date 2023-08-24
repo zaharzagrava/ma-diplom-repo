@@ -13,3 +13,11 @@ export class ProductDto extends IntersectionType(
   IntersectionType(CreateProductDto, TimestampsFields),
   IdField,
 ) {}
+
+export class SpentResourceDto {
+  @ApiProperty()
+  newAmount: number;
+
+  @ApiProperty()
+  name: string;
+}

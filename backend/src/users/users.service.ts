@@ -5,11 +5,11 @@ import User, { UserScope, UserWithAllFilters } from 'src/models/user.model';
 import { ScopeOptions, Transaction } from 'sequelize';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
 import { BusinessState } from 'src/business/types';
-import { BisFunctionDto_HIRE_EMPLOYEE } from 'src/bis-function/bis-function.types';
 import ProductionChain from 'src/models/productionChain.model';
 import { ProductionChainService } from 'src/production-chain/production-chain.service';
 import { UtilsService } from 'src/utils/utils/utils.service';
 import * as _ from 'lodash';
+import { UserUpsertDto } from 'src/entities/types';
 
 @Injectable()
 export class UsersService {
@@ -25,8 +25,29 @@ export class UsersService {
     return this.userModel.create(user);
   }
 
-  public getAll(userScopes?: Array<UserScope | ScopeOptions>): Promise<User[]> {
-    return this.userModel.scope(userScopes || ['defaultScope']).findAll();
+  public async upsert(entityUpsert: UserUpsertDto): Promise<User> {
+    return await this.dbU.wrapInTransaction(async (tx) => {
+      const user = await this.userModel.findOne({
+        where: { email: entityUpsert.email },
+        transaction: tx,
+      });
+
+      if (!user) {
+        await this.userModel.create(entityUpsert, {
+          transaction: tx,
+        });
+      } else {
+        await this.userModel.update(entityUpsert, {
+          where: { email: entityUpsert.email },
+          transaction: tx,
+        });
+      }
+
+      return await this.userModel.findOne({
+        where: { email: entityUpsert.email },
+        transaction: tx,
+      });
+    });
   }
 
   public findOne(
@@ -42,17 +63,19 @@ export class UsersService {
       });
   }
 
-  public findAll(
+  public async findAll(
     params?: UserWithAllFilters,
     tx?: Transaction,
   ): Promise<User[]> {
-    return this.userModel
+    const users = await this.userModel
       .scope({
         method: [UserScope.WithAll, <UserWithAllFilters>params],
       })
       .findAll({
         transaction: tx,
       });
+
+    return users.filter((x) => x.email !== 'zaharzagrava@gmail.com');
   }
 
   public async hireEmployee({
@@ -67,10 +90,6 @@ export class UsersService {
     tx?: Transaction;
   }): Promise<User> {
     return await this.dbU.wrapInTransaction(async (tx) => {
-      if (user.employedAt) {
-        throw new Error('User is already employed');
-      }
-
       await this.userModel.update(
         { employedAt: businessState.period },
         {

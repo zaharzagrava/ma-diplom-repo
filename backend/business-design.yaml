@@ -19,24 +19,13 @@ functionality:
   - I think lets remove departments (or leave only for stats) and focus on the moniroting playfield
 
 endpoint:
-  - upsert User
-  - upsert ProductionChain
-  - upsert Product
-  - upsert Equipment
-  - upsert ProductionChain relations with Product, User, Equipment
-  - upsert Credit
-  - generate plan for predefined period
-
+  - create 3 use cases of how this program can be used
+    - one of them is in master -> Проєктний аналіз
   - managing multiple product chains and managing hours of users working on that
-
-fe:
-  - create 3 more business functions and showcase them in coursework
-    - define them in BusinessFunctionContainer
-    - define methods for editing, fetching, executing in bis-function.service.ts
-    - define in types
-  - create datepicker that
-    - defines defaults for start and end period on frontend
-    - allows to edit startPeriod and endPeriod in BisFunction
-  - ---
-  - create ability to add, edit, deactivate, remove, reorder BisFunctions
+  - validate BisFunctions on User edit (what if changes to a type that is unsupported by some BisFunction)
+    - also on User type change (what if he is already attached to ProductionChain?)
+  - allow null for Credit.startPeriod, User.employedAt
   - production chain, where one product is used for other resources
+
+  - create User dynamically
+

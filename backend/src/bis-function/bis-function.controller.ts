@@ -54,7 +54,7 @@ export class BisFunctionController {
     @User() user: UserRawDto,
     @Body() params: BisFunctionChangeOrderDto,
   ) {
-    console.log('--- /api/bis-function/upsert');
+    console.log('--- /api/bis-function/order');
     console.log(params);
 
     return await this.bisFunctionService.changeOrder({

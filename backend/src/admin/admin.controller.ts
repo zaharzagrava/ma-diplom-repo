@@ -1,6 +1,7 @@
-import { Controller, Post, Logger } from '@nestjs/common';
+import { Controller, Post, Logger, Body } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
+import { SyncDto } from './types';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -10,9 +11,9 @@ export class AdminController {
   constructor(private readonly adminService: AdminService) {}
 
   @Post('/seed')
-  async syncKpisBonusshares() {
+  async syncKpisBonusshares(@Body() params: SyncDto) {
     this.l.log('--- manual sync kpis bonus shares ---');
 
-    await this.adminService.seed();
+    await this.adminService.seed(params);
   }
 }

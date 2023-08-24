@@ -55,14 +55,11 @@ export class FinancialPlanningService {
         }
 
         // We will have a set of functions: produce goods, sell goods etc. and each function will accept all data needed and change it accorddingly
-        const state: BusinessState[] = [
-          { balance: business.balance, period: fromPeriod, prompts: [] },
-        ];
+        const state: BusinessState[] = [];
         let iPeriod = fromPeriod;
-        while (iPeriod !== toPeriod) {
-          const prevState = state[state.length - 1];
+        while (iPeriod !== this.periodService.next(toPeriod)) {
           let iState: BusinessState = {
-            balance: prevState.balance,
+            balance: state[state.length - 1]?.balance ?? business.balance,
             period: iPeriod,
             prompts: [],
           };
@@ -70,8 +67,7 @@ export class FinancialPlanningService {
           // Execute ticks
           await this.tickCredits(iState, tx);
 
-          // Execute business functions
-          for (const bisFunction of bisFunctions
+          const activeBisFunctions = bisFunctions
             .filter((x) => {
               return this.periodService.between(
                 x.startPeriod,
@@ -81,18 +77,19 @@ export class FinancialPlanningService {
             })
             .sort((a, b) => {
               return a.order - b.order;
-            })) {
-            console.log('@bisFunction.name');
-            console.log(bisFunction.name);
+            });
+
+          // Execute business functions
+          for (const bisFunction of activeBisFunctions) {
             iState = await this.bisFunctionService.exec(
               iState,
               bisFunction,
               tx,
             );
-
-            console.log('@iState');
-            console.log(iState);
           }
+
+          console.log('Prompts');
+          console.log(iState.prompts);
 
           state.push(iState);
           iPeriod = this.periodService.next(iPeriod);

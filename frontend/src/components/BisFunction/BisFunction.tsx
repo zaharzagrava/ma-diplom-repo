@@ -9,9 +9,8 @@ import {
   BisFunctionSettings,
   BisFunctionType,
   bisFunctionTypes,
-  FormFieldType,
 } from "../../store/bis-function.types";
-import { Entities } from "../../store/types";
+import { Entities, FormFieldType } from "../../store/types";
 import Button from "../Button/Button";
 import FormDatepicker from "../Form/FormDatePicker/FormDatePicker";
 import { FormDropdown } from "../Form/FormDropdown/FormDropdown";

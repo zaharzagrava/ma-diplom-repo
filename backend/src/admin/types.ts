@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import User from 'src/models/user.model';
 
 export class DbCredsDto {
   @ApiProperty()
@@ -16,4 +15,8 @@ export class DbCredsDto {
 
   @ApiProperty()
   host: string;
+}
+
+export class SyncDto {
+  mode: string;
 }

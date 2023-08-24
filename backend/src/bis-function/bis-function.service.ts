@@ -469,9 +469,6 @@ export class BisFunctionService {
           moved: movedBisFunction,
         };
 
-        console.log('@udpated');
-        console.log(123);
-
         return alpha;
       } catch (error) {
         console.log('Bis function upsert error');
@@ -493,108 +490,101 @@ export class BisFunctionService {
     bisFunctionUpsert: BisFunctionUpsertDto;
   }) {
     return await this.dbUtilsService.wrapInTransaction(async (tx) => {
-      try {
-        const bisFunction = await this.bisFunctionModel.findOne({
+      const bisFunction = await this.bisFunctionModel.findOne({
+        where: { name: bisFunctionUpsert.name },
+        transaction: tx,
+      });
+
+      const bisFunctionCount = await this.bisFunctionModel.count({
+        transaction: tx,
+      });
+
+      const upsertBody: CreationAttributes<BisFunction> = {
+        startPeriod: bisFunctionUpsert.startPeriod ?? bisFunction?.startPeriod,
+        ...(bisFunctionUpsert.endPeriod && {
+          endPeriod: bisFunctionUpsert.endPeriod,
+        }),
+        name: bisFunction?.name ?? bisFunctionUpsert.name,
+        order: bisFunction?.order ?? bisFunctionCount + 2,
+        type: bisFunction?.type ?? bisFunctionUpsert.type,
+      };
+
+      switch (bisFunctionUpsert.type) {
+        case BisFunctionType.TAKE_CREDIT:
+          this.prepareUpsert_TAKE_CREDIT(
+            bisFunctionUpsert as BisFunctionUpsertDto_TAKE_CREDIT,
+            upsertBody,
+          );
+          break;
+        case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
+          this.prepareUpsert_PAYOUT_CREDIT_FIXED_AMOUNT(
+            bisFunctionUpsert as BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT,
+            upsertBody,
+          );
+          break;
+
+        case BisFunctionType.HIRE_EMPLOYEE:
+          this.prepareUpsert_HIRE_EMPLOYEE(
+            bisFunctionUpsert as BisFunctionUpsertDto_HIRE_EMPLOYEE,
+            upsertBody,
+          );
+          break;
+        case BisFunctionType.FIRE_EMPLOYEE:
+          this.prepareUpsert_FIRE_EMPLOYEE(
+            bisFunctionUpsert as BisFunctionUpsertDto_FIRE_EMPLOYEE,
+            upsertBody,
+          );
+          break;
+        case BisFunctionType.PAYOUT_SALARIES:
+          this.prepareUpsert_PAYOUT_SALARIES(
+            bisFunctionUpsert as BisFunctionUpsertDto_PAYOUT_SALARIES,
+            upsertBody,
+          );
+          break;
+
+        case BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT:
+          this.prepareUpsert_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT(
+            bisFunctionUpsert as BisFunctionUpsertDto_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
+            upsertBody,
+          );
+          break;
+        case BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT:
+          this.prepareUpsert_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT(
+            bisFunctionUpsert as BisFunctionUpsertDto_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
+            upsertBody,
+          );
+          break;
+        case BisFunctionType.PRODUCE_PRODUCTS:
+          this.prepareUpsert_PRODUCE_PRODUCTS(
+            bisFunctionUpsert as BisFunctionUpsertDto_PRODUCE_PRODUCTS,
+            upsertBody,
+          );
+          break;
+        case BisFunctionType.SELL_PRODUCT_FIXED:
+          this.prepareUpsert_SELL_PRODUCT_FIXED(
+            bisFunctionUpsert as BisFunctionUpsertDto_SELL_PRODUCT_FIXED,
+            upsertBody,
+          );
+          break;
+      }
+
+      if (!bisFunction) {
+        await this.bisFunctionModel.create(upsertBody, {
+          transaction: tx,
+        });
+      } else {
+        await this.bisFunctionModel.update(upsertBody, {
+          where: { name: bisFunction.name },
+          transaction: tx,
+        });
+      }
+
+      return await this.postProcessBisFunction(
+        (await this.bisFunctionModel.findOne({
           where: { name: bisFunctionUpsert.name },
           transaction: tx,
-        });
-
-        const bisFunctionCount = await this.bisFunctionModel.count({
-          transaction: tx,
-        });
-
-        const upsertBody: CreationAttributes<BisFunction> = {
-          startPeriod:
-            bisFunctionUpsert.startPeriod ?? bisFunction?.startPeriod,
-          ...(bisFunctionUpsert.endPeriod && {
-            endPeriod: bisFunctionUpsert.endPeriod,
-          }),
-          name: bisFunction?.name ?? bisFunctionUpsert.name,
-          order: bisFunction?.order ?? bisFunctionCount + 1,
-          type: bisFunction?.type ?? bisFunctionUpsert.type,
-        };
-
-        switch (bisFunctionUpsert.type) {
-          case BisFunctionType.TAKE_CREDIT:
-            this.prepareUpsert_TAKE_CREDIT(
-              bisFunctionUpsert as BisFunctionUpsertDto_TAKE_CREDIT,
-              upsertBody,
-            );
-            break;
-          case BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT:
-            this.prepareUpsert_PAYOUT_CREDIT_FIXED_AMOUNT(
-              bisFunctionUpsert as BisFunctionUpsertDto_PAYOUT_CREDIT_FIXED_AMOUNT,
-              upsertBody,
-            );
-            break;
-
-          case BisFunctionType.HIRE_EMPLOYEE:
-            this.prepareUpsert_HIRE_EMPLOYEE(
-              bisFunctionUpsert as BisFunctionUpsertDto_HIRE_EMPLOYEE,
-              upsertBody,
-            );
-            break;
-          case BisFunctionType.FIRE_EMPLOYEE:
-            this.prepareUpsert_FIRE_EMPLOYEE(
-              bisFunctionUpsert as BisFunctionUpsertDto_FIRE_EMPLOYEE,
-              upsertBody,
-            );
-            break;
-          case BisFunctionType.PAYOUT_SALARIES:
-            this.prepareUpsert_PAYOUT_SALARIES(
-              bisFunctionUpsert as BisFunctionUpsertDto_PAYOUT_SALARIES,
-              upsertBody,
-            );
-            break;
-
-          case BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT:
-            this.prepareUpsert_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT(
-              bisFunctionUpsert as BisFunctionUpsertDto_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
-              upsertBody,
-            );
-            break;
-          case BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT:
-            this.prepareUpsert_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT(
-              bisFunctionUpsert as BisFunctionUpsertDto_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
-              upsertBody,
-            );
-            break;
-          case BisFunctionType.PRODUCE_PRODUCTS:
-            this.prepareUpsert_PRODUCE_PRODUCTS(
-              bisFunctionUpsert as BisFunctionUpsertDto_PRODUCE_PRODUCTS,
-              upsertBody,
-            );
-            break;
-          case BisFunctionType.SELL_PRODUCT_FIXED:
-            this.prepareUpsert_SELL_PRODUCT_FIXED(
-              bisFunctionUpsert as BisFunctionUpsertDto_SELL_PRODUCT_FIXED,
-              upsertBody,
-            );
-            break;
-        }
-
-        if (!bisFunction) {
-          await this.bisFunctionModel.create(upsertBody, {
-            transaction: tx,
-          });
-        } else {
-          await this.bisFunctionModel.update(upsertBody, {
-            where: { name: bisFunction.name },
-            transaction: tx,
-          });
-        }
-
-        return await this.postProcessBisFunction(
-          (await this.bisFunctionModel.findOne({
-            where: { name: bisFunctionUpsert.name },
-            transaction: tx,
-          })) as BisFunction,
-        );
-      } catch (error) {
-        console.log('Bis function upsert error');
-        console.log(error);
-        console.log(JSON.stringify(error, null, 2));
-      }
+        })) as BisFunction,
+      );
     });
   }
 
@@ -627,6 +617,7 @@ export class BisFunctionService {
     upsertBody: CreationAttributes<BisFunction>,
   ) {
     upsertBody.userId = _bisFunctionUpsert.userId;
+    upsertBody.productionChainId = _bisFunctionUpsert.productionChainId;
 
     return _bisFunctionUpsert;
   }
@@ -784,15 +775,17 @@ export class BisFunctionService {
           bisFunction_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
           tx,
         );
-      // case BisFunctionType.PRODUCE_PRODUCTS:
-      //   const bisFunction_PRODUCE_PRODUCTS =
-      //     await this.postProcess_PRODUCE_PRODUCTS(bisFunction, tx);
 
-      //   return this.exec_PRODUCE_PRODUCTS(
-      //     businessState,
-      //     bisFunction_PRODUCE_PRODUCTS,
-      //     tx,
-      //   );
+      case BisFunctionType.PRODUCE_PRODUCTS:
+        const bisFunction_PRODUCE_PRODUCTS =
+          await this.postProcess_PRODUCE_PRODUCTS(bisFunction, tx);
+
+        return this.exec_PRODUCE_PRODUCTS(
+          businessState,
+          bisFunction_PRODUCE_PRODUCTS,
+          tx,
+        );
+
       case BisFunctionType.SELL_PRODUCT_FIXED:
         const bisFunction_SELL_PRODUCT_FIXED =
           await this.postProcess_SELL_PRODUCT_FIXED(bisFunction, tx);
@@ -903,17 +896,16 @@ export class BisFunctionService {
         `[${bisFunction.name}] ${bisFunction.user.fullName} was hired on ${bisFunction.productionChain.name}`,
       );
     } catch (error) {
-      if (error.message === 'Credit is already paid out') {
+      if (
+        [
+          'User is already employed',
+          'Credit is already paid out',
+          'Credit is not taken, no need to payout',
+        ].includes(error.message)
+      ) {
         this.u.pushAndRecordPrompt(
           businessState,
-          `[${bisFunction.name}] Credit is already paid out, no actions done`,
-        );
-
-        return businessState;
-      } else if (error.message === 'Credit is not taken, no need to payout') {
-        this.u.pushAndRecordPrompt(
-          businessState,
-          `[${bisFunction.name}] Credit is not taken, no need to payout, no actions done`,
+          `[${bisFunction.name}] ${error.message}`,
         );
 
         return businessState;
@@ -1009,7 +1001,7 @@ export class BisFunctionService {
     boughtResources.forEach((x) => {
       this.u.pushAndRecordPrompt(
         businessState,
-        `- ${x.buyAmount} of '${x.name}' was bought at ${x.price}`,
+        `- ${x.buyAmount} of '${x.name}' was bought at ${x.price}$`,
       );
     });
 
@@ -1048,6 +1040,59 @@ export class BisFunctionService {
     return businessState;
   }
 
+  private async exec_PRODUCE_PRODUCTS(
+    businessState: BusinessState,
+    bisFunction: BisFunctionDto_PRODUCE_PRODUCTS,
+    tx?: Transaction,
+  ): Promise<BusinessState> {
+    const prevBalance = businessState.balance;
+
+    try {
+      const {
+        minEnoughForXProducts,
+        minProducable,
+        minUsersCount,
+        spentResources,
+        typesCount,
+      } = await this.productionChainService.produce({
+        businessState,
+        productionChain: bisFunction.productionChain,
+        tx,
+      });
+
+      this.u.pushAndRecordPrompt(
+        businessState,
+        `[${bisFunction.name}] Will produce: ${minProducable}, since users can produce only ${minUsersCount}, resources are enough only for ${minEnoughForXProducts}`,
+      );
+
+      spentResources.forEach((x) => {
+        this.u.pushAndRecordPrompt(
+          businessState,
+          `- ${x.newAmount} of '${x.name}' is left`,
+        );
+      });
+
+      return businessState;
+    } catch (error) {
+      if (
+        [
+          'No users assigned to this production chain',
+          'No resources assigned to this production chain',
+          'Not enough users for at least 1 product',
+          'Not enough resources for at least 1 product',
+        ].includes(error.message)
+      ) {
+        this.u.pushAndRecordPrompt(
+          businessState,
+          `[${bisFunction.name}] ${error.message}`,
+        );
+        return businessState;
+      }
+
+      throw error;
+    }
+  }
+
   /**
    * @description
    *    - buys enough products to produce a given amount of Products in a give ProductionChain
@@ -1058,7 +1103,7 @@ export class BisFunctionService {
     bisFunction: BisFunctionDto_SELL_PRODUCT_FIXED,
     tx?: Transaction,
   ): Promise<BusinessState> {
-    const { product, income } = await this.productService.sellProduct({
+    const { product, income, sold } = await this.productService.sellProduct({
       businessState,
       product: bisFunction.product,
       sellAmount: bisFunction.amount,
@@ -1075,7 +1120,7 @@ export class BisFunctionService {
     } else {
       this.u.pushAndRecordPrompt(
         businessState,
-        `[${bisFunction.name}] Balance was increased by sold products: ${businessState.balance} + ${income} = ${newBalance}`,
+        `[${bisFunction.name}] Balance was increased by ${sold} sold products: ${businessState.balance} + ${income} = ${newBalance}`,
       );
     }
 

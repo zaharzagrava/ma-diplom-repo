@@ -35,10 +35,16 @@ const FormDatepicker: FunctionComponent<Props> = ({ name, label }: Props) => (
               dateFormat="MMMM yyyy"
               showMonthYearPicker
               name={name}
-              selected={DateTime.fromFormat(
-                (field.value as any).toString(),
-                "yyyyMM"
-              ).toJSDate()}
+              selected={((): Date | undefined => {
+                if(field.value) {
+                  return DateTime.fromFormat(
+                    (field.value).toString(),
+                    "yyyyMM"
+                  ).toJSDate();
+                }
+                
+                return undefined;
+              })()}
               onChange={(date) => {
                 if (date !== null) {
                   const dateYYYYMM =

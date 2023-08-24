@@ -9,7 +9,7 @@ import Credit, {
 import * as _ from 'lodash';
 import { UtilsService } from 'src/utils/utils/utils.service';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
-import { BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT } from 'src/bis-function/bis-function.types';
+import { CreditUpsertDto } from 'src/entities/types';
 
 @Injectable()
 export class CreditService {
@@ -34,6 +34,31 @@ export class CreditService {
       .findAll({
         transaction: tx,
       });
+  }
+
+  public async upsert(entityUpsert: CreditUpsertDto) {
+    return await this.dbU.wrapInTransaction(async (tx) => {
+      const credit = await this.creditModel.findOne({
+        where: { name: entityUpsert.name },
+        transaction: tx,
+      });
+
+      if (!credit) {
+        await this.creditModel.create(entityUpsert, {
+          transaction: tx,
+        });
+      } else {
+        await this.creditModel.update(entityUpsert, {
+          where: { name: entityUpsert.name },
+          transaction: tx,
+        });
+      }
+
+      return await this.creditModel.findOne({
+        where: { name: entityUpsert.name },
+        transaction: tx,
+      });
+    });
   }
 
   public async tick(

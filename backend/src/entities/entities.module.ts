@@ -7,6 +7,7 @@ import { EntitiesController } from './entities.controller';
 import { EntitiesService } from './entities.service';
 import { UsersModule } from 'src/users/users.module';
 import { ProductionChainModule } from 'src/production-chain/production-chain.module';
+import { EquipmentModule } from 'src/equipment/equipment.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ProductionChainModule } from 'src/production-chain/production-chain.mod
     ResourceModule,
     UsersModule,
     ProductionChainModule,
+    EquipmentModule,
   ],
   controllers: [EntitiesController],
   providers: [EntitiesService],

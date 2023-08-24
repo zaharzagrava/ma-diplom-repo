@@ -13,6 +13,7 @@ import ProductionChainEquipment from 'src/models/productionChainEquipment.model'
 import ProductionChainResource from 'src/models/productionChainResource.model';
 import Equipment from 'src/models/equipment.model';
 import ProductionChainUser from 'src/models/productionChainUser.model';
+import { SyncDto } from './types';
 
 @Injectable()
 export class AdminService {
@@ -36,7 +37,7 @@ export class AdminService {
     @InjectModel(ProductionChainUser)
     private productionChainUserModel: typeof ProductionChainUser,
   ) {
-    this.seed();
+    // this.defaultSeed();
   }
 
   public alpha() {
@@ -49,300 +50,332 @@ export class AdminService {
    * @param email
    * @param password
    */
-  public async seed() {
+  public async seed(params: SyncDto) {
     try {
       this.l.log(`--- Running seeds ---`);
 
-      await this.userModel.destroy({ where: {}, force: true });
-      await this.creditModel.destroy({ where: {}, force: true });
-      await this.equipmentModel.destroy({ where: {}, force: true });
-      await this.bisFunctionModel.destroy({ where: {}, force: true });
-      await this.businessModel.destroy({ where: {}, force: true });
-      await this.resourceModel.destroy({ where: {}, force: true });
-      await this.productModel.destroy({ where: {}, force: true });
-      await this.productionChainModel.destroy({ where: {}, force: true });
-      await this.productionChainEquipmentModel.destroy({
-        where: {},
-        force: true,
-      });
-      await this.productionChainResourceModel.destroy({
-        where: {},
-        force: true,
-      });
-      await this.productionChainUserModel.destroy({
-        where: {},
-        force: true,
-      });
+      switch (params.mode) {
+        case 'default':
+          return await this.defaultSeed();
 
-      // ---
-
-      // --- Business
-
-      await this.businessModel.create({
-        name: 'My business',
-        balance: 1000,
-      });
-
-      // --- User
-
-      console.log('@main user');
-      await this.userModel.create({
-        email: 'zaharzagrava@gmail.com',
-        fullName: 'Alpha Userus',
-        type: UserType.CUTTER,
-        salary: 0,
-      });
-
-      console.log('@user1');
-      const user1 = await this.userModel.create({
-        email: 'ivanpetrovych@gmail.com',
-        fullName: 'Ivan Petrovych',
-        type: UserType.SEAMSTRESS,
-        salary: 1000,
-        employedAt: null,
-      });
-
-      console.log('@user2');
-      const user2 = await this.userModel.create({
-        email: 'petroivanobych@gmail.com',
-        fullName: 'Petro Ivanovych',
-        type: UserType.CUTTER,
-        salary: 1200,
-        employedAt: null,
-      });
-
-      console.log('@user3');
-      const user3 = await this.userModel.create({
-        email: 'annakarenina@gmail.com',
-        fullName: 'Anna Karenina',
-        type: UserType.SEAMSTRESS,
-        salary: 2200,
-        employedAt: 202201,
-      });
-
-      // --- Resource
-      console.log('@resource1');
-      const resource1 = await this.resourceModel.create({
-        name: 'Нитки',
-        amount: 10,
-        price: 1,
-      });
-
-      console.log('@resource2');
-      const resource2 = await this.resourceModel.create({
-        name: 'Клей',
-        amount: 3,
-        price: 2,
-      });
-
-      console.log('@resource3');
-      const resource3 = await this.resourceModel.create({
-        name: 'Кришки',
-        amount: 1,
-        price: 10,
-      });
-
-      // --- Equipment
-
-      console.log('@equipment1');
-      const equipment1 = await this.equipmentModel.create({
-        name: 'Швейні інструменти',
-        amount: 0,
-        price: 20,
-      });
-
-      const equipment2 = await this.equipmentModel.create({
-        name: 'Робочий стіл',
-        amount: 0,
-        price: 200,
-      });
-
-      // --- Product
-
-      console.log('@tableProduct');
-      const tableProduct = await this.productModel.create({
-        name: 'Мішок з кришкою',
-        amount: 0,
-        price: 200,
-      });
-
-      // --- ProductionChain
-
-      const productionChain = await this.productionChainModel.create({
-        name: 'Виробництво мішків',
-        productId: tableProduct.id,
-      });
-
-      // --- ProductionChainResource
-
-      await this.productionChainResourceModel.create({
-        amount: 10,
-        resourceId: resource1.id,
-        productionChainId: productionChain.id,
-      });
-      await this.productionChainResourceModel.create({
-        amount: 3,
-        resourceId: resource2.id,
-        productionChainId: productionChain.id,
-      });
-      await this.productionChainResourceModel.create({
-        amount: 1,
-        resourceId: resource3.id,
-        productionChainId: productionChain.id,
-      });
-
-      // --- ProductionChainResource
-
-      await this.productionChainEquipmentModel.create({
-        amount: 2,
-        equipmentId: equipment1.id,
-        productionChainId: productionChain.id,
-      });
-      await this.productionChainEquipmentModel.create({
-        amount: 1,
-        equipmentId: equipment2.id,
-        productionChainId: productionChain.id,
-      });
-
-      // --- ProductionChainUser
-
-      await this.productionChainUserModel.create({
-        userId: null,
-        productionChainId: productionChain.id,
-        type: UserType.SEAMSTRESS,
-      });
-      await this.productionChainUserModel.create({
-        userId: null,
-        productionChainId: productionChain.id,
-        type: UserType.CUTTER,
-      });
-
-      // --- Credit
-
-      const credit = await this.creditModel.create({
-        name: 'NBU Credit',
-        startPeriod: 202201,
-        sum: 3000,
-        rate: 0.02,
-      });
-
-      const credit2 = await this.creditModel.create({
-        name: 'Privatbank credit',
-        startPeriod: null,
-        sum: 1000,
-        rate: 0.05,
-      });
-
-      // --- BisFunction
-
-      // await this.bisFunctionModel.create({
-      //   name: 'Hire SEAMSTRESS',
-      //   type: BisFunctionType.HIRE_EMPLOYEE,
-      //   startPeriod: 202201,
-      //   endPeriod: 202201,
-      //   order: 1,
-      //   userId: user1.id,
-      //   productionChainId: productionChain.id,
-      // });
-
-      // await this.bisFunctionModel.create({
-      //   name: 'Hire CUTTER',
-      //   type: BisFunctionType.HIRE_EMPLOYEE,
-      //   startPeriod: 202201,
-      //   endPeriod: 202201,
-      //   order: 2,
-      //   userId: user2.id,
-      //   productionChainId: productionChain.id,
-      // });
-
-      // await this.bisFunctionModel.create({
-      //   name: 'Fire Anna',
-      //   type: BisFunctionType.FIRE_EMPLOYEE,
-      //   startPeriod: 202201,
-      //   endPeriod: 202201,
-      //   order: 3,
-      //   userId: user3.id,
-      // });
-
-      // await this.bisFunctionModel.create({
-      //   name: 'Buy resources',
-      //   type: BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
-      //   startPeriod: 202201,
-      //   endPeriod: 202212,
-      //   meta: {
-      //     amount: 1,
-      //   },
-      //   order: 4,
-      //   productionChainId: productionChain.id,
-      // });
-
-      // await this.bisFunctionModel.create({
-      //   name: 'Buy Equipment',
-      //   type: BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
-      //   startPeriod: 202201,
-      //   endPeriod: 202201,
-      //   meta: {
-      //     amount: 1,
-      //   },
-      //   order: 5,
-      //   productionChainId: productionChain.id,
-      // });
-
-      // await this.bisFunctionModel.create({
-      //   name: 'Produce tables',
-      //   type: BisFunctionType.PRODUCE_PRODUCTS,
-      //   startPeriod: 202201,
-      //   endPeriod: 202212,
-      //   meta: {
-      //     amount: 1,
-      //   },
-      //   order: 6,
-      //   productionChainId: productionChain.id,
-      // });
-
-      await this.bisFunctionModel.create({
-        name: 'Sell products',
-        type: BisFunctionType.SELL_PRODUCT_FIXED,
-        startPeriod: 202203,
-        endPeriod: 202203,
-        meta: {
-          amount: 1,
-        },
-        order: 7,
-        productId: tableProduct.id,
-      });
-
-      await this.bisFunctionModel.create({
-        name: 'Payout NBU credit',
-        type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
-        startPeriod: 202201,
-        endPeriod: 202205,
-        meta: {
-          amount: 200,
-        },
-        order: 8,
-        creditId: credit.id,
-      });
-
-      await this.bisFunctionModel.create({
-        name: 'Take PrivatBank Credit',
-        type: BisFunctionType.TAKE_CREDIT,
-        startPeriod: 202205,
-        endPeriod: 202205,
-        order: 9,
-        creditId: credit2.id,
-      });
-
-      // await this.bisFunctionModel.create({
-      //   name: 'Payout Salaries',
-      //   type: BisFunctionType.PAYOUT_SALARIES,
-      //   startPeriod: 202201,
-      //   endPeriod: 202212,
-      //   order: 10,
-      // });
+        default:
+          break;
+      }
     } catch (error) {
       console.log('Admin seeding error');
       console.log(error);
     }
+  }
+
+  private async defaultSeed() {
+    await this.cleanup();
+
+    // --- Business
+
+    await this.businessModel.create({
+      name: 'My business',
+      balance: 1000,
+    });
+
+    // --- User
+
+    console.log('@main user');
+    await this.userModel.create({
+      email: 'zaharzagrava@gmail.com',
+      fullName: 'Alpha Userus',
+      type: UserType.CUTTER,
+      salary: 0,
+    });
+
+    console.log('@user1');
+    const user1 = await this.userModel.create({
+      email: 'ivanpetrovych@gmail.com',
+      fullName: 'Ivan Petrovych',
+      type: UserType.SEAMSTRESS,
+      salary: 400,
+      employedAt: null,
+    });
+
+    console.log('@user2');
+    const user2 = await this.userModel.create({
+      email: 'petroivanobych@gmail.com',
+      fullName: 'Petro Ivanovych',
+      type: UserType.CUTTER,
+      salary: 300,
+      employedAt: null,
+    });
+
+    console.log('@user3');
+    const user3 = await this.userModel.create({
+      email: 'annakarenina@gmail.com',
+      fullName: 'Anna Karenina',
+      type: UserType.SEAMSTRESS,
+      salary: 400,
+      employedAt: 202201,
+    });
+
+    // --- Resource
+    console.log('@resource1');
+    const resource1 = await this.resourceModel.create({
+      name: 'Нитки',
+      amount: 10,
+      price: 1,
+    });
+
+    console.log('@resource2');
+    const resource2 = await this.resourceModel.create({
+      name: 'Клей',
+      amount: 3,
+      price: 2,
+    });
+
+    console.log('@resource3');
+    const resource3 = await this.resourceModel.create({
+      name: 'Кришки',
+      amount: 1,
+      price: 10,
+    });
+
+    // --- Equipment
+
+    console.log('@equipment1');
+    const equipment1 = await this.equipmentModel.create({
+      name: 'Швейні інструменти',
+      amount: 0,
+      price: 20,
+    });
+
+    const equipment2 = await this.equipmentModel.create({
+      name: 'Робочий стіл',
+      amount: 0,
+      price: 200,
+    });
+
+    // --- Product
+
+    console.log('@tableProduct');
+    const tableProduct = await this.productModel.create({
+      name: 'Мішок з кришкою',
+      amount: 0,
+      price: 1000,
+    });
+
+    // --- ProductionChain
+
+    const productionChain = await this.productionChainModel.create({
+      name: 'Виробництво мішків',
+      productId: tableProduct.id,
+    });
+
+    // --- ProductionChainResource
+
+    await this.productionChainResourceModel.create({
+      amount: 10,
+      resourceId: resource1.id,
+      productionChainId: productionChain.id,
+    });
+    await this.productionChainResourceModel.create({
+      amount: 3,
+      resourceId: resource2.id,
+      productionChainId: productionChain.id,
+    });
+    await this.productionChainResourceModel.create({
+      amount: 1,
+      resourceId: resource3.id,
+      productionChainId: productionChain.id,
+    });
+
+    // --- ProductionChainResource
+
+    await this.productionChainEquipmentModel.create({
+      amount: 2,
+      equipmentId: equipment1.id,
+      productionChainId: productionChain.id,
+    });
+    await this.productionChainEquipmentModel.create({
+      amount: 1,
+      equipmentId: equipment2.id,
+      productionChainId: productionChain.id,
+    });
+
+    // --- ProductionChainUser
+
+    await this.productionChainUserModel.create({
+      userId: null,
+      productionChainId: productionChain.id,
+      type: UserType.SEAMSTRESS,
+    });
+    await this.productionChainUserModel.create({
+      userId: null,
+      productionChainId: productionChain.id,
+      type: UserType.CUTTER,
+    });
+
+    // --- Credit
+
+    const credit = await this.creditModel.create({
+      name: 'NBU Credit',
+      startPeriod: 202201,
+      sum: 3000,
+      rate: 0.02,
+    });
+
+    const credit2 = await this.creditModel.create({
+      name: 'Privatbank credit',
+      startPeriod: null,
+      sum: 5000,
+      rate: 0.05,
+    });
+
+    // --- BisFunction
+
+    await this.bisFunctionModel.create({
+      name: 'Hire SEAMSTRESS',
+      type: BisFunctionType.HIRE_EMPLOYEE,
+      startPeriod: 202201,
+      endPeriod: 202201,
+      order: 1,
+      userId: user1.id,
+      productionChainId: productionChain.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Hire CUTTER',
+      type: BisFunctionType.HIRE_EMPLOYEE,
+      startPeriod: 202201,
+      endPeriod: 202201,
+      order: 2,
+      userId: user2.id,
+      productionChainId: productionChain.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Hire SEAMSTRESS 2',
+      type: BisFunctionType.HIRE_EMPLOYEE,
+      startPeriod: 202201,
+      endPeriod: 202201,
+      order: 1,
+      userId: user1.id,
+      productionChainId: productionChain.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Hire CUTTER 2',
+      type: BisFunctionType.HIRE_EMPLOYEE,
+      startPeriod: 202201,
+      endPeriod: 202201,
+      order: 2,
+      userId: user2.id,
+      productionChainId: productionChain.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Fire Anna',
+      type: BisFunctionType.FIRE_EMPLOYEE,
+      startPeriod: 202201,
+      endPeriod: 202201,
+      order: 3,
+      userId: user3.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Buy resources',
+      type: BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
+      startPeriod: 202201,
+      endPeriod: 202212,
+      meta: {
+        amount: 1,
+      },
+      order: 4,
+      productionChainId: productionChain.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Buy Equipment',
+      type: BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
+      startPeriod: 202201,
+      endPeriod: 202201,
+      meta: {
+        amount: 1,
+      },
+      order: 5,
+      productionChainId: productionChain.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Produce tables',
+      type: BisFunctionType.PRODUCE_PRODUCTS,
+      startPeriod: 202201,
+      endPeriod: 202212,
+      meta: {
+        amount: 1,
+      },
+      order: 6,
+      productionChainId: productionChain.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Sell products',
+      type: BisFunctionType.SELL_PRODUCT_FIXED,
+      startPeriod: 202201,
+      endPeriod: 202212,
+      meta: {
+        amount: 40,
+      },
+      order: 7,
+      productId: tableProduct.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Payout NBU credit',
+      type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
+      startPeriod: 202201,
+      endPeriod: 202205,
+      meta: {
+        amount: 200,
+      },
+      order: 8,
+      creditId: credit.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Take PrivatBank Credit',
+      type: BisFunctionType.TAKE_CREDIT,
+      startPeriod: 202205,
+      endPeriod: 202205,
+      order: 9,
+      creditId: credit2.id,
+    });
+
+    await this.bisFunctionModel.create({
+      name: 'Payout Salaries',
+      type: BisFunctionType.PAYOUT_SALARIES,
+      startPeriod: 202201,
+      endPeriod: 202212,
+      order: 10,
+    });
+  }
+
+  private async cleanup() {
+    await this.userModel.destroy({ where: {}, force: true });
+    await this.creditModel.destroy({ where: {}, force: true });
+    await this.equipmentModel.destroy({ where: {}, force: true });
+    await this.bisFunctionModel.destroy({ where: {}, force: true });
+    await this.businessModel.destroy({ where: {}, force: true });
+    await this.resourceModel.destroy({ where: {}, force: true });
+    await this.productModel.destroy({ where: {}, force: true });
+    await this.productionChainModel.destroy({ where: {}, force: true });
+    await this.productionChainEquipmentModel.destroy({
+      where: {},
+      force: true,
+    });
+    await this.productionChainResourceModel.destroy({
+      where: {},
+      force: true,
+    });
+    await this.productionChainUserModel.destroy({
+      where: {},
+      force: true,
+    });
   }
 }

@@ -1,6 +1,7 @@
+import { EntityUpsertDto, EntityUpsertType } from "../containers/EntityUpsert/types";
 import { ErrorCodes } from "../error";
 import { BisFunctionChangeOrderDto as BisFunctionOrderChangeDto, BisFunctionDeleteDto, BisFunctionDto, BisFunctionEditDto } from "./bis-function.types";
-import { BisMetriscDto, Credit, Entities, Entity, Myself, Product, Resource } from "./types";
+import { BisMetriscDto, Credit, Entities, Entity, Myself, Product, Resource, EntityUpsertable } from "./types";
 
 /* Action Types */
 export const actionTypes = {
@@ -45,6 +46,18 @@ export const actionTypes = {
     "ENTITIES_GET_ALL_SUCCESS" as "ENTITIES_GET_ALL_SUCCESS",
   ENTITIES_GET_ALL_FAILURE:
     "ENTITIES_GET_ALL_FAILURE" as "ENTITIES_GET_ALL_FAILURE",
+
+  ENTITY_UPSERT: "ENTITY_UPSERT" as "ENTITY_UPSERT",
+  ENTITY_UPSERT_SUCCESS:
+    "ENTITY_UPSERT_SUCCESS" as "ENTITY_UPSERT_SUCCESS",
+  ENTITY_UPSERT_FAILURE:
+    "ENTITY_UPSERT_FAILURE" as "ENTITY_UPSERT_FAILURE",
+
+  ENTITY_DELETE: "ENTITY_DELETE" as "ENTITY_DELETE",
+  ENTITY_DELETE_SUCCESS:
+    "ENTITY_DELETE_SUCCESS" as "ENTITY_DELETE_SUCCESS",
+  ENTITY_DELETE_FAILURE:
+    "ENTITY_DELETE_FAILURE" as "ENTITY_DELETE_FAILURE",
 
   LOG_OUT_ENDUSER: "LOG_OUT_ENDUSER" as "LOG_OUT_ENDUSER",
   LOG_OUT_ENDUSER_SUCCESS:
@@ -192,6 +205,44 @@ export interface EntitiesGetAllFailure {
   };
 }
 
+export interface EntityUpsert {
+  type: typeof actionTypes.ENTITY_UPSERT;
+  payload: EntityUpsertDto;
+}
+
+export interface EntityUpsertSuccess {
+  type: typeof actionTypes.ENTITY_UPSERT_SUCCESS;
+  payload: EntityUpsertable;
+}
+
+export interface EntityUpsertFailure {
+  type: typeof actionTypes.ENTITY_UPSERT_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
+export interface EntityDelete {
+  type: typeof actionTypes.ENTITY_DELETE;
+  payload: {
+    id: string;
+    __type__: EntityUpsertType;
+  }
+}
+
+export interface EntityDeleteSuccess {
+  type: typeof actionTypes.ENTITY_DELETE_SUCCESS;
+  // id of the deleted entity
+  payload: string;
+}
+
+export interface EntityDeleteFailure {
+  type: typeof actionTypes.ENTITY_DELETE_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
 export interface LogOutEnduser {
   type: typeof actionTypes.LOG_OUT_ENDUSER;
 }
@@ -231,6 +282,8 @@ export type FailureAppActionTypes =
   | typeof actionTypes.BIS_FUNCTION_ORDER_CHANGE_FAILURE
   | typeof actionTypes.BIS_FUNCTION_DELETE_FAILURE
   | typeof actionTypes.ENTITIES_GET_ALL_FAILURE
+  | typeof actionTypes.ENTITY_UPSERT_FAILURE
+  | typeof actionTypes.ENTITY_DELETE_FAILURE
   ;
 
 
@@ -243,6 +296,8 @@ export type FailureAppAction =
   | BisFunctionOrderChangeFailure
   | BisFunctionDeleteFailure
   | EntitiesGetAllFailure
+  | EntityUpsertFailure
+  | EntityDeleteFailure
   | LogOutEnduserFailure;
 
 export type AppAction =
@@ -268,6 +323,12 @@ export type AppAction =
   | EntitiesGetAll
   | EntitiesGetAllSuccess
   | EntitiesGetAllFailure
+  | EntityUpsert
+  | EntityUpsertSuccess
+  | EntityUpsertFailure
+  | EntityDelete
+  | EntityDeleteSuccess
+  | EntityDeleteFailure
   | LogOutEnduser
   | LogOutEnduserSuccess
   | LogOutEnduserFailure
