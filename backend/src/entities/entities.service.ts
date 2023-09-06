@@ -27,6 +27,7 @@ export class EntitiesService {
       this.creditService.findAll(),
       this.usersService.findAll(),
       this.productionChainService.findAll(),
+      this.equipmentService.findAll(),
     ]);
 
     // TODO: add __type__ property to differentiate
@@ -37,6 +38,7 @@ export class EntitiesService {
       credits: entities[2],
       users: entities[3],
       productionChains: entities[4],
+      equipment: entities[5],
     };
   }
 

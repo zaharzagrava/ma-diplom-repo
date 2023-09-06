@@ -35,7 +35,7 @@ export interface BisFunctionTypeDescDto {
 
 export const bisFunctionTypes: BisFunctionTypeDescDto[] = [
   {
-    label: 'Credit: Tale',
+    label: 'Credit: Take',
     type: BisFunctionType.TAKE_CREDIT,
     description: `Takes a given credit, icnreases balance by the sum, and starts paying out interest from the same period`
   },

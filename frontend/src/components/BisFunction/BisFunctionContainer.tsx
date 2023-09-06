@@ -124,7 +124,7 @@ export const bisFunctionsSettings: BisFunctionSettings = {
       productionChainId: {
         type: FormFieldType.DROPDOWN,
         label: "The product chain for which to buy resources:",
-        placeholder: 'Choose product',
+        placeholder: 'Choose resource',
         validate: joi.string().required(),
         default: null,
       },
@@ -142,7 +142,7 @@ export const bisFunctionsSettings: BisFunctionSettings = {
       productionChainId: {
         type: FormFieldType.DROPDOWN,
         label: "The product chain for which to buy equipment:",
-        placeholder: 'Choose product',
+        placeholder: 'Choose equipment',
         validate: joi.string().required(),
         default: null,
       },
@@ -249,7 +249,8 @@ export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto | BisFun
       if(!isEdit) {
         return {
           ...createParams,
-          userId: undefined
+          userId: undefined,
+          productionChainId: undefined,
         } as BisFunctionEditDto_HIRE_EMPLOYEE;
       }
 
@@ -258,6 +259,7 @@ export const bisFunctionsToEditTransform = (bisFunction: BisFunctionDto | BisFun
       return {
         ...editParams,
         userId: bisFunction_HIRE_EMPLOYEE.user.id,
+        productionChainId: bisFunction_HIRE_EMPLOYEE.productionChain.id,
       } as BisFunctionEditDto_HIRE_EMPLOYEE;
 
     case BisFunctionType.FIRE_EMPLOYEE:

@@ -87,7 +87,7 @@ export class UsersService {
     businessState: BusinessState;
     user: User;
     productionChain: ProductionChain;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<User> {
     return await this.dbU.wrapInTransaction(async (tx) => {
       await this.userModel.update(
@@ -135,7 +135,7 @@ export class UsersService {
   }: {
     businessState: BusinessState;
     user: User;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<User> {
     return await this.dbU.wrapInTransaction(async (tx) => {
       if (!user.employedAt) {
@@ -166,7 +166,7 @@ export class UsersService {
     tx,
   }: {
     businessState: BusinessState;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<
     {
       amount: number;

@@ -82,7 +82,7 @@ export class ProductService {
     businessState: BusinessState;
     product: Product;
     sellAmount: number;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<{
     product: Product;
     income: number;
@@ -118,7 +118,7 @@ export class ProductService {
   }: {
     id: string;
     amount: number;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<{
     product: Product;
   }> {

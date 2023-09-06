@@ -64,7 +64,7 @@ export class CreditService {
   public async tick(
     businessState: BusinessState,
     credit: Credit,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     // filter out inactive credits
     if (!credit.startPeriod) return businessState;
@@ -93,7 +93,7 @@ export class CreditService {
   }: {
     businessState: BusinessState;
     credit: Credit;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<Credit> {
     return await this.dbU.wrapInTransaction(async (tx) => {
       if (credit.startPeriod) {
@@ -124,7 +124,7 @@ export class CreditService {
     businessState: BusinessState;
     amount: number;
     credit: Credit;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<{
     credit: Credit;
     payoutAmount: number;
@@ -142,8 +142,8 @@ export class CreditService {
 
       const oldCreditSum = credit.sum;
       const payoutAmount = Math.min(credit.sum, amount);
-      businessState.balance -= payoutAmount;
-      credit.sum -= payoutAmount;
+      businessState.balance = _.round(businessState.balance - payoutAmount, 2);
+      credit.sum = _.round(credit.sum - payoutAmount, 2);
 
       await this.creditModel.update(
         { sum: credit.sum },

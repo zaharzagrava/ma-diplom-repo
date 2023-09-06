@@ -88,9 +88,10 @@ export const FormComponent: FC<{
           case BisFunctionType.FIRE_EMPLOYEE:
             return params.entities.users;
           case BisFunctionType.SELL_PRODUCT_FIXED:
+            return params.entities.products;
           case BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT:
           case BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT:
-            return params.entities.products;
+            return params.entities.productionChains;
           case BisFunctionType.PRODUCE_PRODUCTS:
             return params.entities.productionChains;
           case BisFunctionType.TAKE_CREDIT:

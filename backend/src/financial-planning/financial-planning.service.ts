@@ -43,7 +43,7 @@ export class FinancialPlanningService {
     try {
       await this.dbUtilsService.wrapInTransaction(async (tx) => {
         const fromPeriod = params.from ?? 202201;
-        const toPeriod = params.to ?? 202212;
+        const toPeriod = params.to ?? 202312;
         const bisFunctions = await this.bisFunctionModel.findAll();
 
         const business = await this.businessModel.findOne();
@@ -120,7 +120,7 @@ export class FinancialPlanningService {
    * @description
    *    - tick all environment triggers
    */
-  public async tickCredits(businessState: BusinessState, tx?: Transaction) {
+  public async tickCredits(businessState: BusinessState, tx: Transaction) {
     const credits = await this.creditService.findAll({}, tx);
 
     for (const credit of credits) {

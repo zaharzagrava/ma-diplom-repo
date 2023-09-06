@@ -83,7 +83,7 @@ export class ResourceService {
     businessState: BusinessState;
     amount: number;
     productionChain: ProductionChain;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<
     {
       buyAmount: number;
@@ -130,7 +130,7 @@ export class ResourceService {
   }: {
     prodChainResources: ProductionChainResource[];
     amount: number;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<SpentResourceDto[]> {
     return await this.dbU.wrapInTransaction(
       async (tx): Promise<SpentResourceDto[]> => {
@@ -170,7 +170,7 @@ export class ResourceService {
   }: {
     resource: Resource;
     buyAmount: number;
-    tx?: Transaction;
+    tx: Transaction;
   }) {
     return await resource.update(
       { amount: resource.amount + buyAmount },
@@ -185,7 +185,7 @@ export class ResourceService {
   }: {
     resource: Resource;
     newAmount: number;
-    tx?: Transaction;
+    tx: Transaction;
   }) {
     return await resource.update({ amount: newAmount }, { transaction: tx });
   }

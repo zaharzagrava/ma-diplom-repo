@@ -37,7 +37,7 @@ export class AdminService {
     @InjectModel(ProductionChainUser)
     private productionChainUserModel: typeof ProductionChainUser,
   ) {
-    // this.defaultSeed();
+    this.quizzSeed1();
   }
 
   public alpha() {
@@ -67,293 +67,495 @@ export class AdminService {
     }
   }
 
+  private async quizzSeed1() {
+    // Evaluate when you can start expanding your production chain
+    // Evaluate when you can start start second production chain
+
+    try {
+      await this.cleanup();
+
+      // --- Business
+
+      await this.businessModel.create({
+        name: 'My business',
+        balance: 1000,
+      });
+
+      // --- User
+
+      console.log('@main user');
+      await this.userModel.create({
+        email: 'zaharzagrava@gmail.com',
+        fullName: 'Alpha Userus',
+        type: UserType.SEAMSTRESS,
+        salary: 0,
+      });
+
+      console.log('@user1');
+      const user1 = await this.userModel.create({
+        email: 'ivanpetrovych@gmail.com',
+        fullName: 'Ivan Petrovych',
+        type: UserType.SEAMSTRESS,
+        salary: 400,
+        employedAt: null,
+      });
+
+      console.log('@user2');
+      const user2 = await this.userModel.create({
+        email: 'petroivanobych@gmail.com',
+        fullName: 'Petro Ivanovych',
+        type: UserType.SEAMSTRESS,
+        salary: 400,
+        employedAt: null,
+      });
+
+      // --- Resource
+      console.log('@equipment1');
+      const equipment1 = await this.equipmentModel.create({
+        name: 'Робочий стіл',
+        amount: 0,
+        price: 1000,
+      });
+      const resource = await this.resourceModel.create({
+        name: 'Тканина',
+        amount: 0,
+        price: 10,
+      });
+
+      // --- Product
+
+      console.log('@tableProduct');
+      const tableProduct = await this.productModel.create({
+        name: 'Послуги з пошиття одягу',
+        amount: 0,
+        price: 500,
+      });
+
+      // --- ProductionChain
+
+      const productionChain = await this.productionChainModel.create({
+        name: 'Пошиття одягу',
+        productId: tableProduct.id,
+      });
+
+      await this.productionChainEquipmentModel.create({
+        amount: 1,
+        equipmentId: equipment1.id,
+        productionChainId: productionChain.id,
+      });
+      await this.productionChainResourceModel.create({
+        amount: 5,
+        resourceId: resource.id,
+        productionChainId: productionChain.id,
+      });
+
+      //
+      // --- ProductionChainUser
+
+      await this.productionChainUserModel.create({
+        userId: null,
+        productionChainId: productionChain.id,
+        type: UserType.SEAMSTRESS,
+      });
+      await this.productionChainUserModel.create({
+        userId: null,
+        productionChainId: productionChain.id,
+        type: UserType.SEAMSTRESS,
+      });
+
+      // --- Credit
+
+      const credit = await this.creditModel.create({
+        name: 'NBU Credit',
+        startPeriod: null,
+        sum: 3000,
+        rate: 0.8,
+      });
+
+      const credit2 = await this.creditModel.create({
+        name: 'Privatbank credit',
+        startPeriod: null,
+        sum: 2500,
+        rate: 0.2,
+      });
+
+      // --- BisFunction
+
+      await this.bisFunctionModel.create({
+        name: 'Hire SEAMSTRESS 1',
+        type: BisFunctionType.HIRE_EMPLOYEE,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        order: 1,
+        userId: user1.id,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Hire SEAMSTRESS 2',
+        type: BisFunctionType.HIRE_EMPLOYEE,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        order: 2,
+        userId: user2.id,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Buy Equipment',
+        type: BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        meta: {
+          amount: 2,
+        },
+        order: 3,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Buy resources',
+        type: BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
+        startPeriod: 202201,
+        endPeriod: 202312,
+        meta: {
+          amount: 2,
+        },
+        order: 4,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Шити Одяг',
+        type: BisFunctionType.PRODUCE_PRODUCTS,
+        startPeriod: 202201,
+        endPeriod: 202312,
+        meta: {
+          amount: 1,
+        },
+        order: 5,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Sell products',
+        type: BisFunctionType.SELL_PRODUCT_FIXED,
+        startPeriod: 202201,
+        endPeriod: 202312,
+        meta: {
+          amount: 10,
+        },
+        order: 6,
+        productId: tableProduct.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Payout Salaries',
+        type: BisFunctionType.PAYOUT_SALARIES,
+        startPeriod: 202201,
+        endPeriod: 202312,
+        order: 7,
+      });
+    } catch (error) {
+      console.log('@error');
+      console.log(error);
+      console.log(JSON.stringify(error, null, 2));
+    }
+  }
+
   private async defaultSeed() {
-    await this.cleanup();
+    try {
+      await this.cleanup();
 
-    // --- Business
+      // --- Business
 
-    await this.businessModel.create({
-      name: 'My business',
-      balance: 1000,
-    });
+      await this.businessModel.create({
+        name: 'My business',
+        balance: 1000,
+      });
 
-    // --- User
+      // --- User
 
-    console.log('@main user');
-    await this.userModel.create({
-      email: 'zaharzagrava@gmail.com',
-      fullName: 'Alpha Userus',
-      type: UserType.CUTTER,
-      salary: 0,
-    });
+      console.log('@main user');
+      await this.userModel.create({
+        email: 'zaharzagrava@gmail.com',
+        fullName: 'Alpha Userus',
+        type: UserType.CUTTER,
+        salary: 0,
+      });
 
-    console.log('@user1');
-    const user1 = await this.userModel.create({
-      email: 'ivanpetrovych@gmail.com',
-      fullName: 'Ivan Petrovych',
-      type: UserType.SEAMSTRESS,
-      salary: 400,
-      employedAt: null,
-    });
+      console.log('@user1');
+      const user1 = await this.userModel.create({
+        email: 'ivanpetrovych@gmail.com',
+        fullName: 'Ivan Petrovych',
+        type: UserType.SEAMSTRESS,
+        salary: 400,
+        employedAt: null,
+      });
 
-    console.log('@user2');
-    const user2 = await this.userModel.create({
-      email: 'petroivanobych@gmail.com',
-      fullName: 'Petro Ivanovych',
-      type: UserType.CUTTER,
-      salary: 300,
-      employedAt: null,
-    });
+      console.log('@user2');
+      const user2 = await this.userModel.create({
+        email: 'petroivanobych@gmail.com',
+        fullName: 'Petro Ivanovych',
+        type: UserType.CUTTER,
+        salary: 300,
+        employedAt: null,
+      });
 
-    console.log('@user3');
-    const user3 = await this.userModel.create({
-      email: 'annakarenina@gmail.com',
-      fullName: 'Anna Karenina',
-      type: UserType.SEAMSTRESS,
-      salary: 400,
-      employedAt: 202201,
-    });
+      console.log('@user3');
+      const user3 = await this.userModel.create({
+        email: 'annakarenina@gmail.com',
+        fullName: 'Anna Karenina',
+        type: UserType.SEAMSTRESS,
+        salary: 400,
+        employedAt: 202201,
+      });
 
-    // --- Resource
-    console.log('@resource1');
-    const resource1 = await this.resourceModel.create({
-      name: 'Нитки',
-      amount: 10,
-      price: 1,
-    });
+      // --- Resource
+      console.log('@resource1');
+      const resource1 = await this.resourceModel.create({
+        name: 'Нитки',
+        amount: 10,
+        price: 1,
+      });
 
-    console.log('@resource2');
-    const resource2 = await this.resourceModel.create({
-      name: 'Клей',
-      amount: 3,
-      price: 2,
-    });
+      console.log('@resource2');
+      const resource2 = await this.resourceModel.create({
+        name: 'Клей',
+        amount: 3,
+        price: 2,
+      });
 
-    console.log('@resource3');
-    const resource3 = await this.resourceModel.create({
-      name: 'Кришки',
-      amount: 1,
-      price: 10,
-    });
-
-    // --- Equipment
-
-    console.log('@equipment1');
-    const equipment1 = await this.equipmentModel.create({
-      name: 'Швейні інструменти',
-      amount: 0,
-      price: 20,
-    });
-
-    const equipment2 = await this.equipmentModel.create({
-      name: 'Робочий стіл',
-      amount: 0,
-      price: 200,
-    });
-
-    // --- Product
-
-    console.log('@tableProduct');
-    const tableProduct = await this.productModel.create({
-      name: 'Мішок з кришкою',
-      amount: 0,
-      price: 1000,
-    });
-
-    // --- ProductionChain
-
-    const productionChain = await this.productionChainModel.create({
-      name: 'Виробництво мішків',
-      productId: tableProduct.id,
-    });
-
-    // --- ProductionChainResource
-
-    await this.productionChainResourceModel.create({
-      amount: 10,
-      resourceId: resource1.id,
-      productionChainId: productionChain.id,
-    });
-    await this.productionChainResourceModel.create({
-      amount: 3,
-      resourceId: resource2.id,
-      productionChainId: productionChain.id,
-    });
-    await this.productionChainResourceModel.create({
-      amount: 1,
-      resourceId: resource3.id,
-      productionChainId: productionChain.id,
-    });
-
-    // --- ProductionChainResource
-
-    await this.productionChainEquipmentModel.create({
-      amount: 2,
-      equipmentId: equipment1.id,
-      productionChainId: productionChain.id,
-    });
-    await this.productionChainEquipmentModel.create({
-      amount: 1,
-      equipmentId: equipment2.id,
-      productionChainId: productionChain.id,
-    });
-
-    // --- ProductionChainUser
-
-    await this.productionChainUserModel.create({
-      userId: null,
-      productionChainId: productionChain.id,
-      type: UserType.SEAMSTRESS,
-    });
-    await this.productionChainUserModel.create({
-      userId: null,
-      productionChainId: productionChain.id,
-      type: UserType.CUTTER,
-    });
-
-    // --- Credit
-
-    const credit = await this.creditModel.create({
-      name: 'NBU Credit',
-      startPeriod: 202201,
-      sum: 3000,
-      rate: 0.02,
-    });
-
-    const credit2 = await this.creditModel.create({
-      name: 'Privatbank credit',
-      startPeriod: null,
-      sum: 5000,
-      rate: 0.05,
-    });
-
-    // --- BisFunction
-
-    await this.bisFunctionModel.create({
-      name: 'Hire SEAMSTRESS',
-      type: BisFunctionType.HIRE_EMPLOYEE,
-      startPeriod: 202201,
-      endPeriod: 202201,
-      order: 1,
-      userId: user1.id,
-      productionChainId: productionChain.id,
-    });
-
-    await this.bisFunctionModel.create({
-      name: 'Hire CUTTER',
-      type: BisFunctionType.HIRE_EMPLOYEE,
-      startPeriod: 202201,
-      endPeriod: 202201,
-      order: 2,
-      userId: user2.id,
-      productionChainId: productionChain.id,
-    });
-
-    await this.bisFunctionModel.create({
-      name: 'Hire SEAMSTRESS 2',
-      type: BisFunctionType.HIRE_EMPLOYEE,
-      startPeriod: 202201,
-      endPeriod: 202201,
-      order: 1,
-      userId: user1.id,
-      productionChainId: productionChain.id,
-    });
-
-    await this.bisFunctionModel.create({
-      name: 'Hire CUTTER 2',
-      type: BisFunctionType.HIRE_EMPLOYEE,
-      startPeriod: 202201,
-      endPeriod: 202201,
-      order: 2,
-      userId: user2.id,
-      productionChainId: productionChain.id,
-    });
-
-    await this.bisFunctionModel.create({
-      name: 'Fire Anna',
-      type: BisFunctionType.FIRE_EMPLOYEE,
-      startPeriod: 202201,
-      endPeriod: 202201,
-      order: 3,
-      userId: user3.id,
-    });
-
-    await this.bisFunctionModel.create({
-      name: 'Buy resources',
-      type: BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
-      startPeriod: 202201,
-      endPeriod: 202212,
-      meta: {
+      console.log('@resource3');
+      const resource3 = await this.resourceModel.create({
+        name: 'Кришки',
         amount: 1,
-      },
-      order: 4,
-      productionChainId: productionChain.id,
-    });
+        price: 10,
+      });
 
-    await this.bisFunctionModel.create({
-      name: 'Buy Equipment',
-      type: BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
-      startPeriod: 202201,
-      endPeriod: 202201,
-      meta: {
+      // --- Equipment
+
+      console.log('@equipment1');
+      const equipment1 = await this.equipmentModel.create({
+        name: 'Швейні інструменти',
+        amount: 0,
+        price: 20,
+      });
+
+      const equipment2 = await this.equipmentModel.create({
+        name: 'Робочий стіл',
+        amount: 0,
+        price: 200,
+      });
+
+      // --- Product
+
+      console.log('@tableProduct');
+      const tableProduct = await this.productModel.create({
+        name: 'Мішок з кришкою',
+        amount: 0,
+        price: 1000,
+      });
+
+      // --- ProductionChain
+
+      const productionChain = await this.productionChainModel.create({
+        name: 'Виробництво мішків',
+        productId: tableProduct.id,
+      });
+
+      // --- ProductionChainResource
+
+      await this.productionChainResourceModel.create({
+        amount: 10,
+        resourceId: resource1.id,
+        productionChainId: productionChain.id,
+      });
+      await this.productionChainResourceModel.create({
+        amount: 3,
+        resourceId: resource2.id,
+        productionChainId: productionChain.id,
+      });
+      await this.productionChainResourceModel.create({
         amount: 1,
-      },
-      order: 5,
-      productionChainId: productionChain.id,
-    });
+        resourceId: resource3.id,
+        productionChainId: productionChain.id,
+      });
 
-    await this.bisFunctionModel.create({
-      name: 'Produce tables',
-      type: BisFunctionType.PRODUCE_PRODUCTS,
-      startPeriod: 202201,
-      endPeriod: 202212,
-      meta: {
+      // --- ProductionChainResource
+
+      await this.productionChainEquipmentModel.create({
+        amount: 2,
+        equipmentId: equipment1.id,
+        productionChainId: productionChain.id,
+      });
+      await this.productionChainEquipmentModel.create({
         amount: 1,
-      },
-      order: 6,
-      productionChainId: productionChain.id,
-    });
+        equipmentId: equipment2.id,
+        productionChainId: productionChain.id,
+      });
 
-    await this.bisFunctionModel.create({
-      name: 'Sell products',
-      type: BisFunctionType.SELL_PRODUCT_FIXED,
-      startPeriod: 202201,
-      endPeriod: 202212,
-      meta: {
-        amount: 40,
-      },
-      order: 7,
-      productId: tableProduct.id,
-    });
+      // --- ProductionChainUser
 
-    await this.bisFunctionModel.create({
-      name: 'Payout NBU credit',
-      type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
-      startPeriod: 202201,
-      endPeriod: 202205,
-      meta: {
-        amount: 200,
-      },
-      order: 8,
-      creditId: credit.id,
-    });
+      await this.productionChainUserModel.create({
+        userId: null,
+        productionChainId: productionChain.id,
+        type: UserType.SEAMSTRESS,
+      });
+      await this.productionChainUserModel.create({
+        userId: null,
+        productionChainId: productionChain.id,
+        type: UserType.CUTTER,
+      });
 
-    await this.bisFunctionModel.create({
-      name: 'Take PrivatBank Credit',
-      type: BisFunctionType.TAKE_CREDIT,
-      startPeriod: 202205,
-      endPeriod: 202205,
-      order: 9,
-      creditId: credit2.id,
-    });
+      // --- Credit
 
-    await this.bisFunctionModel.create({
-      name: 'Payout Salaries',
-      type: BisFunctionType.PAYOUT_SALARIES,
-      startPeriod: 202201,
-      endPeriod: 202212,
-      order: 10,
-    });
+      const credit = await this.creditModel.create({
+        name: 'NBU Credit',
+        startPeriod: 202201,
+        sum: 3000,
+        rate: 0.02,
+      });
+
+      const credit2 = await this.creditModel.create({
+        name: 'Privatbank credit',
+        startPeriod: null,
+        sum: 5000,
+        rate: 0.05,
+      });
+
+      // --- BisFunction
+
+      await this.bisFunctionModel.create({
+        name: 'Hire SEAMSTRESS',
+        type: BisFunctionType.HIRE_EMPLOYEE,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        order: 1,
+        userId: user1.id,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Hire CUTTER',
+        type: BisFunctionType.HIRE_EMPLOYEE,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        order: 2,
+        userId: user2.id,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Hire SEAMSTRESS 2',
+        type: BisFunctionType.HIRE_EMPLOYEE,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        order: 3,
+        userId: user1.id,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Hire CUTTER 2',
+        type: BisFunctionType.HIRE_EMPLOYEE,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        order: 4,
+        userId: user2.id,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Fire Anna',
+        type: BisFunctionType.FIRE_EMPLOYEE,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        order: 5,
+        userId: user3.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Buy resources',
+        type: BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
+        startPeriod: 202201,
+        endPeriod: 202212,
+        meta: {
+          amount: 1,
+        },
+        order: 6,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Buy Equipment',
+        type: BisFunctionType.BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
+        startPeriod: 202201,
+        endPeriod: 202201,
+        meta: {
+          amount: 1,
+        },
+        order: 7,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Produce tables',
+        type: BisFunctionType.PRODUCE_PRODUCTS,
+        startPeriod: 202201,
+        endPeriod: 202212,
+        meta: {
+          amount: 1,
+        },
+        order: 8,
+        productionChainId: productionChain.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Sell products',
+        type: BisFunctionType.SELL_PRODUCT_FIXED,
+        startPeriod: 202201,
+        endPeriod: 202212,
+        meta: {
+          amount: 40,
+        },
+        order: 9,
+        productId: tableProduct.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Payout NBU credit',
+        type: BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT,
+        startPeriod: 202201,
+        endPeriod: 202205,
+        meta: {
+          amount: 200,
+        },
+        order: 10,
+        creditId: credit.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Take PrivatBank Credit',
+        type: BisFunctionType.TAKE_CREDIT,
+        startPeriod: 202205,
+        endPeriod: 202205,
+        order: 11,
+        creditId: credit2.id,
+      });
+
+      await this.bisFunctionModel.create({
+        name: 'Payout Salaries',
+        type: BisFunctionType.PAYOUT_SALARIES,
+        startPeriod: 202201,
+        endPeriod: 202212,
+        order: 12,
+      });
+    } catch (error) {
+      console.log('@error');
+      console.log(error);
+      console.log(JSON.stringify(error, null, 2));
+    }
   }
 
   private async cleanup() {

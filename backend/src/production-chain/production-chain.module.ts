@@ -9,6 +9,7 @@ import ProductionChainUser from 'src/models/productionChainUser.model';
 import { ProductModule } from 'src/product/product.module';
 import { ResourceModule } from 'src/resource/resource.module';
 import ProductionChainResource from 'src/models/productionChainResource.model';
+import ProductionChainEquipment from 'src/models/productionChainEquipment.model';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import ProductionChainResource from 'src/models/productionChainResource.model';
       ProductionChain,
       ProductionChainUser,
       ProductionChainResource,
+      ProductionChainEquipment,
     ]),
     DbUtilsModule,
     UtilsModule,

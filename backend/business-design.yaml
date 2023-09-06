@@ -21,11 +21,33 @@ functionality:
 endpoint:
   - create 3 use cases of how this program can be used
     - one of them is in master -> Проєктний аналіз
+  - add additional info per each BisFunction
+  - add createTreelike
+  - add editing of ProductionChain, ProductionChainUser, ProductionChainResource
+  - add ability to SPEND money simulating building some project
+    - this will allow to predict how much money and when we can invest in building a new project
+    - you can do it through ProductionChain with only equipment
+    - you can even do fractional investments through buying equpment one by one
+  - add ability to change any entity
+    - this will allow to change product price
+  - auto generated names for bis functions
   - managing multiple product chains and managing hours of users working on that
   - validate BisFunctions on User edit (what if changes to a type that is unsupported by some BisFunction)
     - also on User type change (what if he is already attached to ProductionChain?)
   - allow null for Credit.startPeriod, User.employedAt
   - production chain, where one product is used for other resources
 
+  - statistics of how much was spent during each period
+
   - create User dynamically
+
+  - how long a company can survive without selling goods
+    - produce 2 equipments, resources and users
+    - see that not enought money
+    - produce only 1 equipments, resources, users
+    - see that we can only buy 2 equipment on 202310
+    - take credit on 202202, buy equpment on 202202, hire 1 person, buy 2 resources
+    - start payout of credit
+  - 3 employees, figure out when credit will be paid out
+  - buying a house where you invest into stocks, and calculate when you will be able to build it
 

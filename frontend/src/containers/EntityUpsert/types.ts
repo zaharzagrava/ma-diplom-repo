@@ -13,9 +13,19 @@ export const upsertTypeToKey = (entityUpsertType: EntityUpsertType): keyof Entit
   switch(entityUpsertType) {
     case EntityUpsertType.USER: return 'users';
     case EntityUpsertType.CREDIT: return 'credits';
-    case EntityUpsertType.EQUIPMENT: return 'equipments';
+    case EntityUpsertType.EQUIPMENT: return 'equipment';
     case EntityUpsertType.PRODUCT: return 'products';
     case EntityUpsertType.RESOURCE: return 'resources';
+  }
+}
+
+export const upsertTypeToHeader = (entityUpsertType: EntityUpsertType): string => {
+  switch(entityUpsertType) {
+    case EntityUpsertType.USER: return 'Користувачі';
+    case EntityUpsertType.CREDIT: return 'Кредити';
+    case EntityUpsertType.EQUIPMENT: return 'Обладнання';
+    case EntityUpsertType.PRODUCT: return 'Продукти';
+    case EntityUpsertType.RESOURCE: return 'Ресурси';
   }
 }
 

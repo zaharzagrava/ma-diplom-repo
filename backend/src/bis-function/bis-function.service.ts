@@ -75,20 +75,22 @@ export class BisFunctionService {
   ) {}
 
   public async findAll(params?: BisFunctionWithAll, postProcess = true) {
-    const bisFunctions = (await this.bisFunctionModel.findAll()).sort(
-      (a, b) => a.order - b.order,
-    );
+    return await this.dbUtilsService.wrapInTransaction(async (tx) => {
+      const bisFunctions = (await this.bisFunctionModel.findAll()).sort(
+        (a, b) => a.order - b.order,
+      );
 
-    const processedBisFunctions = bisFunctions.map(async (bisFunction) =>
-      this.postProcessBisFunction(bisFunction),
-    );
+      const processedBisFunctions = bisFunctions.map(async (bisFunction) =>
+        this.postProcessBisFunction(bisFunction, tx),
+      );
 
-    return await Promise.all(processedBisFunctions);
+      return await Promise.all(processedBisFunctions);
+    });
   }
 
   private async postProcess_TAKE_CREDIT(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_TAKE_CREDIT> {
     if (bisFunction.type !== BisFunctionType.TAKE_CREDIT) {
       throw new Error('Not a valid type');
@@ -115,7 +117,7 @@ export class BisFunctionService {
 
   private async postProcess_PAYOUT_CREDIT_FIXED_AMOUNT(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT> {
     if (bisFunction.type !== BisFunctionType.PAYOUT_CREDIT_FIXED_AMOUNT) {
       throw new Error('Not a valid type');
@@ -144,7 +146,7 @@ export class BisFunctionService {
 
   private async postProcess_HIRE_EMPLOYEE(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_HIRE_EMPLOYEE> {
     if (bisFunction.type !== BisFunctionType.HIRE_EMPLOYEE) {
       throw new Error('Not a valid type');
@@ -186,7 +188,7 @@ export class BisFunctionService {
 
   private async postProcess_FIRE_EMPLOYEE(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_FIRE_EMPLOYEE> {
     if (bisFunction.type !== BisFunctionType.FIRE_EMPLOYEE) {
       throw new Error('Not a valid type');
@@ -214,7 +216,7 @@ export class BisFunctionService {
 
   private async postProcess_PAYOUT_SALARIES(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_PAYOUT_SALARIES> {
     if (bisFunction.type !== BisFunctionType.PAYOUT_SALARIES) {
       throw new Error('Not a valid type');
@@ -232,7 +234,7 @@ export class BisFunctionService {
 
   private async postProcess_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT> {
     if (
       bisFunction.type !== BisFunctionType.BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT
@@ -264,7 +266,7 @@ export class BisFunctionService {
 
   private async postProcess_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT> {
     if (
       bisFunction.type !==
@@ -297,7 +299,7 @@ export class BisFunctionService {
 
   private async postProcess_PRODUCE_PRODUCTS(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_PRODUCE_PRODUCTS> {
     if (bisFunction.type !== BisFunctionType.PRODUCE_PRODUCTS) {
       throw new Error('Not a valid type');
@@ -326,7 +328,7 @@ export class BisFunctionService {
 
   private async postProcess_SELL_PRODUCT_FIXED(
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BisFunctionDto_SELL_PRODUCT_FIXED> {
     if (bisFunction.type !== BisFunctionType.SELL_PRODUCT_FIXED) {
       throw new Error('Not a valid type');
@@ -353,7 +355,7 @@ export class BisFunctionService {
     };
   }
 
-  private postProcessBisFunction(bisFunction: BisFunction, tx?: Transaction) {
+  private postProcessBisFunction(bisFunction: BisFunction, tx: Transaction) {
     switch (bisFunction.type) {
       case BisFunctionType.TAKE_CREDIT:
         return this.postProcess_TAKE_CREDIT(bisFunction, tx);
@@ -465,6 +467,7 @@ export class BisFunctionService {
               where: { name: bisFunctionChangeOrder.name },
               transaction: tx,
             })) as BisFunction,
+            tx,
           ),
           moved: movedBisFunction,
         };
@@ -505,7 +508,7 @@ export class BisFunctionService {
           endPeriod: bisFunctionUpsert.endPeriod,
         }),
         name: bisFunction?.name ?? bisFunctionUpsert.name,
-        order: bisFunction?.order ?? bisFunctionCount + 2,
+        order: bisFunction?.order ?? bisFunctionCount + 1,
         type: bisFunction?.type ?? bisFunctionUpsert.type,
       };
 
@@ -584,6 +587,7 @@ export class BisFunctionService {
           where: { name: bisFunctionUpsert.name },
           transaction: tx,
         })) as BisFunction,
+        tx,
       );
     });
   }
@@ -696,7 +700,7 @@ export class BisFunctionService {
   public async exec(
     businessState: BusinessState,
     bisFunction: BisFunction,
-    tx?: Transaction,
+    tx: Transaction,
   ) {
     switch (bisFunction.type) {
       case BisFunctionType.TAKE_CREDIT:
@@ -807,7 +811,7 @@ export class BisFunctionService {
   private async exec_TAKE_CREDIT(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_TAKE_CREDIT,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     const beforeBalance = businessState.balance;
 
@@ -841,7 +845,7 @@ export class BisFunctionService {
   private async exec_PAYOUT_CREDIT_FIXED_AMOUNT(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_PAYOUT_CREDIT_FIXED_AMOUNT,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     try {
       const resp = await this.creditService.payoutCredit({
@@ -881,7 +885,7 @@ export class BisFunctionService {
   private async exec_HIRE_EMPLOYEE(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_HIRE_EMPLOYEE,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     try {
       await this.usersService.hireEmployee({
@@ -920,7 +924,7 @@ export class BisFunctionService {
   private async exec_FIRE_EMPLOYEE(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_FIRE_EMPLOYEE,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     try {
       await this.usersService.fireEmployee({
@@ -948,7 +952,7 @@ export class BisFunctionService {
   private async exec_PAYOUT_SALARIES(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_PAYOUT_SALARIES,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     const prevBalance = businessState.balance;
 
@@ -979,7 +983,7 @@ export class BisFunctionService {
   private async exec_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_BUY_RESOURCE_FOR_PRODUCT_FIXED_AMOUNT,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     const prevBalance = businessState.balance;
 
@@ -1011,7 +1015,7 @@ export class BisFunctionService {
   private async exec_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_BUY_EQUIPMENT_FOR_PRODUCT_FIXED_AMOUNT,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     const prevBalance = businessState.balance;
 
@@ -1043,26 +1047,44 @@ export class BisFunctionService {
   private async exec_PRODUCE_PRODUCTS(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_PRODUCE_PRODUCTS,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     const prevBalance = businessState.balance;
 
     try {
       const {
-        minEnoughForXProducts,
+        otherLogs,
+        usersTypesCount,
+        minProductsFromUsers,
+        minProductsFromResources,
+        minProductsFromEquipment,
         minProducable,
-        minUsersCount,
         spentResources,
-        typesCount,
       } = await this.productionChainService.produce({
         businessState,
         productionChain: bisFunction.productionChain,
         tx,
       });
 
+      const produceReasons = () => {
+        let reason = '';
+        if (minProductsFromUsers !== null)
+          reason += `users - for ${minProductsFromUsers}. `;
+
+        if (minProductsFromResources !== null)
+          reason += `resources - for ${minProductsFromResources}. `;
+
+        if (minProductsFromEquipment !== null)
+          reason += `equipment - for ${minProductsFromEquipment}. `;
+
+        return reason;
+      };
+
       this.u.pushAndRecordPrompt(
         businessState,
-        `[${bisFunction.name}] Will produce: ${minProducable}, since users can produce only ${minUsersCount}, resources are enough only for ${minEnoughForXProducts}`,
+        `[${
+          bisFunction.name
+        }] Will produce: ${minProducable}, since components are enough for: ${produceReasons()}`,
       );
 
       spentResources.forEach((x) => {
@@ -1071,6 +1093,8 @@ export class BisFunctionService {
           `- ${x.newAmount} of '${x.name}' is left`,
         );
       });
+
+      otherLogs.forEach((x) => this.u.pushAndRecordPrompt(businessState, x));
 
       return businessState;
     } catch (error) {
@@ -1101,7 +1125,7 @@ export class BisFunctionService {
   private async exec_SELL_PRODUCT_FIXED(
     businessState: BusinessState,
     bisFunction: BisFunctionDto_SELL_PRODUCT_FIXED,
-    tx?: Transaction,
+    tx: Transaction,
   ): Promise<BusinessState> {
     const { product, income, sold } = await this.productService.sellProduct({
       businessState,

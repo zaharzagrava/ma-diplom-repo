@@ -59,8 +59,8 @@ export const FormDropdown = ({
     >
       {label && <FieldLabel>{label}</FieldLabel>}
       <Field name={name}>
-        {({ field, form }: FieldProps) => (
-          <Dropdown
+        {({ field, form }: FieldProps) => {
+          return <Dropdown
             editable={editable}
             setIsOpen={setIsOpen}
             onChose={form.setFieldValue.bind(this)}
@@ -72,7 +72,7 @@ export const FormDropdown = ({
             placeholder={placeholder}
             name={name}
           />
-        )}
+        }}
       </Field>
       <ErrorMessage
         component={FormError as React.FunctionComponent<{}>}

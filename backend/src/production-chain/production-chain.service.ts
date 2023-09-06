@@ -15,6 +15,8 @@ import { ProductService } from 'src/product/product.service';
 import { ResourceService } from 'src/resource/resource.service';
 import Resource from 'src/models/resource.model';
 import { SpentResourceDto } from 'src/resource/types';
+import ProductionChainEquipment from 'src/models/productionChainEquipment.model';
+import Equipment from 'src/models/equipment.model';
 
 @Injectable()
 export class ProductionChainService {
@@ -32,6 +34,8 @@ export class ProductionChainService {
     private readonly productionChainUserModel: typeof ProductionChainUser,
     @InjectModel(ProductionChainResource)
     private readonly productionChainResourceModel: typeof ProductionChainResource,
+    @InjectModel(ProductionChainEquipment)
+    private readonly productionChainEquipmentModel: typeof ProductionChainEquipment,
   ) {}
 
   public findOne(
@@ -78,7 +82,7 @@ export class ProductionChainService {
     businessState: BusinessState;
     user: User;
     productionChain: ProductionChain;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<{
     user: User;
     reassignedFrom: string;
@@ -132,9 +136,6 @@ export class ProductionChainService {
         transaction: tx,
       });
 
-      console.log('@asd');
-      console.log(asd);
-
       return {
         user,
         reassignedFrom,
@@ -152,7 +153,7 @@ export class ProductionChainService {
   }: {
     businessState: BusinessState;
     user: User;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<boolean> {
     return await this.dbU.wrapInTransaction(async (tx) => {
       const prodChainUsers = await this.productionChainUserModel.findAll({
@@ -179,11 +180,13 @@ export class ProductionChainService {
   }: {
     businessState: BusinessState;
     productionChain: ProductionChain;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<{
-    typesCount: Record<string, number>;
-    minUsersCount: number;
-    minEnoughForXProducts: number;
+    otherLogs: string[];
+    usersTypesCount: Record<string, number>;
+    minProductsFromUsers: number;
+    minProductsFromResources: number;
+    minProductsFromEquipment: number;
     minProducable: number;
     spentResources: SpentResourceDto[];
   }> {
@@ -191,76 +194,76 @@ export class ProductionChainService {
       async (
         tx,
       ): Promise<{
-        typesCount: Record<string, number>;
-        minUsersCount: number;
-        minEnoughForXProducts: number;
+        otherLogs: string[];
+        usersTypesCount: Record<string, number>;
+        minProductsFromUsers: number | null;
+        minProductsFromResources: number | null;
+        minProductsFromEquipment: number | null;
         minProducable: number;
         spentResources: SpentResourceDto[];
       }> => {
-        const [prodChainUsers, prodChainResources] = await Promise.all([
-          this.productionChainUserModel.findAll({
-            where: {
-              productionChainId: productionChain.id,
-              userId: { [Op.not]: null },
-            },
-            transaction: tx,
-          }),
-          this.productionChainResourceModel.findAll({
-            where: { productionChainId: productionChain.id },
-            include: [{ model: Resource }],
-            transaction: tx,
-          }),
-        ]);
+        const otherLogs = [];
 
+        const [prodChainUsers, prodChainResources, prodChainEquipment] =
+          await Promise.all([
+            this.productionChainUserModel.findAll({
+              where: {
+                productionChainId: productionChain.id,
+                userId: { [Op.not]: null },
+              },
+              transaction: tx,
+            }),
+            this.productionChainResourceModel.findAll({
+              where: { productionChainId: productionChain.id },
+              include: [{ model: Resource }],
+              transaction: tx,
+            }),
+            this.productionChainEquipmentModel.findAll({
+              where: { productionChainId: productionChain.id },
+              include: [{ model: Equipment }],
+              transaction: tx,
+            }),
+          ]);
+
+        let minProductsFromUsers = null;
+        let usersTypesCount: Record<string, number> = {};
         if (prodChainUsers.length === 0) {
-          throw new Error('No users assigned to this production chain');
+          otherLogs.push('No users needed for this production chain');
+        } else {
+          ({ minProductsFromUsers, usersTypesCount } =
+            this.calcMinProductsFromUsers(prodChainUsers));
         }
 
+        let minProductsFromResources = null;
         if (prodChainResources.length === 0) {
-          throw new Error('No resources assigned to this production chain');
+          otherLogs.push('No resources needed for this production chain');
+        } else {
+          minProductsFromResources =
+            this.calcMinProductsFromResources(prodChainResources);
         }
 
-        const typesCount: Record<string, number> = {};
-        for (const prodChainUser of prodChainUsers) {
-          typesCount[prodChainUser.type] =
-            (typesCount[prodChainUser.type] ?? 0) + 1;
-        }
-        const minUsersCount = Math.min(...Object.values(typesCount));
-
-        if (!minUsersCount) {
-          throw new Error('Not enough users for at least 1 product');
+        let minProductsFromEquipment = null;
+        if (prodChainEquipment.length === 0) {
+          otherLogs.push('No equipment needed for this production chain');
+        } else {
+          minProductsFromEquipment =
+            this.calculateMinProductsFromEquipment(prodChainEquipment);
         }
 
-        let minEnoughForXProducts = Infinity;
-        console.log(
-          prodChainResources.map((x) => ({
-            resourceAmount: x.resource.amount,
-            amount: x.amount,
-          })),
+        const minProducable = this.getMinProducable(
+          minProductsFromResources,
+          minProductsFromUsers,
+          minProductsFromEquipment,
         );
-        for (const prodChainResource of prodChainResources) {
-          const enoughForXProducts = Math.floor(
-            prodChainResource.resource.amount / prodChainResource.amount,
-          );
 
-          minEnoughForXProducts = Math.min(
-            minEnoughForXProducts,
-            enoughForXProducts,
-          );
-        }
-
-        if (!minEnoughForXProducts) {
-          throw new Error('Not enough resources for at least 1 product');
-        }
-
-        const minProducable = Math.min(minEnoughForXProducts, minUsersCount);
-
-        const spentResources: SpentResourceDto[] =
+        const spentResources: SpentResourceDto[] = [];
+        if (prodChainResources.length !== 0) {
           await this.resourceService.spendOnProducts({
             prodChainResources,
             amount: minProducable,
             tx,
           });
+        }
 
         await this.productService.increaseAmount({
           id: productionChain.productId,
@@ -269,14 +272,90 @@ export class ProductionChainService {
         });
 
         return {
-          typesCount,
-          minUsersCount,
-          minEnoughForXProducts,
+          otherLogs,
+          usersTypesCount,
+          minProductsFromUsers,
+          minProductsFromResources,
+          minProductsFromEquipment,
           minProducable,
           spentResources,
         };
       },
       tx,
     );
+  }
+
+  private getMinProducable(
+    minProductsFromResources: number | null,
+    minProductsFromUsers: number | null,
+    minProductsFromEquipment: number | null,
+  ) {
+    const comparisonArray: number[] = [];
+    if (minProductsFromResources !== null)
+      comparisonArray.push(minProductsFromResources);
+    if (minProductsFromUsers !== null)
+      comparisonArray.push(minProductsFromUsers);
+    if (minProductsFromEquipment !== null)
+      comparisonArray.push(minProductsFromEquipment);
+
+    return Math.min(...comparisonArray);
+  }
+
+  private calcMinProductsFromUsers(prodChainUsers: ProductionChainUser[]) {
+    const usersTypesCount: Record<string, number> = {};
+    for (const prodChainUser of prodChainUsers) {
+      usersTypesCount[prodChainUser.type] =
+        (usersTypesCount[prodChainUser.type] ?? 0) + 1;
+    }
+    const minProductsFromUsers = Math.min(...Object.values(usersTypesCount));
+
+    if (!minProductsFromUsers) {
+      throw new Error('Not enough users for at least 1 product');
+    }
+    return { minProductsFromUsers, usersTypesCount };
+  }
+
+  private calcMinProductsFromResources(
+    prodChainResources: ProductionChainResource[],
+  ) {
+    let minEnoughForXProducts = Infinity;
+    for (const prodChainResource of prodChainResources) {
+      const enoughForXProducts = Math.floor(
+        prodChainResource.resource.amount / prodChainResource.amount,
+      );
+
+      minEnoughForXProducts = Math.min(
+        minEnoughForXProducts,
+        enoughForXProducts,
+      );
+    }
+
+    if (!minEnoughForXProducts) {
+      throw new Error('Not enough resources for at least 1 product');
+    }
+
+    return minEnoughForXProducts;
+  }
+
+  private calculateMinProductsFromEquipment(
+    prodChainEquipments: ProductionChainEquipment[],
+  ) {
+    let minEnoughForXProducts = Infinity;
+    for (const prodChainEquipment of prodChainEquipments) {
+      const enoughForXProducts = Math.floor(
+        prodChainEquipment.equipment.amount / prodChainEquipment.amount,
+      );
+
+      minEnoughForXProducts = Math.min(
+        minEnoughForXProducts,
+        enoughForXProducts,
+      );
+    }
+
+    if (!minEnoughForXProducts) {
+      throw new Error('Not enough resources for at least 1 product');
+    }
+
+    return minEnoughForXProducts;
   }
 }

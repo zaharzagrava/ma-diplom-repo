@@ -25,6 +25,19 @@ export class EquipmentService {
     private readonly productionChainEquipmentModel: typeof ProductionChainEquipment,
   ) {}
 
+  public findAll(
+    params?: EquipmentWithAllFilters,
+    tx?: Transaction,
+  ): Promise<Equipment[]> {
+    return this.equipmentModel
+      .scope({
+        method: [EquipmentScope.WithAll, <EquipmentWithAllFilters>params],
+      })
+      .findAll({
+        transaction: tx,
+      });
+  }
+
   public findOne(
     params?: EquipmentWithAllFilters,
     tx?: Transaction,
@@ -72,7 +85,7 @@ export class EquipmentService {
     businessState: BusinessState;
     amount: number;
     productionChain: ProductionChain;
-    tx?: Transaction;
+    tx: Transaction;
   }): Promise<
     {
       buyAmount: number;
@@ -98,6 +111,7 @@ export class EquipmentService {
         await this.buyEquipment({
           equipment: prodChainEquipment.equipment,
           buyAmount,
+          tx,
         });
 
         boughtEquipment.push({
@@ -118,7 +132,7 @@ export class EquipmentService {
   }: {
     equipment: Equipment;
     buyAmount: number;
-    tx?: Transaction;
+    tx: Transaction;
   }) {
     return await equipment.update(
       { amount: equipment.amount + buyAmount },

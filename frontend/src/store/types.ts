@@ -134,7 +134,7 @@ export interface Entities {
   products: Product[];
   resources: Resource[];
   users: User[];
-  equipments: Equipment[];
+  equipment: Equipment[];
   productionChains: ProductionChain[];
 }
 
@@ -143,7 +143,7 @@ export interface EntitiesUpsertable {
   resources: Resource[];
   credits: Credit[];
   users: User[];
-  equipments: Equipment[];
+  equipment: Equipment[];
 }
 
 export type CreateErrorObject<T extends { [key: string]: any }> = {

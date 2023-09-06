@@ -41,7 +41,7 @@ const amountValidation = () => ({
   type: FormFieldType.STRING,
   label: "Amount:",
   placeholder: 'Amount',
-  validate: joi.number().min(1).max(10000).required(),
+  validate: joi.number().min(0).max(10000).required(),
   default: null,
 });
 

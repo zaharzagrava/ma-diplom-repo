@@ -161,15 +161,12 @@ export const RootReducer = produce(
         break;
       case actionTypes.BIS_FUNCTION_UPSERT_SUCCESS:
         if(draft.bisFunctions) {
-          const updatedBisFunctions = draft.bisFunctions.map(x => {
-            if(x.id === action.payload.id) {
-              return action.payload;
-            }
-
-            return x;
-          })
-
-          draft.bisFunctions = updatedBisFunctions
+          const index = draft.bisFunctions.findIndex(x => x.id === action.payload.id)
+          if(index !== -1) {
+            draft.bisFunctions.splice(index, 1, action.payload as any);
+          } else {
+            draft.bisFunctions.push(action.payload as any);
+          }
         }
 
         draft.actions.bisFunctionUpsert.errors = null;
