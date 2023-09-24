@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Icon from '../../Icon/Icon';
 import { FieldLabel } from '../../Utils/FieldLabel';
 import FormError from '../FormError/FormError';
+import { Tooltip } from '@mui/material';
 
 interface Props {
   name: string;
@@ -31,6 +32,7 @@ interface Props {
   | 'week';
   placeholder: string;
   label?: string;
+  longLabel?: string;
   isHideIconShown?: boolean;
   editable?: boolean;
 }
@@ -55,6 +57,7 @@ const FormStringField: FunctionComponent<Props> = ({
   type: argType,
   placeholder,
   label,
+  longLabel,
   isHideIconShown,
   editable,
 }: Props) => {
@@ -71,33 +74,33 @@ const FormStringField: FunctionComponent<Props> = ({
       {label && <FieldLabel>{label}</FieldLabel>}
       <Field name={name}>
         {({ field }: FieldProps) => (
-          <InputContainer>
-            <input
-              style={{
-                paddingLeft: 10,
-                paddingRight: 10,
-                paddingTop: 5,
-                paddingBottom: 5,
-                fontSize: 16,
-                width: '100%'
-              }}
-              type={type}
-              name={name}
-              placeholder={placeholder}
-              // className={`${styles.field} ${!editable && styles.uneditable}`}
-              // For nullable values in db, so that react won't yell at us for using null value in html input
-              value={field.value ?? ''}
-              onChange={field.onChange}
-              onBlur={field.onBlur}
-              readOnly={!editable}
-              size={30}
-            />
-            {isHideIconShown && (
-              <div>
-                <Icon type="eye" onClick={() => setIsHidden(!isHidden)} />
-              </div>
-            )}
-          </InputContainer>
+          <Tooltip title={longLabel}>
+            <InputContainer>
+              <input
+                style={{
+                  paddingLeft: 10,
+                  paddingRight: 10,
+                  paddingTop: 5,
+                  paddingBottom: 5,
+                  fontSize: 16,
+                }}
+                type={type}
+                name={name}
+                placeholder={placeholder}
+                // className={`${styles.field} ${!editable && styles.uneditable}`}
+                // For nullable values in db, so that react won't yell at us for using null value in html input
+                value={field.value ?? ''}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                readOnly={!editable}
+              />
+              {isHideIconShown && (
+                <div>
+                  <Icon type="eye" onClick={() => setIsHidden(!isHidden)} />
+                </div>
+              )}
+            </InputContainer>
+          </Tooltip>
         )}
       </Field>
       <ErrorMessage

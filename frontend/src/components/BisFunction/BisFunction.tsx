@@ -15,6 +15,8 @@ import Button from "../Button/Button";
 import FormDatepicker from "../Form/FormDatePicker/FormDatePicker";
 import { FormDropdown } from "../Form/FormDropdown/FormDropdown";
 import FormStringField from "../Form/FormStringField/FormStringField";
+import FormStringMock from "../Form/FormStringField/FormStringMock";
+import Icon from "../Icon/Icon";
 import { Card } from "../Utils/Card";
 import { bisFunctionsSettings } from "./BisFunctionContainer";
 import OrderChanger from "./OrderChanger";
@@ -23,9 +25,10 @@ export const HorizontalGrid = styled.div`
   display: grid;
   grid-gap: 20px;
   grid-auto-flow: column;
-  grid-template-columns: 120px 300px 300px 250px 250px 100px;
+  grid-template-columns: 120px 200px 1fr 65px 65px 40px 40px;
 
   align-items: center;
+  height: 100%;
 `;
 
 type Props = {
@@ -56,6 +59,7 @@ export const FormComponent: FC<{
   value: {
     type: FormFieldType;
     label: string;
+    longLabel?: string;
     validate: Joi.AnySchema<any>;
     default: any;
     placeholder?: string;
@@ -70,6 +74,7 @@ export const FormComponent: FC<{
         name={params.name}
         placeholder={params.value.default}
         label={params.value.label}
+        longLabel={params.value.longLabel}
       />
     );
     // FormFieldType.DROPDOWN
@@ -114,6 +119,7 @@ export const FormComponent: FC<{
         name={params.name}
         placeholder={params.value.placeholder}
         label={params.value.label}
+        longLabel={params.value.longLabel}
         labelDirection="column"
         options={filteredEntities.map((x) => x.id)}
         labels={filteredEntities.map((x: any) => x.name || x.fullName)}
@@ -143,21 +149,17 @@ const BisFunction: FC<Props> = (params) => {
         validate={params.onValidate}
         onSubmit={params.onSubmit}
       >
-        {({ handleSubmit }: FormikProps<BisFunctionEditDto>) => (
+        {({ handleSubmit, values }: FormikProps<BisFunctionEditDto>) => (
           <div>
             <HorizontalGrid>
               {params.isEdit && <OrderChanger onOrderChange={params.onOrderChange} />}
-              {params.isEdit ? (
-                <h2>
-                  {typeof params.bisFunction === "object" &&
-                    params.bisFunction.name}
-                </h2>
-              ) : (
-                <FormStringField
-                  name={"name"}
-                  placeholder={"Function name"}
-                />
-              )}
+              {params.isEdit ?
+              <FormStringField
+                name={"name"}
+                placeholder={"Function name"}
+              /> :
+              <FormStringMock value={values.name || ''} />
+              }
               <FormDropdown
                 name="type"
                 placeholder="Function type"
@@ -173,14 +175,14 @@ const BisFunction: FC<Props> = (params) => {
                 buttonType="submit"
                 onClick={() => handleSubmit()}
               >
-                {params.isEdit ? 'Update' : 'Create'}
+                {params.isEdit ? <Icon type="pencil" style={{width: 20, height: 20 }} /> : <Icon type="save"  style={{width: 20, height: 20 }} />}
               </Button>
               {params.isEdit &&
               <Button
                 buttonType="button"
                 onClick={() => params.onDelete()}
               >
-                Delete
+                <Icon type="cancel"  style={{width: 20, height: 20 }} />
               </Button>
               }
             </HorizontalGrid> 

@@ -7,12 +7,14 @@ import Icon from "../../Icon/Icon";
 import { useOutsideClick } from "../../../hooks/useOutsideClick";
 import { FieldLabel } from "../../Utils/FieldLabel";
 import { Dropdown } from "./Dropdown";
+import { Tooltip } from "@mui/material";
 
 interface Props {
   name: string;
   defaultValue?: string;
   placeholder?: string;
   label?: string;
+  longLabel?: string;
   labelDirection?: "column" | "row";
   options: string[];
   labels: string[];
@@ -41,6 +43,7 @@ export const FormDropdown = ({
   defaultValue,
   placeholder,
   label,
+  longLabel,
   options,
   labels,
   labelDirection = "row",
@@ -50,6 +53,9 @@ export const FormDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useOutsideClick(ref, () => setIsOpen(false));
+
+  console.log('@longLabel');
+  console.log(longLabel);
 
   return (
     <Container
@@ -65,6 +71,7 @@ export const FormDropdown = ({
             setIsOpen={setIsOpen}
             onChose={form.setFieldValue.bind(this)}
             isOpen={isOpen}
+            longLabel={longLabel}
             labels={labels}
             options={options}
             value={field.value}

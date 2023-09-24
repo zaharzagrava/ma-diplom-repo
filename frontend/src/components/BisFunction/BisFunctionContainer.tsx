@@ -58,7 +58,8 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       creditId: {
         type: FormFieldType.DROPDOWN,
-        label: "The credit to take:",
+        longLabel: "The credit to take",
+        label: 'Credit:',
         placeholder: 'Choose credit',
         validate: joi.string().required(),
         default: null,
@@ -70,13 +71,15 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       amount: {
         type: FormFieldType.STRING,
-        label: "Payout amount, that will be paid out each period:",
+        longLabel: "Payout amount, that will be paid out each period",
+        label: 'Payout:',
         validate: joi.number().min(1).max(10000).required(),
         default: 10,
       },
       creditId: {
         type: FormFieldType.DROPDOWN,
-        label: "The credit to pay out:",
+        longLabel: "The credit to pay out",
+        label: 'Credit:',
         placeholder: 'Choose credit',
         validate: joi.string().required(),
         default: null,
@@ -88,14 +91,16 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       userId: {
         type: FormFieldType.DROPDOWN,
-        label: "The user to employ:",
+        longLabel: "The user to employ",
+        label: 'Employee:',
         placeholder: 'Choose employee',
         validate: joi.string().required(),
         default: null,
       },
       productionChainId: {
         type: FormFieldType.DROPDOWN,
-        label: "On which production chain to employ:",
+        longLabel: "On which production chain to employ",
+        label: 'Production chain:',
         placeholder: 'Choose production chain',
         validate: joi.string().required(),
         default: null,
@@ -107,7 +112,8 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       userId: {
         type: FormFieldType.DROPDOWN,
-        label: "The user to fire:",
+        longLabel: "The user to fire",
+        label: 'Employee:',
         placeholder: 'Choose employee',
         validate: joi.string().required(),
         default: null,
@@ -123,14 +129,16 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       productionChainId: {
         type: FormFieldType.DROPDOWN,
-        label: "The product chain for which to buy resources:",
-        placeholder: 'Choose resource',
+        longLabel: "The product chain for which to buy resources",
+        label: 'Production chain:',
+        placeholder: 'Choose production chain',
         validate: joi.string().required(),
         default: null,
       },
       amount: {
         type: FormFieldType.STRING,
-        label: "Amount:",
+        longLabel: "Buy resources enough for X products",
+        label: 'For:',
         validate: joi.number().min(1).max(10000).required(),
         default: 0,
       },
@@ -141,14 +149,16 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       productionChainId: {
         type: FormFieldType.DROPDOWN,
-        label: "The product chain for which to buy equipment:",
+        longLabel: "The product chain for which to buy equipment",
+        label: 'Production chain:',
         placeholder: 'Choose equipment',
         validate: joi.string().required(),
         default: null,
       },
       amount: {
         type: FormFieldType.STRING,
-        label: "Amount:",
+        longLabel: "Buy equipment enough for X products",
+        label: 'For:',
         validate: joi.number().min(1).max(10000).required(),
         default: 0,
       },
@@ -159,7 +169,8 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       productionChainId: {
         type: FormFieldType.DROPDOWN,
-        label: "The production chain which to use to product:",
+        longLabel: "The production chain which to use to product",
+        label: 'Production chain:',
         placeholder: 'Choose production chain',
         validate: joi.string().required(),
         default: null,
@@ -171,13 +182,15 @@ export const bisFunctionsSettings: BisFunctionSettings = {
     fields: {
       amount: {
         type: FormFieldType.STRING,
-        label: "Amount to sell:",
+        longLabel: "Amount to sell",
+        label: 'Amount:',
         validate: joi.number().min(1).max(10000).required(),
         default: 0,
       },
       productId: {
         type: FormFieldType.DROPDOWN,
-        label: "The product to sell:",
+        longLabel: "The product to sell",
+        label: 'Product:',
         validate: joi.string().required(),
         default: null,
       },

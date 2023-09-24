@@ -85,6 +85,7 @@ export type BisFunctionSettings = Record<BisFunctionType, {
   fields: Record<string, {
     type: FormFieldType;
     label: string;
+    longLabel?: string;
     placeholder?: string;
     validate: joi.AnySchema;
     default: any;

@@ -8,13 +8,15 @@ import MonitorAndPlanningContainer from "./containers/MonitorAndPlanning/Monitor
 export default createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<AppContainer/>}>
-      <Route path='/home' element={<MonitorAndPlanningContainer/>}></Route>
-      <Route path='/users' element={<EntitiesUpsertContainer type={EntityUpsertType.USER} />}></Route>
-      <Route path='/resources' element={<EntitiesUpsertContainer type={EntityUpsertType.RESOURCE} />}></Route>
-      <Route path='/credits' element={<EntitiesUpsertContainer type={EntityUpsertType.CREDIT} />}></Route>
-      <Route path='/equipments' element={<EntitiesUpsertContainer type={EntityUpsertType.EQUIPMENT} />}></Route>
-      <Route path='/products' element={<EntitiesUpsertContainer type={EntityUpsertType.PRODUCT} />}></Route>
-      <Route path="*" element={<NotFound />}/>
+      <Route path='/home' element={<MonitorAndPlanningContainer/>}/>
+      <Route path='/users' element={<EntitiesUpsertContainer type={EntityUpsertType.USER} />}/>
+      <Route path='/resources' element={<EntitiesUpsertContainer type={EntityUpsertType.RESOURCE} />}/>
+      <Route path='/credits' element={<EntitiesUpsertContainer type={EntityUpsertType.CREDIT} />}/>
+      <Route path='/equipments' element={<EntitiesUpsertContainer type={EntityUpsertType.EQUIPMENT} />}/>
+      <Route path='/products' element={<EntitiesUpsertContainer type={EntityUpsertType.PRODUCT} />}/>
+      
+      <Route path="*" element={<NotFound />}/>  {/* for /test, /asd */}
+      <Route index element={<MonitorAndPlanningContainer />}/> {/* for empty path */}
     </Route>
   )
 );

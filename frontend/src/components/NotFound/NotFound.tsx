@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 
 const NotFound = () => {
   return (
-    <h1>NotFound</h1>
+    <h1>Цієї сторінки не існує</h1>
   );
 };
 

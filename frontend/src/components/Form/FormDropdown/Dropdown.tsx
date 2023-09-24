@@ -1,3 +1,4 @@
+import { Tooltip } from "@mui/material";
 import React, { FC } from "react";
 import { styled } from "styled-components";
 
@@ -51,6 +52,7 @@ export const Dropdown: FC<{
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onChose: (name: string, option: string) => any;
   isOpen: boolean;
+  longLabel?: string;
   labels: string[];
   options: string[];
   value: string;
@@ -62,6 +64,7 @@ export const Dropdown: FC<{
   setIsOpen,
   onChose,
   isOpen,
+  longLabel,
   labels,
   options,
   value,
@@ -70,36 +73,38 @@ export const Dropdown: FC<{
   name,
 }) => {
   return (
-    <InnerContainer>
-      <button
-        type="button"
-        disabled={!editable}
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <ChosenOptionContainer>
-          {labels[options.findIndex((option) => option === value)] ||
-            labels[options.findIndex((option) => option === defaultValue)] ||
-            placeholder}
-        </ChosenOptionContainer>
-        <div>
-          <Icon type="triangle" />
-        </div>
-      </button>
-      {isOpen && (
-        <OptionsContainer>
-          {options.map((option, optionIndex) => (
-            <Option
-              key={option}
-              onClick={() => {
-                onChose(name, option);
-                setIsOpen(false);
-              }}
-            >
-              {labels[optionIndex]}
-            </Option>
-          ))}
-        </OptionsContainer>
-      )}
-    </InnerContainer>
+    <Tooltip title={longLabel} >
+      <InnerContainer>
+        <button
+          type="button"
+          disabled={!editable}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <ChosenOptionContainer>
+            {labels[options.findIndex((option) => option === value)] ||
+              labels[options.findIndex((option) => option === defaultValue)] ||
+              placeholder}
+          </ChosenOptionContainer>
+          <div>
+            <Icon type="triangle" />
+          </div>
+        </button>
+        {isOpen && (
+          <OptionsContainer>
+            {options.map((option, optionIndex) => (
+              <Option
+                key={option}
+                onClick={() => {
+                  onChose(name, option);
+                  setIsOpen(false);
+                }}
+              >
+                {labels[optionIndex]}
+              </Option>
+            ))}
+          </OptionsContainer>
+        )}
+      </InnerContainer>
+    </Tooltip>
   );
 };
