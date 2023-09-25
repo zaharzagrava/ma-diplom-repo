@@ -70,6 +70,12 @@ export const RootReducerInitialState = {
       success: null as boolean | null, // is there been at least one successful register
     },
 
+    productionChainUpsert: {
+      loading: false as boolean,
+      errors: null as ErrorCodes[] | null,
+      success: null as boolean | null, // is there been at least one successful register
+    },
+
     entitiesGetAll: {
       loading: false as boolean,
       errors: null as ErrorCodes[] | null,
@@ -221,6 +227,28 @@ export const RootReducer = produce(
       case actionTypes.BIS_FUNCTION_DELETE_FAILURE:
         draft.actions.bisFunctionDelete.errors = action.payload.errors;
         draft.actions.bisFunctionDelete.loading = false;
+        break;
+
+      case actionTypes.PRODUCTION_CHAIN_UPSERT:
+        draft.actions.productionChainUpsert.errors = null;
+        draft.actions.productionChainUpsert.loading = true;
+        break;
+      case actionTypes.PRODUCTION_CHAIN_UPSERT_SUCCESS:
+        if(draft.entites?.productionChains) {
+          const index = draft.entites?.productionChains.findIndex(x => x.id === action.payload.id)
+          if(index !== -1) {
+            draft.entites?.productionChains.splice(index, 1, action.payload as any);
+          } else {
+            draft.entites?.productionChains.push(action.payload as any);
+          }
+        }
+
+        draft.actions.productionChainUpsert.errors = null;
+        draft.actions.productionChainUpsert.loading = false;
+        break;
+      case actionTypes.PRODUCTION_CHAIN_UPSERT_FAILURE:
+        draft.actions.productionChainUpsert.errors = action.payload.errors;
+        draft.actions.productionChainUpsert.loading = false;
         break;
 
       case actionTypes.ENTITIES_GET_ALL:

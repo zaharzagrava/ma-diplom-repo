@@ -51,6 +51,7 @@ export const Dropdown: FC<{
   editable?: boolean;
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onChose: (name: string, option: string) => any;
+  onBlur?: () => any;
   isOpen: boolean;
   longLabel?: string;
   labels: string[];
@@ -63,6 +64,7 @@ export const Dropdown: FC<{
   editable = true,
   setIsOpen,
   onChose,
+  onBlur,
   isOpen,
   longLabel,
   labels,
@@ -98,6 +100,7 @@ export const Dropdown: FC<{
                   onChose(name, option);
                   setIsOpen(false);
                 }}
+                onBlur={onBlur}
               >
                 {labels[optionIndex]}
               </Option>

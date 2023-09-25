@@ -51,3 +51,6 @@ endpoint:
   - 3 employees, figure out when credit will be paid out
   - buying a house where you invest into stocks, and calculate when you will be able to build it
 
+current-limitations:
+  - only one production chain per account. initial production chain is created with seeds, user can edit it but not delete
+

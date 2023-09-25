@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op, Transaction } from 'sequelize';
 import * as _ from 'lodash';
@@ -6,7 +11,7 @@ import ProductionChain, {
   ProductionChainScope,
   ProductionChainWithAllFilters,
 } from 'src/models/productionChain.model';
-import User from 'src/models/user.model';
+import User, { UserType } from 'src/models/user.model';
 import { BusinessState } from 'src/business/types';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
 import ProductionChainUser from 'src/models/productionChainUser.model';
@@ -17,6 +22,8 @@ import Resource from 'src/models/resource.model';
 import { SpentResourceDto } from 'src/resource/types';
 import ProductionChainEquipment from 'src/models/productionChainEquipment.model';
 import Equipment from 'src/models/equipment.model';
+import { UsersDbService } from 'src/users-db/users-db.service';
+import { CreateProductionChainDto } from './types';
 
 @Injectable()
 export class ProductionChainService {
@@ -27,6 +34,7 @@ export class ProductionChainService {
 
     private readonly productService: ProductService,
     private readonly resourceService: ResourceService,
+    private readonly usersDbService: UsersDbService,
 
     @InjectModel(ProductionChain)
     private readonly productionChainModel: typeof ProductionChain,
@@ -70,6 +78,150 @@ export class ProductionChainService {
       });
   }
 
+  private async dbUpsert(
+    productionChainUpsert: Partial<CreateProductionChainDto>,
+    tx?: Transaction,
+  ) {
+    return await this.dbU.wrapInTransaction(async (tx) => {
+      const productionChain = await this.productionChainModel.findOne({
+        where: { name: productionChainUpsert.name },
+        transaction: tx,
+      });
+
+      if (!productionChain) {
+        await this.productionChainModel.create(productionChainUpsert, {
+          transaction: tx,
+        });
+      } else {
+        await this.productionChainModel.update(productionChainUpsert, {
+          where: { name: productionChainUpsert.name },
+          transaction: tx,
+        });
+      }
+
+      return await this.productionChainModel.findOne({
+        where: { name: productionChainUpsert.name },
+        transaction: tx,
+      });
+    });
+  }
+
+  /**
+   * upsert
+   */
+  public upsert(
+    {
+      name,
+      productId,
+      equipments,
+      users,
+      resources,
+    }: {
+      name?: string;
+      productId?: string;
+      equipments: { id: string; amount: number }[];
+      users: { id: string }[];
+      resources: { id: string; amount: number }[];
+    },
+    tx?: Transaction,
+  ) {
+    this.dbU.wrapInTransaction(async (tx) => {
+      try {
+        const productionChain = await this.findOne({
+          name,
+        });
+
+        if (!productionChain)
+          throw new NotFoundException('Production chain is not found');
+
+        await this.cleanUpProductionChain({
+          id: productionChain.id,
+          tx,
+        });
+
+        await this.dbUpsert(
+          {
+            name,
+            productId,
+          },
+          tx,
+        );
+
+        for (const equipment of equipments) {
+          await this.productionChainEquipmentModel.create({
+            equipmentId: equipment.id,
+            productionChainId: productionChain.id,
+            amount: equipment.amount,
+          });
+        }
+
+        for (const resource of resources) {
+          await this.productionChainResourceModel.create({
+            resourceId: resource.id,
+            productionChainId: productionChain.id,
+            amount: resource.amount,
+          });
+        }
+
+        const prodChainUsers = await this.getUserTypes(productionChain.id, tx);
+
+        const dbUsers = await this.usersDbService.findAll({
+          id: users.map((x) => x.id),
+        });
+
+        for (const user of users) {
+          const dbUser = dbUsers.find((u) => u.id === user.id);
+
+          if (!dbUser) {
+            throw new BadRequestException(`Incorrect user id ${user.id}`);
+          }
+
+          this.ensureCorrectUserType(prodChainUsers, dbUser);
+
+          await this.productionChainUserModel.create({
+            userId: user.id,
+            productionChainId: productionChain.id,
+            type: dbUser.type,
+          });
+        }
+      } catch (error) {
+        console.log('@error');
+        console.log(JSON.stringify(error, null, 2));
+      }
+    }, tx);
+  }
+
+  /**
+   * cleanUpProductionChain
+   */
+  public async cleanUpProductionChain({
+    id,
+    tx,
+  }: {
+    id: string;
+    tx?: Transaction;
+  }) {
+    await this.productionChainResourceModel.destroy({
+      where: { productionChainId: id },
+      transaction: tx,
+    });
+
+    await this.productionChainEquipmentModel.destroy({
+      where: { productionChainId: id },
+      transaction: tx,
+    });
+
+    await this.productionChainUserModel.destroy({
+      where: {
+        productionChainId: id,
+        userId: {
+          [Op.not]: null,
+        },
+      },
+      transaction: tx,
+    });
+  }
+
   /**
    * hireEmployee
    */
@@ -96,16 +248,9 @@ export class ProductionChainService {
         transaction: tx,
       });
 
-      const prodChainUsers = await this.productionChainUserModel.findAll({
-        where: { userId: null, productionChainId: productionChain.id },
-        transaction: tx,
-      });
+      const prodChainUsers = await this.getUserTypes(productionChain.id, tx);
 
-      if (!prodChainUsers.find((x) => x.type === user.type)) {
-        throw new Error(
-          `User of type ${user.type} cannot be assigned to the production chain`,
-        );
-      }
+      this.ensureCorrectUserType(prodChainUsers, user);
 
       if (prodChainUser) {
         if (prodChainUser.productionChain.id === productionChain.id) {
@@ -141,6 +286,24 @@ export class ProductionChainService {
         reassignedFrom,
       };
     }, tx);
+  }
+
+  private ensureCorrectUserType(
+    prodChainUsers: ProductionChainUser[],
+    user: { type: UserType },
+  ) {
+    if (!prodChainUsers.find((x) => x.type === user.type)) {
+      throw new Error(
+        `User of type ${user.type} cannot be assigned to the production chain`,
+      );
+    }
+  }
+
+  private async getUserTypes(productionChainId: string, tx: Transaction) {
+    return await this.productionChainUserModel.findAll({
+      where: { userId: null, productionChainId },
+      transaction: tx,
+    });
   }
 
   /**

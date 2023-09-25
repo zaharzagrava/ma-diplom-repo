@@ -121,6 +121,32 @@ export interface ProductionChain {
   name: string;
   productId: string;
   product: Product;
+  prodChainEquipments: ProductionChainEquipment[];
+  prodChainResources: ProductionChainResource[];
+  prodChainUsers: ProductionChainUser[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ProductionChainEquipment {
+  id: string;
+  amount: number;
+  equipmentId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ProductionChainResource {
+  id: string;
+  amount: number;
+  resourceId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ProductionChainUser {
+  id: string;
+  userId: string;
   createdAt: Date;
   updatedAt: Date;
 }

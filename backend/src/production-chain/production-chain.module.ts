@@ -10,6 +10,8 @@ import { ProductModule } from 'src/product/product.module';
 import { ResourceModule } from 'src/resource/resource.module';
 import ProductionChainResource from 'src/models/productionChainResource.model';
 import ProductionChainEquipment from 'src/models/productionChainEquipment.model';
+import { UsersDbModule } from 'src/users-db/users-db.module';
+import { ProductionChainController } from './production-chain.controller';
 
 @Module({
   imports: [
@@ -24,8 +26,9 @@ import ProductionChainEquipment from 'src/models/productionChainEquipment.model'
     UtilsModule,
     ProductModule,
     ResourceModule,
+    UsersDbModule,
   ],
-  controllers: [],
+  controllers: [ProductionChainController],
   providers: [ProductionChainService],
   exports: [ProductionChainService],
 })

@@ -4,7 +4,7 @@ import { ErrorCodes } from '../error';
 import { firebaseAuth } from '../firebase';
 import router from '../router';
 import {
-  actionTypes, AppAction, BisFunctionDelete, BisFunctionOrderChange, BisFunctionUpsert, EntityDelete, EntityUpsert, FailureAppAction, FailureAppActionTypes,
+  actionTypes, AppAction, BisFunctionDelete, BisFunctionOrderChange, BisFunctionUpsert, EntityDelete, EntityUpsert, FailureAppAction, FailureAppActionTypes, ProductionChainUpsert,
 } from './actions';
 import { Entities, Entity, EntityUpsertable } from './types';
 
@@ -205,6 +205,23 @@ function* entityDelete(params: EntityDelete) {
   }
 }
 
+function* productionChainUpsert(params: ProductionChainUpsert) {
+  try {
+    const response: {
+      data: string
+    } = yield call(() => {
+      return axios.put('http://localhost:8000/api/production-chain', params.payload);
+    });
+
+    yield put<AppAction>({
+      type: 'ENTITY_DELETE_SUCCESS',
+      payload: response.data
+    });
+  } catch (error) {
+    yield call(errorHandler, error, 'ENTITY_DELETE_FAILURE');
+  }
+}
+
 export const rootSaga = function* rootSaga() {
   yield takeLeading(actionTypes.GET_MYSELF, getMyself);
   yield takeLeading(actionTypes.PLAN, plan);
@@ -215,4 +232,5 @@ export const rootSaga = function* rootSaga() {
   yield takeLeading(actionTypes.ENTITIES_GET_ALL, entitiesGetAll);
   yield takeLeading(actionTypes.ENTITY_UPSERT, entityUpsert);
   yield takeLeading(actionTypes.ENTITY_DELETE, entityDelete);
+  yield takeLeading(actionTypes.PRODUCTION_CHAIN_UPSERT, productionChainUpsert);
 };

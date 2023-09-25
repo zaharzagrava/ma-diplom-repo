@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { CreateUserDto } from './types';
-import User, { UserScope, UserWithAllFilters } from 'src/models/user.model';
-import { ScopeOptions, Transaction } from 'sequelize';
+import User from 'src/models/user.model';
+import { Transaction } from 'sequelize';
 import { DbUtilsService } from 'src/utils/db-utils/db-utils.service';
 import { BusinessState } from 'src/business/types';
 import ProductionChain from 'src/models/productionChain.model';
@@ -10,12 +10,14 @@ import { ProductionChainService } from 'src/production-chain/production-chain.se
 import { UtilsService } from 'src/utils/utils/utils.service';
 import * as _ from 'lodash';
 import { UserUpsertDto } from 'src/entities/types';
+import { UsersDbService } from 'src/users-db/users-db.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly dbU: DbUtilsService,
     private readonly u: UtilsService,
+    private readonly usersDbService: UsersDbService,
     private readonly productionChainService: ProductionChainService,
 
     @InjectModel(User) private userModel: typeof User,
@@ -50,34 +52,6 @@ export class UsersService {
     });
   }
 
-  public findOne(
-    params?: UserWithAllFilters,
-    tx?: Transaction,
-  ): Promise<User | null> {
-    return this.userModel
-      .scope({
-        method: [UserScope.WithAll, <UserWithAllFilters>params],
-      })
-      .findOne({
-        transaction: tx,
-      });
-  }
-
-  public async findAll(
-    params?: UserWithAllFilters,
-    tx?: Transaction,
-  ): Promise<User[]> {
-    const users = await this.userModel
-      .scope({
-        method: [UserScope.WithAll, <UserWithAllFilters>params],
-      })
-      .findAll({
-        transaction: tx,
-      });
-
-    return users.filter((x) => x.email !== 'zaharzagrava@gmail.com');
-  }
-
   public async hireEmployee({
     businessState,
     user,
@@ -88,8 +62,12 @@ export class UsersService {
     user: User;
     productionChain: ProductionChain;
     tx: Transaction;
-  }): Promise<User> {
+  }): Promise<{
+    user: User;
+    otherLogs: string[];
+  }> {
     return await this.dbU.wrapInTransaction(async (tx) => {
+      const otherLogs: string[] = [];
       await this.userModel.update(
         { employedAt: businessState.period },
         {
@@ -111,20 +89,20 @@ export class UsersService {
         if (
           error.message.includes('cannot be assigned to the production chain')
         ) {
-          this.u.pushAndRecordPrompt(businessState, `- ${error.message}`);
-          return businessState;
+          otherLogs.push(error.message);
+          return { user, otherLogs };
         } else if (
           error.message ===
           'Production chain already assigned, no actions taken'
         ) {
-          this.u.pushAndRecordPrompt(businessState, `- ${error.message}`);
-          return businessState;
+          otherLogs.push(error.message);
+          return { user, otherLogs };
         }
 
         throw error;
       }
 
-      return user;
+      return { user, otherLogs };
     }, tx);
   }
 
@@ -174,7 +152,10 @@ export class UsersService {
     }[]
   > {
     return await this.dbU.wrapInTransaction(async (tx) => {
-      const employedUsers = await this.findAll({ employed: true }, tx);
+      const employedUsers = await this.usersDbService.findAll(
+        { employed: true },
+        tx,
+      );
 
       const paidUsers = [];
       for (const user of employedUsers) {

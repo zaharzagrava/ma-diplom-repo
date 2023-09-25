@@ -44,6 +44,7 @@ import { UtilsService } from 'src/utils/utils/utils.service';
 import { UsersService } from 'src/users/users.service';
 import { ProductionChainService } from 'src/production-chain/production-chain.service';
 import { EquipmentService } from 'src/equipment/equipment.service';
+import { UsersDbService } from 'src/users-db/users-db.service';
 
 @Injectable()
 export class BisFunctionService {
@@ -52,9 +53,9 @@ export class BisFunctionService {
   constructor(
     private readonly dbUtilsService: DbUtilsService,
     private readonly productService: ProductService,
-    private readonly periodService: PeriodService,
     private readonly creditService: CreditService,
     private readonly resourceService: ResourceService,
+    private readonly usersDbService: UsersDbService,
     private readonly usersService: UsersService,
     private readonly equipmentService: EquipmentService,
     private readonly productionChainService: ProductionChainService,
@@ -160,7 +161,7 @@ export class BisFunctionService {
         'Invalid HIRE_EMPLOYEE record, not productionChainId field',
       );
 
-    const user = await this.usersService.findOne(
+    const user = await this.usersDbService.findOne(
       { id: bisFunction.userId },
       tx,
     );
@@ -196,7 +197,7 @@ export class BisFunctionService {
 
     if (!bisFunction.userId) throw new Error('Invalid FIRE_EMPLOYEE record');
 
-    const user = await this.usersService.findOne(
+    const user = await this.usersDbService.findOne(
       { id: bisFunction.userId },
       tx,
     );
@@ -888,7 +889,7 @@ export class BisFunctionService {
     tx: Transaction,
   ): Promise<BusinessState> {
     try {
-      await this.usersService.hireEmployee({
+      const { otherLogs } = await this.usersService.hireEmployee({
         businessState,
         user: bisFunction.user,
         productionChain: bisFunction.productionChain,
@@ -898,6 +899,10 @@ export class BisFunctionService {
       this.u.pushAndRecordPrompt(
         businessState,
         `[${bisFunction.name}] ${bisFunction.user.fullName} was hired on ${bisFunction.productionChain.name}`,
+      );
+
+      otherLogs.forEach((x) =>
+        this.u.pushAndRecordPrompt(businessState, `- ${x}`),
       );
     } catch (error) {
       if (

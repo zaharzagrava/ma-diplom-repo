@@ -40,7 +40,7 @@ interface Props {
 const Container = styled.div`
   display: grid;
   grid-gap: 20px;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: minmax(auto, 0.4fr) 1fr;
   grid-auto-flow: row;
 
   align-items: center;

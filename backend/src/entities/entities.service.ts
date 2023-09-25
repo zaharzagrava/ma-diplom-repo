@@ -6,6 +6,7 @@ import { UsersService } from 'src/users/users.service';
 import { ProductionChainService } from 'src/production-chain/production-chain.service';
 import { EntityDeleteDto, EntityUpsertDto, EntityUpsertType } from './types';
 import { EquipmentService } from 'src/equipment/equipment.service';
+import { UsersDbService } from 'src/users-db/users-db.service';
 
 @Injectable()
 export class EntitiesService {
@@ -16,7 +17,7 @@ export class EntitiesService {
     private readonly creditService: CreditService,
     private readonly equipmentService: EquipmentService,
     private readonly resourceService: ResourceService,
-    private readonly usersService: UsersService,
+    private readonly usersDbService: UsersDbService,
     private readonly productionChainService: ProductionChainService,
   ) {}
 
@@ -25,8 +26,12 @@ export class EntitiesService {
       this.productService.findAll(),
       this.resourceService.findAll(),
       this.creditService.findAll(),
-      this.usersService.findAll(),
-      this.productionChainService.findAll(),
+      this.usersDbService.findAll(),
+      this.productionChainService.findAll({
+        prodChainEquipments: true,
+        prodChainResources: true,
+        prodChainUsers: true,
+      }),
       this.equipmentService.findAll(),
     ]);
 
@@ -46,7 +51,7 @@ export class EntitiesService {
     let resp: any;
     switch (entityUpsert.__type__) {
       case EntityUpsertType.USER:
-        resp = await this.usersService.upsert(entityUpsert);
+        resp = await this.usersDbService.upsert(entityUpsert);
         resp = resp.get({ plain: true });
         resp.__type__ = EntityUpsertType.USER;
         return resp;

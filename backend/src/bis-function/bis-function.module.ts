@@ -18,6 +18,7 @@ import { UtilsModule } from 'src/utils/utils/utils.module';
 import { ProductionChainModule } from 'src/production-chain/production-chain.module';
 import { UsersModule } from 'src/users/users.module';
 import { EquipmentModule } from 'src/equipment/equipment.module';
+import { UsersDbModule } from 'src/users-db/users-db.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { EquipmentModule } from 'src/equipment/equipment.module';
     CreditModule,
     ResourceModule,
     UtilsModule,
+    UsersDbModule,
     UsersModule,
     ProductionChainModule,
     EquipmentModule,

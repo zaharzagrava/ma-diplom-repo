@@ -4,6 +4,7 @@ import AppContainer from "./containers/AppContainer/AppContainer"
 import EntitiesUpsertContainer from "./containers/EntityUpsert/EntitiesUpsertContainer/EntitiesUpsertContainer";
 import { EntityUpsertType } from "./containers/EntityUpsert/types";
 import MonitorAndPlanningContainer from "./containers/MonitorAndPlanning/MonitorAndPlanning";
+import ProductionChainsContainer from "./containers/ProductionChain/EntitiesUpsertContainer/EntitiesUpsertContainer";
 
 export default createBrowserRouter(
   createRoutesFromElements(
@@ -14,6 +15,7 @@ export default createBrowserRouter(
       <Route path='/credits' element={<EntitiesUpsertContainer type={EntityUpsertType.CREDIT} />}/>
       <Route path='/equipments' element={<EntitiesUpsertContainer type={EntityUpsertType.EQUIPMENT} />}/>
       <Route path='/products' element={<EntitiesUpsertContainer type={EntityUpsertType.PRODUCT} />}/>
+      <Route path='/production-chains' element={<ProductionChainsContainer  />}/>
       
       <Route path="*" element={<NotFound />}/>  {/* for /test, /asd */}
       <Route index element={<MonitorAndPlanningContainer />}/> {/* for empty path */}

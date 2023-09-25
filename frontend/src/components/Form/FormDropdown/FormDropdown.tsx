@@ -54,9 +54,6 @@ export const FormDropdown = ({
   const ref = useRef<HTMLDivElement>(null);
   useOutsideClick(ref, () => setIsOpen(false));
 
-  console.log('@longLabel');
-  console.log(longLabel);
-
   return (
     <Container
       ref={ref}
@@ -69,7 +66,10 @@ export const FormDropdown = ({
           return <Dropdown
             editable={editable}
             setIsOpen={setIsOpen}
-            onChose={form.setFieldValue.bind(this)}
+            onChose={(name, option) => {
+              form.setFieldTouched(name, true)
+              return form.setFieldValue.bind(this)(name, option)
+            }}  
             isOpen={isOpen}
             longLabel={longLabel}
             labels={labels}

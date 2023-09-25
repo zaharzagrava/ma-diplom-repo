@@ -1,7 +1,8 @@
 import { EntityUpsertDto, EntityUpsertType } from "../containers/EntityUpsert/types";
+import { ProductionChainUpsertDto } from "../containers/ProductionChain/types";
 import { ErrorCodes } from "../error";
 import { BisFunctionChangeOrderDto as BisFunctionOrderChangeDto, BisFunctionDeleteDto, BisFunctionDto, BisFunctionEditDto } from "./bis-function.types";
-import { BisMetriscDto, Credit, Entities, Entity, Myself, Product, Resource, EntityUpsertable } from "./types";
+import { BisMetriscDto, Credit, Entities, Entity, Myself, Product, Resource, EntityUpsertable, ProductionChain } from "./types";
 
 /* Action Types */
 export const actionTypes = {
@@ -40,6 +41,12 @@ export const actionTypes = {
     "BIS_FUNCTION_DELETE_SUCCESS" as "BIS_FUNCTION_DELETE_SUCCESS",
   BIS_FUNCTION_DELETE_FAILURE:
     "BIS_FUNCTION_DELETE_FAILURE" as "BIS_FUNCTION_DELETE_FAILURE",
+
+  PRODUCTION_CHAIN_UPSERT: "PRODUCTION_CHAIN_UPSERT" as "PRODUCTION_CHAIN_UPSERT",
+  PRODUCTION_CHAIN_UPSERT_SUCCESS:
+    "PRODUCTION_CHAIN_UPSERT_SUCCESS" as "PRODUCTION_CHAIN_UPSERT_SUCCESS",
+  PRODUCTION_CHAIN_UPSERT_FAILURE:
+    "PRODUCTION_CHAIN_UPSERT_FAILURE" as "PRODUCTION_CHAIN_UPSERT_FAILURE",
 
   ENTITIES_GET_ALL: "ENTITIES_GET_ALL" as "ENTITIES_GET_ALL",
   ENTITIES_GET_ALL_SUCCESS:
@@ -189,6 +196,23 @@ export interface BisFunctionDeleteFailure {
   };
 }
 
+export interface ProductionChainUpsert {
+  type: typeof actionTypes.PRODUCTION_CHAIN_UPSERT;
+  payload: ProductionChainUpsertDto;
+}
+
+export interface ProductionChainUpsertSuccess {
+  type: typeof actionTypes.PRODUCTION_CHAIN_UPSERT_SUCCESS;
+  payload: ProductionChain;
+}
+
+export interface ProductionChainUpsertFailure {
+  type: typeof actionTypes.PRODUCTION_CHAIN_UPSERT_FAILURE;
+  payload: {
+    errors: ErrorCodes[];
+  };
+}
+
 export interface EntitiesGetAll {
   type: typeof actionTypes.ENTITIES_GET_ALL;
 }
@@ -284,6 +308,7 @@ export type FailureAppActionTypes =
   | typeof actionTypes.ENTITIES_GET_ALL_FAILURE
   | typeof actionTypes.ENTITY_UPSERT_FAILURE
   | typeof actionTypes.ENTITY_DELETE_FAILURE
+  | typeof actionTypes.PRODUCTION_CHAIN_UPSERT_FAILURE
   ;
 
 
@@ -295,6 +320,7 @@ export type FailureAppAction =
   | BisFunctionUpsertFailure
   | BisFunctionOrderChangeFailure
   | BisFunctionDeleteFailure
+  | ProductionChainUpsertFailure
   | EntitiesGetAllFailure
   | EntityUpsertFailure
   | EntityDeleteFailure
@@ -320,6 +346,9 @@ export type AppAction =
   | BisFunctionDelete
   | BisFunctionDeleteSuccess
   | BisFunctionDeleteFailure
+  | ProductionChainUpsert
+  | ProductionChainUpsertSuccess
+  | ProductionChainUpsertFailure
   | EntitiesGetAll
   | EntitiesGetAllSuccess
   | EntitiesGetAllFailure

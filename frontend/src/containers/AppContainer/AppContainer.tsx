@@ -131,6 +131,9 @@ const AppContainer = () => {
               <ListElem>
                 <Link to="/products">Продукція</Link>
               </ListElem>
+              <ListElem>
+                <Link to="/production-chains">Ланцюги Виробництва</Link>
+              </ListElem>
             </List>
           </Aside>
           <Main>
