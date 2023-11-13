@@ -1,0 +1,85 @@
+default: 
+  image: node:16.15.0
+
+stages:
+  - build
+  - test
+  - pack
+  - migration
+  - deploy
+
+build-backend:
+  stage: build
+  script:
+    - cd backend
+    - yarn
+    - npx -c 'eslint ./src'
+    - yarn run build
+  artifacts:
+    paths:
+      - backend/dist
+    expire_in: 1 hour
+  only:
+    - master
+
+build-frontend:
+  stage: build
+  variables:
+    NODE_ENV: development
+  script:
+    - cd frontend
+    - yarn
+    - npx -c 'eslint ./src'
+    - yarn run build
+  artifacts:
+    paths:
+      - frontend/build
+    expire_in: 1 hour
+  only:
+    - master
+
+build-deployment-package:
+  stage: pack
+  script:
+    - cd backend
+    - rm -rf node_modules
+    - yarn install --production
+    - cd ..
+    - cp -R backend/dist/. deploy/dist/
+    - cp -R frontend/build/. deploy/build/
+    - cp -R backend/node_modules/. deploy/node_modules/
+  artifacts:
+    paths:
+      - deploy
+    expire_in: 1 hour
+  only:
+    - master
+
+db-migration:
+  stage: migration
+  environment: $CI_COMMIT_BRANCH
+  script:
+    - cd backend
+    - echo "Installing sequelize"
+    - npm install -g sequelize sequelize-cli pg
+    - npm install --save sequelize
+    - echo "Running the migrations"
+    - npx sequelize-cli db:migrate --url $DB_URI
+  only:
+    - master
+
+deploy-app:
+  stage: deploy
+  image: tyrellsys/aws-ebcli
+  environment: $CI_COMMIT_BRANCH
+  script:
+    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
+    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
+    - aws configure set region eu-central-1
+    - cd deploy
+    - if [ "$CI_COMMIT_BRANCH" == "master" ]; then ENV_KEY="dev"; fi
+    - eb init --region=eu-central-1 --platform="arn:aws:elasticbeanstalk:eu-central-1::platform/Node.js 16 running on 64bit Amazon Linux 2/5.5.0" "something"
+    - eb use "something-$ENV_KEY"
+    - eb deploy
+  only:
+    - master
