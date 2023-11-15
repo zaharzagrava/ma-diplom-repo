@@ -1,10 +1,10 @@
 import Axios from 'axios'
-import { Config } from '../config';
+import { Config, getApiHostname } from '../config';
 import { firebaseAuth } from '../firebase';
 
 export class InterceptorService {
   public static init(appConfig: Config): void {
-    Axios.defaults.baseURL = `${appConfig.host}${appConfig.apiBaseUrl}`;
+    Axios.defaults.baseURL = `${getApiHostname()}${appConfig.apiBaseUrl}`;
 
     InterceptorService.addRequestInterceptor();
   }
